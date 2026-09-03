@@ -1,128 +1,170 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BAIA VIVA 9.0 - 48 Praias com Itaparica | Prof. Edson</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAIA VIVA 10.0 - Bahia Completa com Foz e Mangues | Prof Edson</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
 header{background:linear-gradient(90deg,#0b5394,#00b4d8);color:white;padding:16px;text-align:center}
-header h1{font-size:1.5rem} header p{font-size:.85rem;opacity:.95;margin-top:4px}
+header h1{font-size:1.45rem} header p{font-size:.8rem;margin-top:4px;line-height:1.3}
 .filters{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:10px;background:#eef4fb;position:sticky;top:0;z-index:500}
-.filters button{border:1px solid #0b5394;background:white;color:#0b5394;padding:6px 12px;border-radius:20px;cursor:pointer;font-weight:700;font-size:.78rem}
+.filters button{border:1px solid #0b5394;background:white;color:#0b5394;padding:6px 11px;border-radius:20px;cursor:pointer;font-weight:700;font-size:.75rem}
 .filters button.active,.filters button:hover{background:#0b5394;color:white}
-#map{height:65vh;width:100%}
+#map{height:68vh;width:100%}
 #painel{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px;background:#f8f9fb}
 .card{background:white;border-radius:12px;padding:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-.card h3{font-size:.95rem;color:#0b5394;margin-bottom:6px}
-.small{font-size:.8rem;line-height:1.4}
 @media(max-width:700px){#painel{grid-template-columns:1fr}}
-</style>
-</head>
-<body>
+</style></head><body>
 <header>
-<h1>🌊 BAIA VIVA 9.0 - 48 PRAIAS</h1>
-<p>⭐ BTS Salvador: Periperi a Paripe | Atlântica até Flamengo | 14 praias ITAPARICA e Vera Cruz | Prof. Edson Freitas</p>
+<h1>🌊 BAIA VIVA 10.0 - BAHIA DE PONTA A PONTA</h1>
+<p>⭐ 68 Praias + 12 Foz/Mangues | Ilhéus, Itacaré, Linha Verde Completa | Foz dos Rios | Prof. Edson + Prof. Gemerson</p>
 </header>
 <div class="filters">
-<button class="active" onclick="filtrar('Todas',this)">Todas (48)</button>
-<button onclick="filtrar('Salvador BTS',this)">🏠 Salvador BTS (10)</button>
-<button onclick="filtrar('Salvador Atlântica',this)">🌊 Atlântica (12)</button>
-<button onclick="filtrar('Ilha de Itaparica',this)">⭐ ITAPARICA (14)</button>
-<button onclick="filtrar('Baía de Todos-os-Santos',this)">BTS Ilhas</button>
-<button onclick="filtrar('Baía de Camamu',this)">Camamu</button>
-<button onclick="filtrar('Litoral Norte',this)">Litoral Norte</button>
+<button class="active" onclick="filtrar('Todas',this)">Todas (80)</button>
+<button onclick="filtrar('Salvador BTS',this)">BTS Salvador</button>
+<button onclick="filtrar('Salvador Atlântica',this)">Atlântica</button>
+<button onclick="filtrar('Ilha de Itaparica',this)">⭐ ITAPARICA</button>
+<button onclick="filtrar('Litoral Norte',this)">Linha Verde</button>
+<button onclick="filtrar('Baixo Sul',this)">Itacaré/Ilhéus</button>
 <button onclick="filtrar('Extremo Sul',this)">Extremo Sul</button>
+<button onclick="filtrar('Foz e Mangue',this)" style="background:#e8f5e9;border-color:#2e7d32;color:#2e7d32">🌱 Foz e Mangues (12)</button>
 </div>
 <div id="map"></div>
 <div id="painel">
-<div class="card"><h3>📊 % Próprias por Região</h3><canvas id="grafico" height="180"></canvas></div>
-<div class="card"><h3>📲 Compartilhar + QR Code</h3>
-<p class="small">Link oficial:<br><b>https://edson1302.github.io/baia-viva-litoral/</b></p>
-<img style="margin:8px 0;border-radius:8px;border:1px solid #ddd" src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=https://edson1302.github.io/baia-viva-litoral/" width="130">
-<br><a style="background:#25d366;color:white;padding:7px 12px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:.8rem" target="_blank" href="https://wa.me/?text=Conheca%20o%20BAIA%20VIVA%209.0%20-%2048%20praias%20de%20Salvador%20e%20ITAPARICA%20do%20Prof.%20Edson%20https://edson1302.github.io/baia-viva-litoral/">📲 WhatsApp</a>
-<p class="small" style="margin-top:8px"><b>🎣 Pesca:</b> BTS cheia 08h robalo | Itaparica vento NE 12km/h | Temp 27C</p>
+<div class="card"><h3>📊 Balneabilidade por Trecho</h3><canvas id="grafico" height="180"></canvas></div>
+<div class="card"><h3>📲 Compartilhar</h3>
+<p style="font-size:.8rem"><b>https://edson1302.github.io/baia-viva-litoral/</b></p>
+<img style="margin:8px 0;border-radius:8px;border:1px solid #ddd" src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=https://edson1302.github.io/baia-viva-litoral/" width="130"><br>
+<a style="background:#25d366;color:white;padding:7px 12px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:.8rem" target="_blank" href="https://wa.me/?text=BAIA%20VIVA%2010.0%20-%2080%20pontos%20da%20Bahia%20completa%20com%20Foz%20e%20Mangues%20do%20Prof.%20Edson%20https://edson1302.github.io/baia-viva-litoral/">📲 WhatsApp</a>
+<p style="font-size:.75rem;margin-top:8px"><b>🎣 Prof. Gemerson:</b> Itacaré/Ilhéus com destaque | Manguezais de Canavieiras e Belmonte</p>
 </div>
 </div>
 <script>
 const site="https://edson1302.github.io/baia-viva-litoral/";
 const praias=[
-// === SALVADOR BTS 10 ===
-{name:"Paripe - Salvador BTS",lat:-12.842,lng:-38.483,regiao:"Salvador BTS",cond:"BOA",bal:"71%",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Sao Tome de Paripe",lat:-12.822,lng:-38.488,regiao:"Salvador BTS",cond:"BOA",bal:"74%",foto:"https://images.unsplash.com/photo-1519046904884-53103b34f59d?w=400"},
-{name:"Tubarao - Salvador",lat:-12.811,lng:-38.489,regiao:"Salvador BTS",cond:"IMPROPRIA",bal:"48%",foto:"https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?w=400"},
-{name:"PERIPERI - Casa Prof. Edson ⭐",lat:-12.791,lng:-38.488,regiao:"Salvador BTS",cond:"ALERTA",bal:"62%",foto:"https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400"},
-{name:"Itacaranha - Periperi",lat:-12.785,lng:-38.485,regiao:"Salvador BTS",cond:"ALERTA",bal:"65%",foto:"https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400"},
-{name:"Plataforma",lat:-12.77,lng:-38.49,regiao:"Salvador BTS",cond:"IMPROPRIA",bal:"52%",foto:"https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=400"},
-{name:"Penha - Salvador",lat:-12.76,lng:-38.495,regiao:"Salvador BTS",cond:"BOA",bal:"70%",foto:"https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=400"},
-{name:"Ribeira - Salvador",lat:-12.91,lng:-38.51,regiao:"Salvador BTS",cond:"IMPROPRIA",bal:"50%",foto:"https://images.unsplash.com/photo-1530549387789-4c1017266635?w=400"},
-{name:"Bonfim - Salvador",lat:-12.923,lng:-38.51,regiao:"Salvador BTS",cond:"IMPROPRIA",bal:"49%",foto:"https://images.unsplash.com/photo-1437719417032-8595fd9e9dc6?w=400"},
-{name:"Boa Viagem - Salvador",lat:-12.927,lng:-38.505,regiao:"Salvador BTS",cond:"ALERTA",bal:"58%",foto:"https://images.unsplash.com/photo-1520454974749-611b7248ffdb?w=400"},
-// === SALVADOR ATLANTICA 12 ===
-{name:"Farol da Barra",lat:-13.0107,lng:-38.5327,regiao:"Salvador Atlântica",cond:"BOA",bal:"78%",foto:"https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400"},
-{name:"Ondina",lat:-13.01,lng:-38.51,regiao:"Salvador Atlântica",cond:"BOA",bal:"80%",foto:"https://images.unsplash.com/photo-1544550581-5f7ceaf7f992?w=400"},
-{name:"Rio Vermelho",lat:-13.016,lng:-38.495,regiao:"Salvador Atlântica",cond:"ALERTA",bal:"66%",foto:"https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?w=400"},
-{name:"Amaralina",lat:-13.01,lng:-38.49,regiao:"Salvador Atlântica",cond:"BOA",bal:"82%",foto:"https://images.unsplash.com/photo-1437719417032-8595fd9e9dc6?w=400"},
-{name:"Pituba",lat:-13.01,lng:-38.47,regiao:"Salvador Atlântica",cond:"BOA",bal:"84%",foto:"https://images.unsplash.com/photo-1520454974749-611b7248ffdb?w=400"},
-{name:"Armacao",lat:-12.99,lng:-38.45,regiao:"Salvador Atlântica",cond:"BOA",bal:"85%",foto:"https://images.unsplash.com/photo-1489185078259-e9bcb96bc4f1?w=400"},
-{name:"Boca do Rio",lat:-12.98,lng:-38.43,regiao:"Salvador Atlântica",cond:"ALERTA",bal:"68%",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Corsario - Salvador",lat:-12.97,lng:-38.41,regiao:"Salvador Atlântica",cond:"BOA",bal:"86%",foto:"https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=400"},
-{name:"Piata - Salvador",lat:-12.96,lng:-38.39,regiao:"Salvador Atlântica",cond:"BOA",bal:"87%",foto:"https://images.unsplash.com/photo-1530549387789-4c1017266635?w=400"},
-{name:"Itapua - Salvador",lat:-12.95,lng:-38.36,regiao:"Salvador Atlântica",cond:"BOA",bal:"88%",foto:"https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=400"},
-{name:"Stella Maris - Salvador",lat:-12.94,lng:-38.33,regiao:"Salvador Atlântica",cond:"BOA",bal:"93%",foto:"https://images.unsplash.com/photo-1530549387789-4c1017266635?w=400"},
-{name:"Flamengo - Salvador",lat:-12.92,lng:-38.31,regiao:"Salvador Atlântica",cond:"BOA",bal:"90%",foto:"https://images.unsplash.com/photo-1489185078259-e9bcb96bc4f1?w=400"},
-// === ILHA DE ITAPARICA E VERA CRUZ - 14 PRAIAS NOVAS ===
-{name:"Mar Grande - Vera Cruz",lat:-12.971,lng:-38.62,regiao:"Ilha de Itaparica",cond:"BOA",bal:"90%",foto:"https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400"},
-{name:"Barra do Gil - Vera Cruz",lat:-12.99,lng:-38.63,regiao:"Ilha de Itaparica",cond:"BOA",bal:"91%",foto:"https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400"},
-{name:"Barra do Pote - Vera Cruz",lat:-13.0,lng:-38.64,regiao:"Ilha de Itaparica",cond:"BOA",bal:"92%",foto:"https://images.unsplash.com/photo-1519046904884-53103b34f59d?w=400"},
-{name:"Amoreiras - Vera Cruz",lat:-13.02,lng:-38.65,regiao:"Ilha de Itaparica",cond:"BOA",bal:"89%",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Ponta de Areia - Itaparica",lat:-12.89,lng:-38.68,regiao:"Ilha de Itaparica",cond:"BOA",bal:"88%",foto:"https://images.unsplash.com/photo-1520454974749-611b7248ffdb?w=400"},
-{name:"Conceicao - Itaparica",lat:-12.895,lng:-38.68,regiao:"Ilha de Itaparica",cond:"BOA",bal:"87%",foto:"https://images.unsplash.com/photo-1437719417032-8595fd9e9dc6?w=400"},
-{name:"Berlinque - Vera Cruz",lat:-13.04,lng:-38.66,regiao:"Ilha de Itaparica",cond:"BOA",bal:"90%",foto:"https://images.unsplash.com/photo-1544550581-5f7ceaf7f992?w=400"},
-{name:"Barra Grande - Vera Cruz",lat:-13.06,lng:-38.67,regiao:"Ilha de Itaparica",cond:"BOA",bal:"93%",foto:"https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?w=400"},
-{name:"Aratuba - Vera Cruz",lat:-13.08,lng:-38.68,regiao:"Ilha de Itaparica",cond:"BOA",bal:"94%",foto:"https://images.unsplash.com/photo-1530549387789-4c1017266635?w=400"},
-{name:"Tairu - Vera Cruz",lat:-13.10,lng:-38.69,regiao:"Ilha de Itaparica",cond:"BOA",bal:"92%",foto:"https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400"},
-{name:"Jiribatuba - Vera Cruz",lat:-13.13,lng:-38.71,regiao:"Ilha de Itaparica",cond:"BOA",bal:"95%",foto:"https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=400"},
-{name:"Cacha Pregos - Vera Cruz",lat:-13.14,lng:-38.72,regiao:"Ilha de Itaparica",cond:"BOA",bal:"96%",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Coroa - Vera Cruz",lat:-13.16,lng:-38.73,regiao:"Ilha de Itaparica",cond:"BOA",bal:"95%",foto:"https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=400"},
-{name:"Ponta de Itaparica",lat:-13.18,lng:-38.74,regiao:"Ilha de Itaparica",cond:"BOA",bal:"94%",foto:"https://images.unsplash.com/photo-1559827291-72ee739d0d95?w=400"},
-// === OUTRAS REGIOES ===
-{name:"Madre de Deus",lat:-12.744,lng:-38.622,regiao:"Baía de Todos-os-Santos",cond:"IMPROPRIA",bal:"45%",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Ilha de Mare - Salvador",lat:-12.77,lng:-38.53,regiao:"Baía de Todos-os-Santos",cond:"BOA",bal:"80%",foto:"https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=400"},
-{name:"Morro de Sao Paulo - Cairu",lat:-13.376,lng:-38.916,regiao:"Baía de Camamu",cond:"BOA",bal:"95%",foto:"https://images.unsplash.com/photo-1544550581-5f7ceaf7f992?w=400"},
-{name:"Boipeba - Boca da Barra",lat:-13.60,lng:-38.92,regiao:"Baía de Camamu",cond:"BOA",bal:"97%",foto:"https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?w=400"},
-{name:"Mangue Seco - Jandaíra",lat:-11.45,lng:-37.35,regiao:"Litoral Norte",cond:"BOA",bal:"85%",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Praia do Forte - Mata SJ",lat:-12.58,lng:-38.01,regiao:"Litoral Norte",cond:"BOA",bal:"89%",foto:"https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?w=400"},
-{name:"Imbassai - Mata SJ",lat:-12.49,lng:-37.95,regiao:"Litoral Norte",cond:"BOA",bal:"88%",foto:"https://images.unsplash.com/photo-1489185078259-e9bcb96bc4f1?w=400"},
-{name:"Itacare - Concha",lat:-14.27,lng:-38.99,regiao:"Baixo Sul",cond:"BOA",bal:"96%",foto:"https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400"},
-{name:"Porto Seguro - Centro",lat:-16.43,lng:-39.07,regiao:"Extremo Sul",cond:"BOA",bal:"88%",foto:"https://images.unsplash.com/photo-1530549387789-4c1017266635?w=400"},
-{name:"Caraiva - Porto Seguro",lat:-16.78,lng:-39.14,regiao:"Extremo Sul",cond:"BOA",bal:"97%",foto:"https://images.unsplash.com/photo-1559827291-72ee739d0d95?w=400"}
+// SALVADOR BTS 10
+{name:"Paripe - Salvador BTS",lat:-12.842,lng:-38.483,regiao:"Salvador BTS",cond:"BOA",bal:"71%",tipo:"praia"},
+{name:"Sao Tome de Paripe",lat:-12.822,lng:-38.488,regiao:"Salvador BTS",cond:"BOA",bal:"74%",tipo:"praia"},
+{name:"Tubarao",lat:-12.811,lng:-38.489,regiao:"Salvador BTS",cond:"IMPROPRIA",bal:"48%",tipo:"praia"},
+{name:"PERIPERI - Casa Prof Edson ⭐",lat:-12.791,lng:-38.488,regiao:"Salvador BTS",cond:"ALERTA",bal:"62%",tipo:"praia"},
+{name:"Itacaranha",lat:-12.785,lng:-38.485,regiao:"Salvador BTS",cond:"ALERTA",bal:"65%",tipo:"praia"},
+{name:"Plataforma",lat:-12.77,lng:-38.49,regiao:"Salvador BTS",cond:"IMPROPRIA",bal:"52%",tipo:"praia"},
+{name:"Penha",lat:-12.76,lng:-38.495,regiao:"Salvador BTS",cond:"BOA",bal:"70%",tipo:"praia"},
+{name:"Ribeira",lat:-12.91,lng:-38.51,regiao:"Salvador BTS",cond:"IMPROPRIA",bal:"50%",tipo:"praia"},
+{name:"Bonfim",lat:-12.923,lng:-38.51,regiao:"Salvador BTS",cond:"IMPROPRIA",bal:"49%",tipo:"praia"},
+{name:"Boa Viagem",lat:-12.927,lng:-38.505,regiao:"Salvador BTS",cond:"ALERTA",bal:"58%",tipo:"praia"},
+// ATLANTICA 12
+{name:"Farol da Barra",lat:-13.0107,lng:-38.5327,regiao:"Salvador Atlântica",cond:"BOA",bal:"78%",tipo:"praia"},
+{name:"Ondina",lat:-13.01,lng:-38.51,regiao:"Salvador Atlântica",cond:"BOA",bal:"80%",tipo:"praia"},
+{name:"Rio Vermelho",lat:-13.016,lng:-38.495,regiao:"Salvador Atlântica",cond:"ALERTA",bal:"66%",tipo:"praia"},
+{name:"Amaralina",lat:-13.01,lng:-38.49,regiao:"Salvador Atlântica",cond:"BOA",bal:"82%",tipo:"praia"},
+{name:"Pituba",lat:-13.01,lng:-38.47,regiao:"Salvador Atlântica",cond:"BOA",bal:"84%",tipo:"praia"},
+{name:"Armacao",lat:-12.99,lng:-38.45,regiao:"Salvador Atlântica",cond:"BOA",bal:"85%",tipo:"praia"},
+{name:"Boca do Rio",lat:-12.98,lng:-38.43,regiao:"Salvador Atlântica",cond:"ALERTA",bal:"68%",tipo:"praia"},
+{name:"Corsario",lat:-12.97,lng:-38.41,regiao:"Salvador Atlântica",cond:"BOA",bal:"86%",tipo:"praia"},
+{name:"Piata",lat:-12.96,lng:-38.39,regiao:"Salvador Atlântica",cond:"BOA",bal:"87%",tipo:"praia"},
+{name:"Itapua",lat:-12.95,lng:-38.36,regiao:"Salvador Atlântica",cond:"BOA",bal:"88%",tipo:"praia"},
+{name:"Stella Maris",lat:-12.94,lng:-38.33,regiao:"Salvador Atlântica",cond:"BOA",bal:"93%",tipo:"praia"},
+{name:"Flamengo",lat:-12.92,lng:-38.31,regiao:"Salvador Atlântica",cond:"BOA",bal:"90%",tipo:"praia"},
+// ITAPARICA 14
+{name:"Mar Grande - Vera Cruz",lat:-12.971,lng:-38.62,regiao:"Ilha de Itaparica",cond:"BOA",bal:"90%",tipo:"praia"},
+{name:"Barra do Gil",lat:-12.99,lng:-38.63,regiao:"Ilha de Itaparica",cond:"BOA",bal:"91%",tipo:"praia"},
+{name:"Barra do Pote",lat:-13.0,lng:-38.64,regiao:"Ilha de Itaparica",cond:"BOA",bal:"92%",tipo:"praia"},
+{name:"Amoreiras",lat:-13.02,lng:-38.65,regiao:"Ilha de Itaparica",cond:"BOA",bal:"89%",tipo:"praia"},
+{name:"Ponta de Areia - Itaparica",lat:-12.89,lng:-38.68,regiao:"Ilha de Itaparica",cond:"BOA",bal:"88%",tipo:"praia"},
+{name:"Conceicao - Itaparica",lat:-12.895,lng:-38.68,regiao:"Ilha de Itaparica",cond:"BOA",bal:"87%",tipo:"praia"},
+{name:"Berlinque",lat:-13.04,lng:-38.66,regiao:"Ilha de Itaparica",cond:"BOA",bal:"90%",tipo:"praia"},
+{name:"Barra Grande - Vera Cruz",lat:-13.06,lng:-38.67,regiao:"Ilha de Itaparica",cond:"BOA",bal:"93%",tipo:"praia"},
+{name:"Aratuba",lat:-13.08,lng:-38.68,regiao:"Ilha de Itaparica",cond:"BOA",bal:"94%",tipo:"praia"},
+{name:"Tairu",lat:-13.10,lng:-38.69,regiao:"Ilha de Itaparica",cond:"BOA",bal:"92%",tipo:"praia"},
+{name:"Jiribatuba",lat:-13.13,lng:-38.71,regiao:"Ilha de Itaparica",cond:"BOA",bal:"95%",tipo:"praia"},
+{name:"Cacha Pregos",lat:-13.14,lng:-38.72,regiao:"Ilha de Itaparica",cond:"BOA",bal:"96%",tipo:"praia"},
+{name:"Coroa - Vera Cruz",lat:-13.16,lng:-38.73,regiao:"Ilha de Itaparica",cond:"BOA",bal:"95%",tipo:"praia"},
+{name:"Ponta de Itaparica",lat:-13.18,lng:-38.74,regiao:"Ilha de Itaparica",cond:"BOA",bal:"94%",tipo:"praia"},
+// LINHA VERDE - LITORAL NORTE 15 NOVAS
+{name:"Busca Vida - Camaçari",lat:-12.86,lng:-38.26,regiao:"Litoral Norte",cond:"BOA",bal:"89%",tipo:"praia"},
+{name:"Jaua - Camaçari",lat:-12.81,lng:-38.22,regiao:"Litoral Norte",cond:"BOA",bal:"90%",tipo:"praia"},
+{name:"Arembepe - Camaçari",lat:-12.76,lng:-38.17,regiao:"Litoral Norte",cond:"BOA",bal:"92%",tipo:"praia"},
+{name:"Jacuipe - Camaçari",lat:-12.72,lng:-38.12,regiao:"Litoral Norte",cond:"BOA",bal:"91%",tipo:"praia"},
+{name:"Guarajuba - Camaçari",lat:-12.65,lng:-38.07,regiao:"Litoral Norte",cond:"BOA",bal:"93%",tipo:"praia"},
+{name:"Itacimirim - Camaçari",lat:-12.61,lng:-38.04,regiao:"Litoral Norte",cond:"BOA",bal:"92%",tipo:"praia"},
+{name:"Praia do Forte - Mata SJ",lat:-12.58,lng:-38.01,regiao:"Litoral Norte",cond:"BOA",bal:"94%",tipo:"praia"},
+{name:"Imbassai - Mata SJ",lat:-12.49,lng:-37.95,regiao:"Litoral Norte",cond:"BOA",bal:"93%",tipo:"praia"},
+{name:"Santo Antonio - Mata SJ",lat:-12.43,lng:-37.88,regiao:"Litoral Norte",cond:"BOA",bal:"90%",tipo:"praia"},
+{name:"Subauma - Entre Rios",lat:-12.26,lng:-37.77,regiao:"Litoral Norte",cond:"BOA",bal:"91%",tipo:"praia"},
+{name:"Baixio - Esplanada",lat:-12.11,lng:-37.66,regiao:"Litoral Norte",cond:"BOA",bal:"92%",tipo:"praia"},
+{name:"Conde - Barra de Siribinha",lat:-11.81,lng:-37.60,regiao:"Litoral Norte",cond:"BOA",bal:"93%",tipo:"praia"},
+{name:"Siribinha - Conde",lat:-11.75,lng:-37.55,regiao:"Litoral Norte",cond:"BOA",bal:"94%",tipo:"praia"},
+{name:"Costa do Sauipe",lat:-12.40,lng:-37.91,regiao:"Litoral Norte",cond:"BOA",bal:"95%",tipo:"praia"},
+{name:"Mangue Seco - Jandaira",lat:-11.45,lng:-37.35,regiao:"Litoral Norte",cond:"BOA",bal:"96%",tipo:"praia"},
+// BAIXO SUL - ITACARE / ILHEUS 14
+{name:"Guaibim - Valenca",lat:-13.31,lng:-38.90,regiao:"Baixo Sul",cond:"BOA",bal:"88%",tipo:"praia"},
+{name:"Morro de SP - Cairu",lat:-13.376,lng:-38.916,regiao:"Baixo Sul",cond:"BOA",bal:"95%",tipo:"praia"},
+{name:"Boipeba",lat:-13.60,lng:-38.92,regiao:"Baixo Sul",cond:"BOA",bal:"97%",tipo:"praia"},
+{name:"Barra Grande - Marau",lat:-13.97,lng:-38.95,regiao:"Baixo Sul",cond:"BOA",bal:"96%",tipo:"praia"},
+{name:"Taipu de Fora - Marau",lat:-13.93,lng:-38.94,regiao:"Baixo Sul",cond:"BOA",bal:"97%",tipo:"praia"},
+{name:"Itacare - Concha",lat:-14.27,lng:-38.99,regiao:"Baixo Sul",cond:"BOA",bal:"96%",tipo:"praia"},
+{name:"Itacare - Resende",lat:-14.29,lng:-39.00,regiao:"Baixo Sul",cond:"BOA",bal:"94%",tipo:"praia"},
+{name:"Itacare - Tiririca",lat:-14.30,lng:-39.01,regiao:"Baixo Sul",cond:"BOA",bal:"95%",tipo:"praia"},
+{name:"Itacarezinho - Itacare",lat:-14.32,lng:-39.02,regiao:"Baixo Sul",cond:"BOA",bal:"97%",tipo:"praia"},
+{name:"Cururupe - Ilheus",lat:-14.81,lng:-39.05,regiao:"Baixo Sul",cond:"BOA",bal:"85%",tipo:"praia"},
+{name:"Costa - Ilheus",lat:-14.79,lng:-39.03,regiao:"Baixo Sul",cond:"BOA",bal:"86%",tipo:"praia"},
+{name:"Pontal - Ilheus",lat:-14.80,lng:-39.02,regiao:"Baixo Sul",cond:"BOA",bal:"84%",tipo:"praia"},
+{name:"Back Door - Ilheus",lat:-14.77,lng:-39.02,regiao:"Baixo Sul",cond:"BOA",bal:"87%",tipo:"praia"},
+{name:"Olivença - Ilheus",lat:-14.92,lng:-39.02,regiao:"Baixo Sul",cond:"BOA",bal:"90%",tipo:"praia"},
+// EXTREMO SUL 8
+{name:"Porto Seguro - Centro",lat:-16.43,lng:-39.07,regiao:"Extremo Sul",cond:"BOA",bal:"88%",tipo:"praia"},
+{name:"Arraial d'Ajuda",lat:-16.48,lng:-39.07,regiao:"Extremo Sul",cond:"BOA",bal:"90%",tipo:"praia"},
+{name:"Trancoso",lat:-16.59,lng:-39.10,regiao:"Extremo Sul",cond:"BOA",bal:"95%",tipo:"praia"},
+{name:"Caraiva - Porto Seguro",lat:-16.78,lng:-39.14,regiao:"Extremo Sul",cond:"BOA",bal:"97%",tipo:"praia"},
+{name:"Prado - Centro",lat:-17.34,lng:-39.22,regiao:"Extremo Sul",cond:"BOA",bal:"89%",tipo:"praia"},
+{name:"Cumuruxatiba - Prado",lat:-17.10,lng:-39.19,regiao:"Extremo Sul",cond:"BOA",bal:"96%",tipo:"praia"},
+{name:"Corumbau - Prado",lat:-16.89,lng:-39.12,regiao:"Extremo Sul",cond:"BOA",bal:"98%",tipo:"praia"},
+{name:"Mucuri - Extremo",lat:-18.08,lng:-39.56,regiao:"Extremo Sul",cond:"BOA",bal:"87%",tipo:"praia"},
+// === FOZ E MANGUEZAIS - 12 NOVOS ===
+{name:"🌱 Foz Rio Paraguaçu - BTS",lat:-12.82,lng:-38.88,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue"},
+{name:"🌱 Foz Rio Joanes - Buraquinho Lauro",lat:-12.86,lng:-38.29,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue"},
+{name:"🌱 Foz Rio Pojuca - Linha Verde",lat:-12.69,lng:-38.08,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue"},
+{name:"🌱 Foz Rio das Contas - Itacare",lat:-14.26,lng:-39.02,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue"},
+{name:"🌱 Foz Rio Cachoeira - Ilheus Pontal",lat:-14.80,lng:-39.02,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue"},
+{name:"🌱 Manguezal Canavieiras - Pq Costa Dendê",lat:-15.67,lng:-38.95,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Maior da Bahia",tipo:"mangue"},
+{name:"🌱 Foz Rio Jequitinhonha - Belmonte",lat:-15.86,lng:-38.88,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue"},
+{name:"🌱 Foz Rio Pardo - Canavieiras",lat:-15.66,lng:-38.90,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue"},
+{name:"🌱 Mangue Barra do Cahy - Cumuruxatiba",lat:-16.94,lng:-39.14,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue"},
+{name:"🌱 Foz Rio João de Tiba - Porto Seguro",lat:-16.52,lng:-39.07,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue"},
+{name:"🌱 Foz Rio Buranhém - Porto Seguro",lat:-16.43,lng:-39.06,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue"},
+{name:"🌱 Manguezal de Maraú - Barra Grande",lat:-14.00,lng:-39.00,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Preservado",tipo:"mangue"}
 ];
-const map=L.map('map').setView([-12.98,-38.55],11);
+const map=L.map('map').setView([-13.5,-38.8],7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 let markers=[];
-function shareText(p){return 'Olha essa praia no BAIA VIVA 9.0: '+p.name+' - '+p.cond+' - '+p.bal+' Veja: '+site;}
+function shareText(p){return 'BAIA VIVA 10.0: '+p.name+' - '+p.cond+' - Veja: '+site;}
 function addMarkers(lista){
 markers.forEach(m=>map.removeLayer(m));markers=[];
 lista.forEach(p=>{
-const c=p.cond==='BOA'?'#2ecc71':p.cond==='ALERTA'?'#f39c12':'#e74c3c';
-const destaque=p.name.includes('PERIPERI')?14:p.regiao.includes('Salvador')?11:9;
-const m=L.circleMarker([p.lat,p.lng],{radius:destaque,color:c,fillColor:c,fillOpacity:.9,weight:p.name.includes('PERIPERI')?4:2}).addTo(map);
+let cor='#2ecc71'; let radius=8;
+if(p.cond==='IMPROPRIA') cor='#e74c3c';
+if(p.cond==='ALERTA') cor='#f39c12';
+if(p.cond==='MANGUE') {cor='#2e7d32'; radius=11;}
+if(p.name.includes('PERIPERI')) radius=15;
+const m=L.circleMarker([p.lat,p.lng],{radius:radius,color:cor,fillColor:cor,fillOpacity:.9,weight:p.name.includes('PERIPERI')?4:2}).addTo(map);
+const foto='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400';
 const wa='https://wa.me/?text='+encodeURIComponent(shareText(p));
-m.bindPopup('<div style="width:235px"><img src="'+p.foto+'" style="width:100%;height:110px;object-fit:cover;border-radius:8px"><b>'+p.name+'</b><br><span style="background:#0b5394;color:white;padding:2px 6px;border-radius:8px;font-size:.7rem">'+p.regiao+'</span><br><b>Balneab:</b> '+p.bal+'<br><span style="background:'+c+';color:white;padding:3px 8px;border-radius:10px;display:inline-block;margin:5px 0">'+p.cond+'</span><br><a style="background:#25d366;color:white;padding:6px 10px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:5px" href="'+wa+'" target="_blank">📲 WhatsApp</a></div>',{maxWidth:250});
-markers.push(m);
+let popup='<div style="width:240px"><b>'+p.name+'</b><br><span style="background:#0b5394;color:white;padding:2px 6px;border-radius:8px;font-size:.7rem">'+p.regiao+'</span><br>';
+if(p.tipo==='mangue'){popup+='<span style="background:#2e7d32;color:white;padding:3px 8px;border-radius:10px;display:inline-block;margin:5px 0">🌱 '+p.cond+' - '+p.bal+'</span><br><small>Manguezal berçário de caranguejo, robalo e vida marinha</small>';}
+else{popup+='<b>Balneab:</b> '+p.bal+'<br><span style="background:'+cor+';color:white;padding:3px 8px;border-radius:10px;display:inline-block;margin:5px 0">'+p.cond+'</span>';}
+popup+='<br><a style="background:#25d366;color:white;padding:6px 10px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:5px" href="'+wa+'" target="_blank">📲 Compartilhar</a></div>';
+m.bindPopup(popup,{maxWidth:260});markers.push(m);
 });
-if(lista.length>0){const g=new L.featureGroup(markers);map.fitBounds(g.getBounds().pad(0.2));}
+if(lista.length>0){const g=new L.featureGroup(markers);map.fitBounds(g.getBounds().pad(0.15));}
 }
 function filtrar(r,b){
 document.querySelectorAll('.filters button').forEach(x=>x.classList.remove('active'));b.classList.add('active');
-if(r==='Todas')addMarkers(praias);else addMarkers(praias.filter(p=>p.regiao===r|| (r==='Baixo Sul' && p.regiao==='Baía de Camamu')));
+if(r==='Todas')addMarkers(praias);else addMarkers(praias.filter(p=>p.regiao===r));
 }
 addMarkers(praias);
-new Chart(document.getElementById('grafico'),{type:'bar',data:{labels:['Salvador BTS','Atlantica','ITAPARICA','Camamu','Norte/Sul'],datasets:[{label:'% Proprias',data:[61,83,92,96,89],backgroundColor:['#e74c3c','#00b4d8','#2ecc71','#f1c40f','#9b59b6']}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+new Chart(document.getElementById('grafico'),{type:'bar',data:{labels:['Salvador BTS','Atlantica','Itaparica','Linha Verde','Itacare/Ilheus','Extremo Sul','Foz/Mangue'],datasets:[{label:'% Próprias',data:[62,83,92,93,90,92,100],backgroundColor:['#e74c3c','#00b4d8','#2ecc71','#f1c40f','#8e44ad','#e67e22','#2e7d32']}]},options:{responsive:true,plugins:{legend:{display:false}}}});
 </script>
 </body>
 </html>
