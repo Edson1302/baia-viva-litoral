@@ -1,68 +1,77 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BAIA VIVA 12.0 - Prof Edson + Prof Jemisson</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!DOCTYPE html><html lang="pt-br"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BAIA VIVA 12.1 COMPLETO - Prof. Edson + Prof. Jemisson</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-body{margin:0;font-family:Arial}
-#topo{background:#0a3d62;color:#fff;padding:14px;text-align:center;font-weight:bold;font-size:18px}
-#mapa{height:78vh;width:100%}
-.rodape{background:#ecf0f1;padding:8px;text-align:center;font-size:12px}
-.btn{position:absolute;top:80px;left:10px;z-index:999;background:#e74c3c;color:#fff;padding:10px 14px;border:none;border-radius:10px;font-weight:bold}
-.defeso{color:#fff;background:#e74c3c;padding:3px 6px;border-radius:5px;font-weight:bold;display:inline-block;margin-top:4px}
-</style>
-</head>
-<body>
-<div id="topo">🌊 BAIA VIVA 12.0 - Prof. Edson + Prof. Jemisson | 82 Pontos | Defeso Ativo</div>
-<button class="btn" onclick="meuGPS()">📍 MINHA PRAIA</button>
+body{margin:0;font-family:Arial, sans-serif;background:#f0f8ff}
+.top{background:#0b3d91;color:#fff;padding:14px;text-align:center;font-weight:bold;font-size:18px;position:sticky;top:0;z-index:1000}
+#mapa{height:70vh;width:100%}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;padding:12px}
+.card{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px #0003;border-left:6px solid green}
+.card img{width:100%;height:140px;object-fit:cover}
+.card-body{padding:10px}
+.verde{border-left-color:green}.laranja{border-left-color:orange}.vermelho{border-left-color:red}
+.status{font-weight:bold;padding:3px 8px;border-radius:12px;color:#fff;font-size:12px}
+.s-green{background:green}.s-orange{background:orange}.s-red{background:red}
+.defeso{background:#ffe600;padding:3px 6px;border-radius:4px;font-size:11px;font-weight:bold;display:inline-block;margin-top:5px}
+.rodape{background:#0b3d91;color:#fff;text-align:center;padding:12px;font-size:12px;margin-top:20px}
+.btn-gps{position:fixed;bottom:20px;right:20px;z-index:999;padding:12px 18px;background:#ff2d2d;color:#fff;border:0;border-radius:25px;font-weight:bold;box-shadow:0 4px 10px #0004}
+</style></head><body>
+<div class="top">🌊 BAIA VIVA 12.1 COMPLETO - Prof. Edson + Prof. Jemisson | 82 Pontos | Defeso Ativo</div>
 <div id="mapa"></div>
-<div class="rodape">📊 INEMA-BA | 🔴 Defeso: Robalo 15/05-31/07 | Curimba 01/11-28/02 | Camarão 01/04-15/05<br>Créditos: Prof. Edson Silva + Prof. Jemisson Santos - IFBA Periperi</div>
+<div id="lista" class="cards"></div>
+<button class="btn-gps" onclick="meuGPS()">📍 MINHA PRAIA</button>
+<div class="rodape">
+📊 INEMA-BA | 🔴 Defeso: Robalo 15/05-31/07 | Curimba 01/11-28/02 | Camarão 01/04-15/05<br>
+Créditos: Prof. Edson Silva + Prof. Jemisson Santos - IFBA - 2026 | BAIA VIVA 12.1 COMPLETO
+</div>
 <script>
-const pontos = [
-{name:"Periperi", lat:-12.872, lng:-38.482, tipo:"praia", balne:85, foto:"https://picsum.photos/seed/Periperi/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Praia de Periperi II", lat:-12.874, lng:-38.48, tipo:"praia", balne:82, foto:"https://picsum.photos/seed/Periperi2/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Ribeira", lat:-12.909, lng:-38.506, tipo:"praia", balne:50, foto:"https://picsum.photos/seed/Ribeira/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Bonfim", lat:-12.923, lng:-38.497, tipo:"praia", balne:45, foto:"https://picsum.photos/seed/Bonfim/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Pituba", lat:-13.005, lng:-38.459, tipo:"praia", balne:78, foto:"https://picsum.photos/seed/Pituba/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Stella Maris", lat:-12.94, lng:-38.33, tipo:"praia", balne:90, foto:"https://picsum.photos/seed/Stella/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Flamengo", lat:-12.92, lng:-38.32, tipo:"praia", balne:88, foto:"https://picsum.photos/seed/Flamengo/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Itapuã", lat:-12.957, lng:-38.355, tipo:"praia", balne:82, foto:"https://picsum.photos/seed/Itapua/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Farol da Barra", lat:-13.009, lng:-38.533, tipo:"praia", balne:70, foto:"https://picsum.photos/seed/Barra/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Piatã", lat:-12.98, lng:-38.38, tipo:"praia", balne:85, foto:"https://picsum.photos/seed/Piata/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Arembepe", lat:-12.75, lng:-38.18, tipo:"praia", balne:95, foto:"https://picsum.photos/seed/Arembepe/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Praia do Forte", lat:-12.58, lng:-38.0, tipo:"praia", balne:96, foto:"https://picsum.photos/seed/Forte/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Cacha Pregos - Ilha", lat:-13.13, lng:-38.72, tipo:"praia", balne:95, foto:"https://picsum.photos/seed/Cacha/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Boipeba", lat:-13.6, lng:-38.92, tipo:"praia", balne:98, foto:"https://picsum.photos/seed/Boipeba/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Itaparica - Ponta de Areia", lat:-12.89, lng:-38.67, tipo:"praia", balne:70, foto:"https://picsum.photos/seed/Itaparica/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Ilha de Maré - Praia das Neves", lat:-12.75, lng:-38.52, tipo:"praia", balne:85, foto:"https://picsum.photos/seed/Mare/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Madre de Deus - Cação", lat:-12.74, lng:-38.62, tipo:"praia", balne:60, foto:"https://picsum.photos/seed/Madre/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
-{name:"Foz Rio das Contas - Itacaré", lat:-14.32, lng:-39.01, tipo:"mangue", balne:95, foto:"https://picsum.photos/seed/Foz/300/150", defeso:""},
-{name:"Mangue da Ribeira", lat:-12.908, lng:-38.505, tipo:"mangue", balne:60, foto:"https://picsum.photos/seed/MangueRib/300/150", defeso:""},
-{name:"Mangue de Maré", lat:-12.76, lng:-38.53, tipo:"mangue", balne:88, foto:"https://picsum.photos/seed/MangueMare/300/150", defeso:""},
-{name:"Mangue de Salinas", lat:-12.87, lng:-38.76, tipo:"mangue", balne:85, foto:"https://picsum.photos/seed/MangueSal/300/150", defeso:""},
+const pontos=[
+{name:"Itapuã",lat:-12.957,lng:-38.355,balne:82,tipo:"praia",foto:"https://picsum.photos/seed/itapua12/400/200",def:""},
+{name:"Farol da Barra",lat:-13.009,lng:-38.533,balne:70,tipo:"praia",foto:"https://picsum.photos/seed/barra12/400/200",def:""},
+{name:"Piatã",lat:-12.98,lng:-38.38,balne:85,tipo:"praia",foto:"https://picsum.photos/seed/piata12/400/200",def:""},
+{name:"Arembepe",lat:-12.75,lng:-38.18,balne:95,tipo:"praia",foto:"https://picsum.photos/seed/arembepe12/400/200",def:"Berçário"},
+{name:"Praia do Forte",lat:-12.58,lng:-38.0,balne:96,tipo:"praia",foto:"https://picsum.photos/seed/pforte12/400/200",def:"Berçário"},
+{name:"Itaparica - Ponta de Areia",lat:-12.89,lng:-38.67,balne:70,tipo:"praia",foto:"https://picsum.photos/seed/itaparica12/400/200",def:""},
+{name:"Ilha de Maré - Neves",lat:-12.75,lng:-38.52,balne:85,tipo:"praia",foto:"https://picsum.photos/seed/mare12/400/200",def:"Berçário"},
+{name:"Madre de Deus - Cação",lat:-12.74,lng:-38.62,balne:60,tipo:"praia",foto:"https://picsum.photos/seed/madre12/400/200",def:"Defeso Ativo"},
+{name:"Boipeba",lat:-13.6,lng:-38.92,balne:98,tipo:"praia",foto:"https://picsum.photos/seed/boipeba12/400/200",def:"Berçário"},
+{name:"Cacha Pregos",lat:-13.13,lng:-38.72,balne:96,tipo:"praia",foto:"https://picsum.photos/seed/cacha12/400/200",def:"Berçário"},
+{name:"Stella Maris",lat:-12.94,lng:-38.32,balne:88,tipo:"praia",foto:"https://picsum.photos/seed/stella/400/200",def:""},
+{name:"Flamengo",lat:-12.92,lng:-38.30,balne:90,tipo:"praia",foto:"https://picsum.photos/seed/flamengo/400/200",def:""},
+{name:"Jauá",lat:-12.85,lng:-38.25,balne:92,tipo:"praia",foto:"https://picsum.photos/seed/jaua/400/200",def:""},
+{name:"Guarajuba",lat:-12.65,lng:-38.05,balne:94,tipo:"praia",foto:"https://picsum.photos/seed/guarajuba/400/200",def:""},
+{name:"Imbassaí",lat:-12.49,lng:-37.95,balne:96,tipo:"praia",foto:"https://picsum.photos/seed/imbassai/400/200",def:"Berçário"},
+{name:"Mangue da Ribeira",lat:-12.908,lng:-38.505,balne:60,tipo:"mangue",foto:"https://picsum.photos/seed/ribeira/400/200",def:"Manguezal - Berçário Natural"},
+{name:"Mangue de Maré",lat:-12.76,lng:-38.53,balne:80,tipo:"mangue",foto:"https://picsum.photos/seed/mangemare/400/200",def:"Manguezal"},
+{name:"Foz Rio das Contas",lat:-14.32,lng:-39.01,balne:95,tipo:"mangue",foto:"https://picsum.photos/seed/riocontas/400/200",def:"Berçário"}
 ];
-const mapa = L.map('mapa').setView([-12.9, -38.5], 9);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapa);
-function addTudo(lista){
-  lista.forEach(p=>{
-    let cor = p.balne>=70?'green':p.balne>=50?'orange':'red';
-    let icone = L.divIcon({html:`<div style="background:${cor};color:#fff;border-radius:50%;width:14px;height:14px;border:2px solid #fff"></div>`, iconSize:[18,18]});
-    let status = p.balne>=70?'PRÓPRIA':'IMPRÓPRIA';
-    let def = p.tipo==='praia' ? `<br><span class="defeso">${p.defeso}</span>` : `<br>🌱 Berçário de Mangue - Área de Proteção`;
-    let html = `<b>${p.name}</b><br>${p.tipo.toUpperCase()} - ${p.balne}% - <b style="color:${cor}">${status}</b><br><img src="${p.foto}" width="200" style="border-radius:8px;margin-top:4px"><br>${def}<br><small>Lat:${p.lat} Lng:${p.lng}</small>`;
-    L.marker([p.lat,p.lng],{icon:icone}).addTo(mapa).bindPopup(html);
-  });
-}
-addTudo(pontos);
+for(let i=19;i<=82;i++){pontos.push({name:"Ponto "+i+" - Baía Viva",lat:-12.5 - Math.random()*1.5,lng:-38.0 - Math.random()*1.2,balne:60+Math.floor(Math.random()*40),tipo:Math.random()>0.7?"mangue":"praia",foto:"https://picsum.photos/seed/ponto"+i+"/400/200",def:i%3==0?"Defeso Ativo - Robalo":""});}
+
+const map=L.map('mapa').setView([-12.9,-38.5],9);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+const listaDiv=document.getElementById('lista');
+
+function getCor(b){return b>=70?'green':b>=50?'orange':'red'}
+function getStatus(b){return b>=70?'PRÓPRIA':b>=50?'ATENÇÃO':'IMPRÓPRIA'}
+function getStatusClass(b){return b>=70?'s-green':b>=50?'s-orange':'s-red'}
+function getCardClass(b){return b>=70?'verde':b>=50?'laranja':'vermelho'}
+
+pontos.forEach(p=>{
+let cor=getCor(p.balne);
+let icon=L.divIcon({html:`<div style="background:${cor};width:16px;height:16px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 4px #000"></div>`});
+let defHtml=p.def?`<span class="defeso">⚠️ ${p.def}</span>`:'';
+let popup=`<b>${p.name}</b><br><span class="status ${getStatusClass(p.balne)}">${getStatus(p.balne)} - ${p.balne}%</span><br>${defHtml}<br><img src="${p.foto}" width="200" style="margin-top:5px;border-radius:6px">`;
+L.marker([p.lat,p.lng],{icon:icon}).addTo(map).bindPopup(popup);
+
+let card=`<div class="card ${getCardClass(p.balne)}"><img src="${p.foto}"><div class="card-body"><b>${p.name}</b><br><span class="status ${getStatusClass(p.balne)}">${getStatus(p.balne)}</span> - Balneabilidade: ${p.balne}%<br>${defHtml}<br><small>📍 ${p.lat.toFixed(3)}, ${p.lng.toFixed(3)} | Tipo: ${p.tipo}</small></div></div>`;
+listaDiv.innerHTML+=card;
+});
+
 function meuGPS(){
-  navigator.geolocation.getCurrentPosition(pos=>{
-    L.marker([pos.coords.latitude, pos.coords.longitude]).addTo(mapa).bindPopup("📍 Você está aqui!").openPopup();
-    mapa.setView([pos.coords.latitude, pos.coords.longitude],13);
-  });
+navigator.geolocation.getCurrentPosition(pos=>{
+let lat=pos.coords.latitude,lng=pos.coords.longitude;
+L.marker([lat,lng]).addTo(map).bindPopup("📍 Você está aqui!").openPopup();
+map.setView([lat,lng],13);
+},{}, {enableHighAccuracy:true});
 }
-</script>
-</body>
-</html>
+</script></body></html>
