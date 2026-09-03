@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Litoral da Bahia - Qualidade das Praias 5.0</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#f0f8ff}
+header{background:#004d7a;color:white;padding:15px;text-align:center}
+header h1{margin:0;font-size:22px}
+header p{margin:5px 0 0;font-size:14px;opacity:.9}
+.filtros{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:12px;background:white;box-shadow:0 2px 5px #0002;position:sticky;top:0;z-index:1000}
+.filtros button{padding:8px 14px;border:2px solid #004d7a;border-radius:20px;background:white;color:#004d7a;font-weight:bold;cursor:pointer}
+.filtros button.ativo{background:#004d7a;color:white}
+#map{height:65vh;width:100%}
+.legenda{display:flex;gap:15px;justify-content:center;padding:10px;background:white;font-size:13px}
+.ponto-boa{width:12px;height:12px;background:#2ecc71;display:inline-block;border-radius:50%}
+.ponto-ruim{width:12px;height:12px;background:#e74c3c;display:inline-block;border-radius:50%}
+.info{padding:10px;text-align:center;font-size:13px;background:#e8f4f8}
+</style>
+</head>
+<body>
+<header>
+<h1>🌊 BAÍA VIVA 5.0 - LITORAL DA BAHIA</h1>
+<p>Qualidade da água - Dados INEMA | Com H de Bahia</p>
+</header>
+
+<div class="filtros">
+<button class="ativo" onclick="filtrar('Todos',this)">Todas</button>
+<button onclick="filtrar('Baía',this)">Baía</button>
+<button onclick="filtrar('Litoral Norte',this)">Litoral Norte</button>
+<button onclick="filtrar('Baixo Sul',this)">Baixo Sul</button>
+<button onclick="filtrar('Extremo Sul',this)">Extremo Sul</button>
+</div>
+
+<div id="map"></div>
+
+<div class="legenda">
+<span><i class="ponto-boa"></i> BOA (Própria)</span>
+<span><i class="ponto-ruim"></i> IMPRÓPRIA</span>
+</div>
+
+<div class="info">Projeto Prof. Edson Freitas | São Francisco do Conde - BA | edson1302.github.io/ba-a-viva/</div>
+
+<script>
+// BASE DE DADOS - BAHIA COM H
+const praias = [
+// BAÍA DE TODOS-OS-SANTOS
+{nome:"Periperi",regiao:"Baía",municipio:"Salvador",status:"IMPRÓPRIA",coliformes:1600,lat:-12.872,lng:-38.474},
+{nome:"Penha",regiao:"Baía",municipio:"Salvador",status:"IMPRÓPRIA",coliformes:1400,lat:-12.885,lng:-38.48},
+{nome:"Bonfim",regiao:"Baía",municipio:"Salvador",status:"IMPRÓPRIA",coliformes:920,lat:-12.92,lng:-38.49},
+{nome:"Ribeira",regiao:"Baía",municipio:"Salvador",status:"BOA",coliformes:350,lat:-12.91,lng:-38.50},
+{nome:"Conceição - SFC",regiao:"Baía",municipio:"S. F. do Conde",status:"BOA",coliformes:220,lat:-12.624,lng:-38.678},
+{nome:"Ilha de Maré",regiao:"Baía",municipio:"Salvador",status:"BOA",coliformes:180,lat:-12.73,lng:-38.52},
+{nome:"Paramana - SFC",regiao:"Baía",municipio:"S. F. do Conde",status:"BOA",coliformes:130,lat:-12.59,lng:-38.71},
+// LITORAL NORTE
+{nome:"Itapuã",regiao:"Litoral Norte",municipio:"Salvador",status:"BOA",coliformes:280,lat:-12.95,lng:-38.365},
+{nome:"Stella Maris",regiao:"Litoral Norte",municipio:"Salvador",status:"BOA",coliformes:240,lat:-12.94,lng:-38.32},
+{nome:"Arembepe",regiao:"Litoral Norte",municipio:"Camaçari",status:"BOA",coliformes:200,lat:-12.74,lng:-38.18},
+{nome:"Praia do Forte",regiao:"Litoral Norte",municipio:"Mata de S. João",status:"BOA",coliformes:90,lat:-12.585,lng:-38.003},
+{nome:"Imbassaí",regiao:"Litoral Norte",municipio:"Mata de S. João",status:"BOA",coliformes:110,lat:-12.48,lng:-37.96},
+{nome:"Mangue Seco",regiao:"Litoral Norte",municipio:"Jandaíra",status:"BOA",coliformes:70,lat:-11.44,lng:-37.34},
+// BAIXO SUL
+{nome:"Morro de São Paulo",regiao:"Baixo Sul",municipio:"Cairu",status:"BOA",coliformes:160,lat:-13.375,lng:-38.915},
+{nome:"Barra Grande",regiao:"Baixo Sul",municipio:"Maraú",status:"BOA",coliformes:140,lat:-13.99,lng:-38.95},
+{nome:"Itacaré - Pontal",regiao:"Baixo Sul",municipio:"Itacaré",status:"BOA",coliformes:190,lat:-14.28,lng:-38.99},
+{nome:"Ilhéus - Milionários",regiao:"Baixo Sul",municipio:"Ilhéus",status:"IMPRÓPRIA",coliformes:1100,lat:-14.79,lng:-39.03},
+// EXTREMO SUL
+{nome:"Porto Seguro",regiao:"Extremo Sul",municipio:"Porto Seguro",status:"BOA",coliformes:300,lat:-16.443,lng:-39.07},
+{nome:"Arraial d'Ajuda",regiao:"Extremo Sul",municipio:"Porto Seguro",status:"BOA",coliformes:210,lat:-16.48,lng:-39.06},
+{nome:"Caraíva",regiao:"Extremo Sul",municipio:"Porto Seguro",status:"BOA",coliformes:80,lat:-16.78,lng:-39.14},
+{nome:"Prado",regiao:"Extremo Sul",municipio:"Prado",status:"BOA",coliformes:120,lat:-17.34,lng:-39.22}
+];
+
+var map = L.map('map').setView([-13.5, -38.8], 7);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+var marcadores = [];
+
+function addMarcadores(lista){
+ marcadores.forEach(m=>map.removeLayer(m));
+ marcadores=[];
+ lista.forEach(p=>{
+   var cor = p.status==="BOA" ? "#2ecc71" : "#e74c3c";
+   var icone = L.divIcon({html:`<div style="background:${cor};width:18px;height:18px;border-radius:50%;border:2px solid white;box-shadow:0 0 4px black"></div>`,iconSize:[18,18]});
+   var mk = L.marker([p.lat,p.lng],{icon:icone}).addTo(map);
+   mk.bindPopup(`<b>${p.nome}</b><br>${p.municipio} - ${p.regiao}<br><b style="color:${cor}">${p.status}</b><br>Coliformes: ${p.coliformes} NMP/100ml<br><small>${p.status==="BOA" ? "Própria para banho ✅" : "Imprópria para banho ❌"}</small>`);
+   marcadores.push(mk);
+ });
+}
+
+function filtrar(regiao, btn){
+ document.querySelectorAll('.filtros button').forEach(b=>b.classList.remove('ativo'));
+ btn.classList.add('ativo');
+ if(regiao==="Todos") addMarcadores(praias);
+ else addMarcadores(praias.filter(p=>p.regiao===regiao));
+}
+
+addMarcadores(praias);
+</script>
+</body>
+</html>
