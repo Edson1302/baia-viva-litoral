@@ -1,34 +1,8 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BAIA VIVA 15.2 ULTRA COMPLETO - IFBA</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<style>
-:root{--primary:#0b3d91;--bg:#eef6ff;--ok:#10b981;--warn:#f59e0b;--bad:#ef4444}
-body{margin:0;font-family:Arial,sans-serif;background:var(--bg)}
-.top{background:var(--primary);color:#fff;padding:14px;text-align:center;position:sticky;top:0;z-index:2000}
-.top h1{margin:0;font-size:18px}.top p{margin:4px 0 0;font-size:11px;opacity:.85}
-.filtros{background:#fff;padding:10px;text-align:center;box-shadow:0 2px 8px #0001;position:sticky;top:66px;z-index:1000;overflow-x:auto;white-space:nowrap}
-.filtros button{padding:8px 14px;margin:2px;border:2px solid var(--primary);background:#fff;color:var(--primary);border-radius:20px;font-weight:700;font-size:11px;cursor:pointer}
-.filtros button.ativo{background:var(--primary);color:#fff}
-#mapa{height:45vh;width:100%}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:10px;padding:12px}
-.card{background:#fff;padding:14px;border-radius:12px;box-shadow:0 3px 8px #0001;border-left:6px solid var(--ok)}
-.verde{border-left-color:var(--ok)}.laranja{border-left-color:var(--warn)}.vermelho{border-left-color:var(--bad)}
-.st{font-weight:800;color:#fff;padding:3px 8px;border-radius:12px;font-size:10px}.g{background:var(--ok)}.o{background:var(--warn)}.r{background:var(--bad)}
-.dados{font-size:11px;margin-top:8px;background:#f4f9ff;padding:8px;border-radius:8px;display:grid;grid-template-columns:1fr 1fr;gap:4px}
-.def{background:#ffe600;padding:2px 6px;border-radius:6px;font-size:10px;font-weight:800}
-.shareBox{background:#fff;padding:24px;text-align:center;border-top:4px solid var(--primary);margin-top:15px}
-.rodape{background:var(--primary);color:#fff;text-align:center;padding:12px;font-size:11px}
-.gps{position:fixed;bottom:20px;right:20px;z-index:999;padding:12px 18px;background:#ff2d2d;color:#fff;border:0;border-radius:30px;font-weight:800}
-.btnZap{background:#25D366;color:#fff;padding:12px 24px;border-radius:25px;text-decoration:none;font-weight:800;display:inline-block}
-.btnCopy{background:var(--primary);color:#fff;padding:12px 24px;border-radius:25px;border:0;font-weight:800;margin-left:6px}
-</style>
-</head>
-<body>
-<div class="top"><h1>🌊 BAIA VIVA 15.2 ULTRA COMPLETO</h1><p>68 Praias Monitoradas | IFBA 2026 - Prof. Edson + Prof. Jemisson</p></div>
+<!DOCTYPE html><html lang="pt-br"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BAIA VIVA 15.2 ULTRA - IFBA</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>body{margin:0;font-family:Arial;background:#eef6ff}.top{background:#0b3d91;color:#fff;padding:12px;text-align:center;position:sticky;top:0;z-index:2000}.filtros{background:#fff;padding:8px;text-align:center;box-shadow:0 2px 5px #0002;position:sticky;top:62px;z-index:1000;overflow-x:auto;white-space:nowrap}.filtros button{padding:7px 12px;margin:2px;border:2px solid #0b3d91;background:#fff;color:#0b3d91;border-radius:20px;font-weight:bold;font-size:11px;cursor:pointer}.filtros button.ativo{background:#0b3d91;color:#fff}#mapa{height:52vh}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:9px;padding:10px}.card{background:#fff;padding:12px;border-radius:10px;box-shadow:0 2px 6px #0002;border-left:6px solid green}.verde{border-left-color:#10b981}.laranja{border-left-color:#f59e0b}.vermelho{border-left-color:#ef4444}.st{font-weight:bold;color:#fff;padding:3px 8px;border-radius:10px;font-size:10px}.g{background:#10b981}.o{background:#f59e0b}.r{background:#ef4444}.dados{font-size:11px;margin-top:6px;background:#f4f9ff;padding:7px;border-radius:8px;display:grid;grid-template-columns:1fr 1fr;gap:3px}.shareBox{background:#fff;padding:20px;text-align:center;border-top:4px solid #0b3d91;margin-top:10px}.rodape{background:#0b3d91;color:#fff;text-align:center;padding:10px;font-size:11px}.gps{position:fixed;bottom:20px;right:20px;z-index:999;padding:12px 18px;background:#ff2d2d;color:#fff;border:0;border-radius:30px;font-weight:bold}.btnZap{background:#25D366;color:#fff;padding:11px 20px;border-radius:25px;text-decoration:none;font-weight:bold;display:inline-block}.btnCopy{background:#0b3d91;color:#fff;padding:11px 20px;border-radius:25px;border:0;font-weight:bold;margin-left:5px}</style></head><body>
+<div class="top"><h1>🌊 BAIA VIVA 15.2 ULTRA COMPLETO</h1><p>68 Praias | IFBA 2026 - Prof. Edson + Prof. Jemisson</p></div>
 <div class="filtros">
 <button class="ativo" onclick="filtrar('todos',this)">TODAS 68</button>
 <button onclick="filtrar('salvador',this)">SALVADOR LESTE</button>
@@ -40,41 +14,38 @@ body{margin:0;font-family:Arial,sans-serif;background:var(--bg)}
 </div>
 <div id="mapa"></div><div id="lista" class="cards"></div>
 <div class="shareBox">
-<h3 style="margin:0 0 6px 0">📲 Compartilhe o BAIA VIVA no IFBA</h3>
-<p style="font-size:12px;color:#64748b">Aponte a câmera</p>
-<img id="qrcode" src="" style="border:6px solid #0b3d91;border-radius:14px;width:170px;height:170px" alt="QR Code">
-<br><br>
+<h3>📲 Compartilhe o BAIA VIVA</h3>
+<img id="qrcode" src="" style="border:5px solid #0b3d91;border-radius:12px;width:170px;height:170px"><br><br>
 <a id="zapLink" href="#" target="_blank" class="btnZap">🟢 WhatsApp</a>
 <button class="btnCopy" onclick="copiarLink()">🔗 Copiar Link</button>
-<p id="linkTxt" style="font-size:11px;color:#64748b;margin-top:10px;word-break:break-all"></p>
+<p id="linkTxt" style="font-size:11px;color:#666;margin-top:8px;word-break:break-all"></p>
 </div>
-<div class="rodape">INEMA-BA + INMET + Marinha | 68 Pontos Reais | IFBA 2026</div>
+<div class="rodape">INEMA-BA + INMET + Marinha | 68 Pontos | IFBA 2026</div>
 <button class="gps" onclick="meuGPS()">📍 MINHA PRAIA</button>
 <script>
 const pontos=[
-{name:"Porto da Barra",lat:-13.0071,lng:-38.5323,balne:95,reg:"salvador",temp:27,sal:36,vento:"SE 15",corr:"CB",massa:"mTa",prev:"Sol",def:""},
-{name:"Farol da Barra",lat:-13.0092,lng:-38.5332,balne:88,reg:"salvador",temp:27,sal:36,vento:"SE 18",corr:"CB mod",massa:"mTa",prev:"Ondas 0.5m",def:"Turístico"},
-{name:"Rio Vermelho",lat:-13.0145,lng:-38.4984,balne:48,reg:"salvador",temp:26,sal:35,vento:"S 12",corr:"CB local",massa:"mTa",prev:"Pancadas",def:"Ressaca"},
-{name:"Amaralina",lat:-13.0131,lng:-38.4719,balne:62,reg:"salvador",temp:27,sal:35,vento:"SE 14",corr:"CB",massa:"mTa",prev:"Sol",def:""},
-{name:"Pituba",lat:-13.0101,lng:-38.4552,balne:35,reg:"salvador",temp:26,sal:34,vento:"SE 15",corr:"CB forte",massa:"mTa",prev:"Instável",def:"Descarte Pluvial"},
-{name:"Itapuã",lat:-12.9572,lng:-38.3551,balne:82,reg:"salvador",temp:28,sal:36,vento:"NE 16",corr:"CB",massa:"mTa",prev:"Sol",def:"Turístico"},
-{name:"Stella Maris",lat:-12.9412,lng:-38.3245,balne:88,reg:"salvador",temp:28,sal:36,vento:"NE 16",corr:"CB",massa:"mTa",prev:"Sol",def:""},
-{name:"Flamengo",lat:-12.9215,lng:-38.3082,balne:90,reg:"salvador",temp:28,sal:36,vento:"NE 18",corr:"CB forte",massa:"mTa",prev:"Vento",def:""},
-{name:"Ribeira - Penha",lat:-12.9073,lng:-38.5002,balne:58,reg:"suburbio",temp:26,sal:30,vento:"SE 8",corr:"BTS maré",massa:"mTa",prev:"Calmo BTS",def:"Manguezal"},
-{name:"Plataforma",lat:-12.8941,lng:-38.4925,balne:60,reg:"suburbio",temp:26,sal:32,vento:"SE 9",corr:"BTS",massa:"mTa",prev:"Calmo",def:"Ponte Turística"},
-{name:"Paripe",lat:-12.8451,lng:-38.4712,balne:68,reg:"suburbio",temp:27,sal:33,vento:"SE 10",corr:"BTS canal",massa:"mTa",prev:"Calmo",def:"Porto pescadores"},
-{name:"Tubarão",lat:-12.8152,lng:-38.4623,balne:75,reg:"suburbio",temp:27,sal:34,vento:"SE 11",corr:"BTS limpa",massa:"mTa",prev:"Boa banho",def:"Praia limpa"},
+{name:"Porto da Barra",lat:-13.007,lng:-38.532,balne:95,reg:"salvador",temp:27,sal:36,vento:"SE 15",corr:"CB",massa:"mTa",prev:"Sol",def:""},
+{name:"Farol da Barra",lat:-13.009,lng:-38.533,balne:88,reg:"salvador",temp:27,sal:36,vento:"SE 18",corr:"CB mod",massa:"mTa",prev:"Ondas 0.5m",def:"Turístico"},
+{name:"Rio Vermelho",lat:-13.014,lng:-38.498,balne:48,reg:"salvador",temp:26,sal:35,vento:"S 12",corr:"CB local",massa:"mTa",prev:"Pancadas",def:"Ressaca"},
+{name:"Amaralina",lat:-13.013,lng:-38.471,balne:62,reg:"salvador",temp:27,sal:35,vento:"SE 14",corr:"CB",massa:"mTa",prev:"Sol",def:""},
+{name:"Itapuã",lat:-12.957,lng:-38.355,balne:82,reg:"salvador",temp:28,sal:36,vento:"NE 16",corr:"CB",massa:"mTa",prev:"Sol",def:"Turístico"},
+{name:"Stella Maris",lat:-12.941,lng:-38.324,balne:88,reg:"salvador",temp:28,sal:36,vento:"NE 16",corr:"CB",massa:"mTa",prev:"Sol",def:""},
+{name:"Flamengo",lat:-12.921,lng:-38.308,balne:90,reg:"salvador",temp:28,sal:36,vento:"NE 18",corr:"CB forte",massa:"mTa",prev:"Vento",def:""},
+{name:"Ribeira",lat:-12.907,lng:-38.5,balne:58,reg:"suburbio",temp:26,sal:30,vento:"SE 8",corr:"BTS maré",massa:"mTa",prev:"Calmo BTS",def:"Manguezal"},
+{name:"Plataforma",lat:-12.894,lng:-38.492,balne:60,reg:"suburbio",temp:26,sal:32,vento:"SE 9",corr:"BTS",massa:"mTa",prev:"Calmo",def:"Ponte"},
+{name:"Paripe",lat:-12.845,lng:-38.471,balne:68,reg:"suburbio",temp:27,sal:33,vento:"SE 10",corr:"BTS canal",massa:"mTa",prev:"Calmo",def:"Pescadores"},
+{name:"Tubarão",lat:-12.815,lng:-38.462,balne:75,reg:"suburbio",temp:27,sal:34,vento:"SE 11",corr:"BTS limpa",massa:"mTa",prev:"Boa",def:"Praia limpa"},
 {name:"Praia do Forte",lat:-12.58,lng:-38.0,balne:96,reg:"litoral",temp:28,sal:37,vento:"NE 19",corr:"CB",massa:"mTa",prev:"Sol",def:"Tamar"},
 {name:"Itaparica",lat:-12.89,lng:-38.67,balne:70,reg:"bts",temp:27,sal:34,vento:"SE 10",corr:"Maré BTS",massa:"mTa",prev:"Calmo",def:"Ilha"},
 {name:"Ilha de Maré",lat:-12.75,lng:-38.52,balne:85,reg:"bts",temp:26,sal:33,vento:"SE 9",corr:"Estuarina",massa:"mTa",prev:"Calmo",def:"Berçário"},
-{name:"Barra Grande",lat:-13.89,lng:-38.94,balne:97,reg:"baixo",temp:28,sal:36,vento:"NE 16",corr:"Baía Camamu",massa:"mTa",prev:"Calmo baía",def:"Baía de Camamu"},
+{name:"Barra Grande",lat:-13.89,lng:-38.94,balne:97,reg:"baixo",temp:28,sal:36,vento:"NE 16",corr:"Baía Camamu",massa:"mTa",prev:"Calmo",def:"Camamu"},
 {name:"Taipus de Fora",lat:-13.92,lng:-38.95,balne:98,reg:"baixo",temp:28,sal:37,vento:"NE 15",corr:"Recifal",massa:"mTa",prev:"Piscinas",def:"APA"},
-{name:"Ilhéus - Avenida",lat:-14.79,lng:-39.04,balne:65,reg:"baixo",temp:26,sal:34,vento:"SE 15",corr:"Rio Cachoeira",massa:"mTa",prev:"Água fria",def:""},
-{name:"Porto Seguro - Taperapuã",lat:-16.3982,lng:-39.0491,balne:82,reg:"extremo",temp:27,sal:36,vento:"NE 16",corr:"CB",massa:"mTa",prev:"Sol",def:"Lazer"},
-{name:"Trancoso",lat:-16.5912,lng:-39.0984,balne:91,reg:"extremo",temp:28,sal:37,vento:"NE 14",corr:"CB",massa:"mTa",prev:"Sol",def:"Quadrado"},
-{name:"Espelho",lat:-16.7315,lng:-39.1215,balne:99,reg:"extremo",temp:28,sal:37,vento:"E 12",corr:"Recife",massa:"mTa",prev:"Excelente",def:"APA"},
-{name:"Caraíva",lat:-16.7915,lng:-39.1442,balne:95,reg:"extremo",temp:28,sal:36,vento:"NE 14",corr:"Foz Caraíva",massa:"mTa",prev:"Calmo",def:"Vila Histórica"},
-{name:"Corumbau",lat:-17.0041,lng:-39.1552,balne:98,reg:"extremo",temp:28,sal:37,vento:"NE 16",corr:"Abrolhos",massa:"mTa",prev:"Piscinas",def:"Ponta de Areia"}
+{name:"Ilhéus",lat:-14.79,lng:-39.04,balne:65,reg:"baixo",temp:26,sal:34,vento:"SE 15",corr:"Rio Cachoeira",massa:"mTa",prev:"Fria",def:""},
+{name:"Porto Seguro - Taperapuã",lat:-16.398,lng:-39.049,balne:82,reg:"extremo",temp:27,sal:36,vento:"NE 16",corr:"CB",massa:"mTa",prev:"Sol",def:"Lazer"},
+{name:"Trancoso",lat:-16.591,lng:-39.098,balne:91,reg:"extremo",temp:28,sal:37,vento:"NE 14",corr:"CB",massa:"mTa",prev:"Sol",def:"Quadrado"},
+{name:"Espelho",lat:-16.731,lng:-39.121,balne:99,reg:"extremo",temp:28,sal:37,vento:"E 12",corr:"Recife",massa:"mTa",prev:"Excelente",def:"APA"},
+{name:"Caraíva",lat:-16.791,lng:-39.144,balne:95,reg:"extremo",temp:28,sal:36,vento:"NE 14",corr:"Foz Caraíva",massa:"mTa",prev:"Calmo",def:"Vila"},
+{name:"Corumbau",lat:-17.004,lng:-39.155,balne:98,reg:"extremo",temp:28,sal:37,vento:"NE 16",corr:"Abrolhos",massa:"mTa",prev:"Piscinas",def:"Ponta"}
 ];
 const map=L.map('mapa').setView([-13.8,-38.9],7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(map);
@@ -85,25 +56,21 @@ let lista=f==='todos'?pontos:pontos.filter(p=>p.reg===f);
 lista.forEach(p=>{
 let cor=p.balne>=70?'#10b981':p.balne>=50?'#f59e0b':'#ef4444';
 let ic=L.divIcon({html:`<div style="background:${cor};width:14px;height:14px;border-radius:50%;border:2px solid #fff"></div>`,className:''});
-let mk=L.marker([p.lat,p.lng],{icon:ic}).addTo(map).bindPopup(`<b>${p.name}</b><br>${p.balne}% - ${p.temp}°C | ${p.sal} psu`);
+let mk=L.marker([p.lat,p.lng],{icon:ic}).addTo(map).bindPopup(`<b>${p.name}</b><br>${p.balne}%`);
 marcadores.push(mk);
 let sTxt=p.balne>=70?'PRÓPRIA':p.balne>=50?'ATENÇÃO':'IMPRÓPRIA';
 let sCls=p.balne>=70?'g':p.balne>=50?'o':'r';
 let cCls=p.balne>=70?'verde':p.balne>=50?'laranja':'vermelho';
-let def=p.def?`<br><span class="def">⚠️ ${p.def}</span>`:''; 
+let def=p.def?`<br><span style="background:#ffe600;padding:2px 6px;border-radius:6px;font-size:10px;font-weight:800">⚠️ ${p.def}</span>`:''; 
 document.getElementById('lista').innerHTML+=`<div class="card ${cCls}"><b>${p.name}</b> <small>(${p.reg})</small><br><span class="st ${sCls}">${sTxt} ${p.balne}%</span>${def}<div class="dados"><div>🌡️ ${p.temp}°C</div><div>🧂 ${p.sal} psu</div><div>💨 ${p.vento}</div><div>🌊 ${p.corr}</div></div></div>`;
 });
 }
 function filtrar(r,b){document.querySelectorAll('.filtros button').forEach(x=>x.classList.remove('ativo'));b.classList.add('ativo');desenha(r);}
 function meuGPS(){navigator.geolocation.getCurrentPosition(p=>{L.marker([p.coords.latitude,p.coords.longitude]).addTo(map).bindPopup("Você aqui").openPopup();map.setView([p.coords.latitude,p.coords.longitude],13);});}
-function inicializar(){
+function copiarLink(){navigator.clipboard.writeText(window.location.href);alert("Link copiado!");}
 let url=window.location.href;
 document.getElementById('linkTxt').innerText=url;
-// CORREÇÃO DO QR CODE - linha 95 a 98
 document.getElementById('qrcode').src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data="+encodeURIComponent(url);
-let msg="🌊 BAIA VIVA 15.2 IFBA - 68 praias da Bahia: "+url;
-document.getElementById('zapLink').href="https://wa.me/?text="+encodeURIComponent(msg);
-}
-function copiarLink(){navigator.clipboard.writeText(window.location.href);alert("Link copiado!");}
-window.onload=()=>{desenha('todos');inicializar();};
+document.getElementById('zapLink').href="https://wa.me/?text="+encodeURIComponent("🌊 BAIA VIVA 15.2 IFBA: "+url);
+desenha('todos');
 </script></body></html>
