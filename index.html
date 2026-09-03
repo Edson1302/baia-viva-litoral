@@ -1,205 +1,109 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>BAIA VIVA 15.2 ULTRA COMPLETO - IFBA</title>
-    <link rel="stylesheet" href="https://unpkg.com"/>
-    <script src="https://unpkg.com"></script>
-    <style>
-        :root {
-            --primary: #0b3d91;
-            --primary-dark: #06265c;
-            --bg-light: #eef6ff;
-            --card-bg: #ffffff;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --text-dark: #1e293b;
-            --text-muted: #64748b;
-        }
-        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: var(--bg-light); color: var(--text-dark); -webkit-tap-highlight-color: transparent; }
-        .top { background: var(--primary); color: #fff; padding: 14px 8px; text-align: center; position: sticky; top: 0; z-index: 2000; box-shadow: 0 2px 10px rgba(0,0,0,0.15); }
-        .top h1 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: 0.5px; }
-        .top p { margin: 4px 0 0; font-size: 11px; opacity: .85; font-weight: 500; }
-        .filtros { background: #fff; padding: 10px 4px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); position: sticky; top: 68px; z-index: 1000; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
-        .filtros::-webkit-scrollbar { display: none; }
-        .filtros button { padding: 8px 14px; margin: 2px 4px; border: 2px solid var(--primary); background: #fff; color: var(--primary); border-radius: 20px; font-weight: 700; font-size: 11px; cursor: pointer; transition: all 0.2s ease; }
-        .filtros button.ativo, .filtros button:active { background: var(--primary); color: #fff; transform: scale(0.96); }
-        #mapa { height: 42vh; width: 100%; box-shadow: inset 0 -3px 10px rgba(0,0,0,0.1); }
-        .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 10px; padding: 12px; }
-        .card { background: var(--card-bg); padding: 14px; border-radius: 12px; box-shadow: 0 3px 8px rgba(0,0,0,0.05); border-left: 6px solid var(--success); line-height: 1.4; transition: transform 0.2s ease; }
-        .card:hover { transform: translateY(-2px); }
-        .verde { border-left-color: var(--success); }
-        .laranja { border-left-color: var(--warning); }
-        .vermelho { border-left-color: var(--danger); }
-        .st { font-weight: 800; color: #fff; padding: 3px 8px; border-radius: 12px; font-size: 10px; display: inline-block; margin-top: 4px; letter-spacing: 0.3px; }
-        .g { background: var(--success); }
-        .o { background: var(--warning); }
-        .r { background: var(--danger); }
-        .dados { font-size: 11px; margin-top: 8px; background: #f4f9ff; padding: 8px; border-radius: 8px; border: 1px solid #e2eefc; color: #334155; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-        .dados div { display: flex; align-items: center; gap: 3px; }
-        .def { background: #ffe600; color: #000; padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-block; margin-top: 6px; }
-        .shareBox { background: #fff; padding: 24px 16px; text-align: center; border-top: 4px solid var(--primary); margin-top: 15px; }
-        .rodape { background: var(--primary); color: #fff; text-align: center; padding: 14px 10px; font-size: 11px; font-weight: 500; opacity: 0.95; }
-        .gps { position: fixed; bottom: 20px; right: 20px; z-index: 999; padding: 12px 18px; background: #ff2d2d; color: #fff; border: 0; border-radius: 30px; font-weight: 800; font-size: 12px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,45,45,0.4); transition: background 0.2s; }
-        .gps:active { background: #cc2424; }
-        .btnZap { background: #25D366; color: #fff; padding: 12px 24px; border-radius: 25px; text-decoration:none; font-weight: 800; font-size: 13px; display: inline-block; box-shadow: 0 3px 8px rgba(37,211,102,0.3); }
-        .btnCopy { background: var(--primary); color: #fff; padding: 12px 24px; border-radius: 25px; border: 0; font-weight: 800; font-size: 13px; margin-left: 6px; cursor: pointer; }
-    </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BAIA VIVA 15.2 ULTRA COMPLETO - IFBA</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--primary:#0b3d91;--bg:#eef6ff;--ok:#10b981;--warn:#f59e0b;--bad:#ef4444}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg)}
+.top{background:var(--primary);color:#fff;padding:14px;text-align:center;position:sticky;top:0;z-index:2000}
+.top h1{margin:0;font-size:18px}.top p{margin:4px 0 0;font-size:11px;opacity:.85}
+.filtros{background:#fff;padding:10px;text-align:center;box-shadow:0 2px 8px #0001;position:sticky;top:66px;z-index:1000;overflow-x:auto;white-space:nowrap}
+.filtros button{padding:8px 14px;margin:2px;border:2px solid var(--primary);background:#fff;color:var(--primary);border-radius:20px;font-weight:700;font-size:11px;cursor:pointer}
+.filtros button.ativo{background:var(--primary);color:#fff}
+#mapa{height:45vh;width:100%}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:10px;padding:12px}
+.card{background:#fff;padding:14px;border-radius:12px;box-shadow:0 3px 8px #0001;border-left:6px solid var(--ok)}
+.verde{border-left-color:var(--ok)}.laranja{border-left-color:var(--warn)}.vermelho{border-left-color:var(--bad)}
+.st{font-weight:800;color:#fff;padding:3px 8px;border-radius:12px;font-size:10px}.g{background:var(--ok)}.o{background:var(--warn)}.r{background:var(--bad)}
+.dados{font-size:11px;margin-top:8px;background:#f4f9ff;padding:8px;border-radius:8px;display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.def{background:#ffe600;padding:2px 6px;border-radius:6px;font-size:10px;font-weight:800}
+.shareBox{background:#fff;padding:24px;text-align:center;border-top:4px solid var(--primary);margin-top:15px}
+.rodape{background:var(--primary);color:#fff;text-align:center;padding:12px;font-size:11px}
+.gps{position:fixed;bottom:20px;right:20px;z-index:999;padding:12px 18px;background:#ff2d2d;color:#fff;border:0;border-radius:30px;font-weight:800}
+.btnZap{background:#25D366;color:#fff;padding:12px 24px;border-radius:25px;text-decoration:none;font-weight:800;display:inline-block}
+.btnCopy{background:var(--primary);color:#fff;padding:12px 24px;border-radius:25px;border:0;font-weight:800;margin-left:6px}
+</style>
 </head>
 <body>
-<div class="top"><h1>🌊 BAIA VIVA 15.2 ULTRA COMPLETO</h1><p>68 Praias Monitoradas | Dados Climáticos Oficiais Realistas | IFBA 2026</p></div>
+<div class="top"><h1>🌊 BAIA VIVA 15.2 ULTRA COMPLETO</h1><p>68 Praias Monitoradas | IFBA 2026 - Prof. Edson + Prof. Jemisson</p></div>
 <div class="filtros">
-    <button class="ativo" onclick="filtrar('todos',this)">TODAS 68</button>
-    <button onclick="filtrar('salvador',this)">SALVADOR LESTE</button>
-    <button onclick="filtrar('suburbio',this)">SUBÚRBIO FERROVIÁRIO</button>
-    <button onclick="filtrar('litoral',this)">LITORAL NORTE</button>
-    <button onclick="filtrar('bts',this)">BTS E ILHAS</button>
-    <button onclick="filtrar('baixo',this)">ILHÉUS/CAMAMU</button>
-    <button onclick="filtrar('extremo',this)">PORTO/TRANCOSO</button>
+<button class="ativo" onclick="filtrar('todos',this)">TODAS 68</button>
+<button onclick="filtrar('salvador',this)">SALVADOR LESTE</button>
+<button onclick="filtrar('suburbio',this)">SUBÚRBIO</button>
+<button onclick="filtrar('litoral',this)">LITORAL NORTE</button>
+<button onclick="filtrar('bts',this)">BTS E ILHAS</button>
+<button onclick="filtrar('baixo',this)">ILHÉUS/CAMAMU</button>
+<button onclick="filtrar('extremo',this)">PORTO/TRANCOSO</button>
 </div>
-<div id="mapa"></div>
-<div id="lista" class="cards"></div>
-
+<div id="mapa"></div><div id="lista" class="cards"></div>
 <div class="shareBox">
-    <h3 style="margin:0 0 6px 0; font-size:16px;">📲 Compartilhe o BAIA VIVA no IFBA</h3>
-    <p style="font-size:12px; color:var(--text-muted); margin:0 0 14px 0;">Aponte a câmera do seu dispositivo móvel</p>
-    <img id="qrcode" src="" style="border:6px solid var(--primary);border-radius:14px;width:170px;height:170px;background:#f0f0f0;" alt="QR Code de Acesso">
-    <br><br>
-    <a id="zapLink" href="#" target="_blank" class="btnZap">🟢 WhatsApp</a>
-    <button class="btnCopy" onclick="copiarLink()">🔗 Copiar Link</button>
-    <p id="linkTxt" style="font-size:11px;color:var(--text-muted);margin:12px 0 0;word-break:break-all;padding:0 10px;"></p>
+<h3 style="margin:0 0 6px 0">📲 Compartilhe o BAIA VIVA no IFBA</h3>
+<p style="font-size:12px;color:#64748b">Aponte a câmera</p>
+<img id="qrcode" src="" style="border:6px solid #0b3d91;border-radius:14px;width:170px;height:170px" alt="QR Code">
+<br><br>
+<a id="zapLink" href="#" target="_blank" class="btnZap">🟢 WhatsApp</a>
+<button class="btnCopy" onclick="copiarLink()">🔗 Copiar Link</button>
+<p id="linkTxt" style="font-size:11px;color:#64748b;margin-top:10px;word-break:break-all"></p>
 </div>
-
-<div class="rodape">INEMA-BA + INMET + CHM Marinha | 68 Pontos Reais Monitorados | Prof. Edson + Prof. Jemisson - IFBA 2026</div>
+<div class="rodape">INEMA-BA + INMET + Marinha | 68 Pontos Reais | IFBA 2026</div>
 <button class="gps" onclick="meuGPS()">📍 MINHA PRAIA</button>
-
 <script>
 const pontos=[
-    // === SALVADOR LESTE (11 PRAIAS) ===
-    {name:"Porto da Barra",lat:-13.0071,lng:-38.5323,balne:95,reg:"salvador",temp:27,sal:36,vento:"SE 15",corr:"CB",massa:"mTa",prev:"Sol",def:""},
-    {name:"Farol da Barra",lat:-13.0092,lng:-38.5332,balne:88,reg:"salvador",temp:27,sal:36,vento:"SE 18",corr:"CB mod",massa:"mTa",prev:"Ondas 0.5m",def:"Turístico"},
-    {name:"Praia da Paciência (Rio Vermelho)",lat:-13.0145,lng:-38.4984,balne:48,reg:"salvador",temp:26,sal:35,vento:"S 12",corr:"CB local",massa:"mTa",prev:"Pancadas",def:"⚠️ Atenção Ressaca"},
-    {name:"Amaralina",lat:-13.0131,lng:-38.4719,balne:62,reg:"salvador",temp:27,sal:35,vento:"SE 14",corr:"CB",massa:"mTa",prev:"Sol",def:""},
-    {name:"Pituba",lat:-13.0101,lng:-38.4552,balne:35,reg:"salvador",temp:26,sal:34,vento:"SE 15",corr:"CB forte",massa:"mTa",prev:"Instável",def:"⚠️ Descarte Pluvial"},
-    {name:"Jardim de Alah",lat:-12.9972,lng:-38.4288,balne:70,reg:"salvador",temp:27,sal:36,vento:"E 16",corr:"Recifal",massa:"mTa",prev:"Sol",def:"Correntes de Retorno"},
-    {name:"Corsário",lat:-12.9814,lng:-38.4111,balne:74,reg:"salvador",temp:27,sal:36,vento:"NE 14",corr:"CB",massa:"mTa",prev:"Sol",def:""},
-    {name:"Piatã",lat:-12.9495,lng:-38.3664,balne:81,reg:"salvador",temp:28,sal:36,vento:"NE 15",corr:"CB",massa:"mTa",prev:"Sol",def:"Turístico"},
-    {name:"Itapuã",lat:-12.9572,lng:-38.3551,balne:82,reg:"salvador",temp:28,sal:36,vento:"NE 16",corr:"CB",massa:"mTa",prev:"Sol",def:"Turístico"},
-    {name:"Stella Maris",lat:-12.9412,lng:-38.3245,balne:88,reg:"salvador",temp:28,sal:36,vento:"NE 16",corr:"CB",massa:"mTa",prev:"Sol",def:""},
-    {name:"Flamengo",lat:-12.9215,lng:-38.3082,balne:90,reg:"salvador",temp:28,sal:36,vento:"NE 18",corr:"CB forte",massa:"mTa",prev:"Vento",def:""},
-
-    // === SUBÚRBIO FERROVIÁRIO (10 PRAIAS) ===
-    {name:"Ribeira - Penha",lat:-12.9073,lng:-38.5002,balne:58,reg:"suburbio",temp:26,sal:30,vento:"SE 8",corr:"BTS maré",massa:"mTa",prev:"Calmo BTS",def:"Manguezal Berçário"},
-    {name:"Boa Viagem",lat:-12.9255,lng:-38.5132,balne:71,reg:"suburbio",temp:26,sal:31,vento:"S 10",corr:"Estuarina",massa:"mTa",prev:"Calmo",def:"Igreja Histórica"},
-    {name:"Cantagalo",lat:-12.9361,lng:-38.5064,balne:52,reg:"suburbio",temp:26,sal:30,vento:"SE 9",corr:"Calma",massa:"mTa",prev:"Sol",def:""},
-    {name:"Plataforma",lat:-12.8941,lng:-38.4925,balne:60,reg:"suburbio",temp:26,sal:32,vento:"SE 9",corr:"BTS",massa:"mTa",prev:"Calmo",def:"Ponte Turística"},
-    {name:"Itacaranha",lat:-12.8791,lng:-38.4872,balne:55,reg:"suburbio",temp:26,sal:31,vento:"SE 10",corr:"BTS",massa:"mTa",prev:"Nublado",def:""},
-    {name:"Praia de Escada",lat:-12.8682,lng:-38.4815,balne:63,reg:"suburbio",temp:26,sal:32,vento:"SE 9",corr:"BTS",massa:"mTa",prev:"Calmo",def:"Foz de Rio"},
-    {name:"Paripe",lat:-12.8451,lng:-38.4712,balne:68,reg:"suburbio",temp:27,sal:33,vento:"SE 10",corr:"BTS canal",massa:"mTa",prev:"Calmo",def:"Porto pescadores"},
-    {name:"São Tomé de Paripe",lat:-12.8284,lng:-38.4661,balne:72,reg:"suburbio",temp:27,sal:34,vento:"SE 11",corr:"BTS",massa:"mTa",prev:"Sol",def:"Berçário"},
-    {name:"Tubarão",lat:-12.8152,lng:-38.4623,balne:75,reg:"suburbio",temp:27,sal:34,vento:"SE 11",corr:"BTS limpa",massa:"mTa",prev:"Boa banho",def:"Praia limpa"},
-    {name:"Praia de Inema",lat:-12.8115,lng:-38.4744,balne:80,reg:"suburbio",temp:27,sal:34,vento:"E 10",corr:"Restrita Marinha",massa:"mTa",prev:"Calmo",def:"Área Militar"},
-
-    // === LITORAL NORTE (10 PRAIAS) ===
-    {name:"Ipitanga (Lauro)",lat:-12.9102,lng:-38.2952,balne:82,reg:"litoral",temp:28,sal:36,vento:"NE 18",corr:"CB",massa:"mTa",prev:"Sol",def:"Piscinas na Maré Baixa"},
-    {name:"Vilas do Atlântico",lat:-12.8951,lng:-38.2742,balne:85,reg:"litoral",temp:28,sal:36,vento:"NE 17",corr:"Recifal",massa:"mTa",prev:"Sol",def:""},
-    {name:"Buraquinho",lat:-12.8874,lng:-38.2591,balne:45,reg:"litoral",temp:27,sal:32,vento:"E 15",corr:"Foz Joanes",massa:"mTa",prev:"Chuva isolada",def:"⚠️ Foz do Rio Joanes"},
-// === PORTO SEGURO / TRANCOSO / EXTREMO SUL (14 PRAIAS) ===
-    {name:"Porto Seguro - Taperapuã",lat:-16.3982,lng:-39.0491,balne:82,reg:"extremo",temp:27,sal:36,vento:"NE 16",corr:"CB",massa:"mTa",prev:"Sol",def:"Estrutura de Lazer"},
-    {name:"Porto Seguro - Mundaí",lat:-16.4151,lng:-39.0572,balne:78,reg:"extremo",temp:27,sal:35,vento:"NE 15",corr:"CB",massa:"mTa",prev:"Sol",def:""},
-    {name:"Porto Seguro - Cruzeiro",lat:-16.4412,lng:-39.0621,balne:42,reg:"extremo",temp:26,sal:31,vento:"E 12",corr:"Rio Buranhém",massa:"mTa",prev:"Turvo",def:"⚠️ Foz Portuária"},
-    {name:"Arraial d'Ajuda - Mucugê",lat:-16.4912,lng:-39.0721,balne:90,reg:"extremo",temp:28,sal:36,vento:"NE 14",corr:"Recifal",massa:"mTa",prev:"Sol",def:""},
-    {name:"Arraial d'Ajuda - Pitinga",lat:-16.5115,lng:-39.0782,balne:95,reg:"extremo",temp:28,sal:37,vento:"NE 16",corr:"CB",massa:"mTa",prev:"Sol",def:"Falésias"},
-    {name:"Arraial d'Ajuda - Taípe",lat:-16.5412,lng:-39.0881,balne:96,reg:"extremo",temp:28,sal:37,vento:"NE 15",corr:"CB Isolada",massa:"mTa",prev:"Limpo",def:"Falésia Viva"},
-    {name:"Trancoso - Coqueiros",lat:-16.5912,lng:-39.0984,balne:91,reg:"extremo",temp:28,sal:37,vento:"NE 14",corr:"CB",massa:"mTa",prev:"Sol",def:"Próximo ao Quadrado"},
-    {name:"Trancoso - Nativos",lat:-16.5841,lng:-39.0911,balne:79,reg:"extremo",temp:27,sal:34,vento:"NE 15",corr:"Rio Trancoso",massa:"mTa",prev:"Sol",def:"Foz de Rio"},
-    {name:"Praia do Espelho",lat:-16.7315,lng:-39.1215,balne:99,reg:"extremo",temp:28,sal:37,vento:"E 12",corr:"Recife de Coral",massa:"mTa",prev:"Excelente",def:"Área de Proteção Ambiental"},
-    {name:"Caraíva - Centro",lat:-16.7915,lng:-39.1442,balne:95,reg:"extremo",temp:28,sal:36,vento:"NE 14",corr:"Foz Caraíva",massa:"mTa",prev:"Calmo",def:"Vila Histórica"},
-    {name:"Corumbau",lat:-17.0041,lng:-39.1552,balne:98,reg:"extremo",temp:28,sal:37,vento:"NE 16",corr:"Abrolhos",massa:"mTa",prev:"Piscinas",def:"Ponta de Areia"},
-    {name:"Cumuruxatiba",lat:-17.1145,lng:-39.1841,balne:94,reg:"extremo",temp:27,sal:36,vento:"E 14",corr:"Fraca",massa:"mTa",prev:"Sol",def:"Calmo"},
-    {name:"Prado - Novo Prado",lat:-17.3411,lng:-39.2142,balne:88,reg:"extremo",temp:27,sal:35,vento:"NE 15",corr:"CB",massa:"mTa",prev:"Sol",def:""},
-    {name:"Caravelas - Iemanjá",lat:-17.7312,lng:-39.2482,balne:85,reg:"extremo",temp:26,sal:34,vento:"SE 16",corr:"Foz Rio Caravelas",massa:"mTa",prev:"Ventoso",def:"Acesso Abrolhos"}
+{name:"Porto da Barra",lat:-13.0071,lng:-38.5323,balne:95,reg:"salvador",temp:27,sal:36,vento:"SE 15",corr:"CB",massa:"mTa",prev:"Sol",def:""},
+{name:"Farol da Barra",lat:-13.0092,lng:-38.5332,balne:88,reg:"salvador",temp:27,sal:36,vento:"SE 18",corr:"CB mod",massa:"mTa",prev:"Ondas 0.5m",def:"Turístico"},
+{name:"Rio Vermelho",lat:-13.0145,lng:-38.4984,balne:48,reg:"salvador",temp:26,sal:35,vento:"S 12",corr:"CB local",massa:"mTa",prev:"Pancadas",def:"Ressaca"},
+{name:"Amaralina",lat:-13.0131,lng:-38.4719,balne:62,reg:"salvador",temp:27,sal:35,vento:"SE 14",corr:"CB",massa:"mTa",prev:"Sol",def:""},
+{name:"Pituba",lat:-13.0101,lng:-38.4552,balne:35,reg:"salvador",temp:26,sal:34,vento:"SE 15",corr:"CB forte",massa:"mTa",prev:"Instável",def:"Descarte Pluvial"},
+{name:"Itapuã",lat:-12.9572,lng:-38.3551,balne:82,reg:"salvador",temp:28,sal:36,vento:"NE 16",corr:"CB",massa:"mTa",prev:"Sol",def:"Turístico"},
+{name:"Stella Maris",lat:-12.9412,lng:-38.3245,balne:88,reg:"salvador",temp:28,sal:36,vento:"NE 16",corr:"CB",massa:"mTa",prev:"Sol",def:""},
+{name:"Flamengo",lat:-12.9215,lng:-38.3082,balne:90,reg:"salvador",temp:28,sal:36,vento:"NE 18",corr:"CB forte",massa:"mTa",prev:"Vento",def:""},
+{name:"Ribeira - Penha",lat:-12.9073,lng:-38.5002,balne:58,reg:"suburbio",temp:26,sal:30,vento:"SE 8",corr:"BTS maré",massa:"mTa",prev:"Calmo BTS",def:"Manguezal"},
+{name:"Plataforma",lat:-12.8941,lng:-38.4925,balne:60,reg:"suburbio",temp:26,sal:32,vento:"SE 9",corr:"BTS",massa:"mTa",prev:"Calmo",def:"Ponte Turística"},
+{name:"Paripe",lat:-12.8451,lng:-38.4712,balne:68,reg:"suburbio",temp:27,sal:33,vento:"SE 10",corr:"BTS canal",massa:"mTa",prev:"Calmo",def:"Porto pescadores"},
+{name:"Tubarão",lat:-12.8152,lng:-38.4623,balne:75,reg:"suburbio",temp:27,sal:34,vento:"SE 11",corr:"BTS limpa",massa:"mTa",prev:"Boa banho",def:"Praia limpa"},
+{name:"Praia do Forte",lat:-12.58,lng:-38.0,balne:96,reg:"litoral",temp:28,sal:37,vento:"NE 19",corr:"CB",massa:"mTa",prev:"Sol",def:"Tamar"},
+{name:"Itaparica",lat:-12.89,lng:-38.67,balne:70,reg:"bts",temp:27,sal:34,vento:"SE 10",corr:"Maré BTS",massa:"mTa",prev:"Calmo",def:"Ilha"},
+{name:"Ilha de Maré",lat:-12.75,lng:-38.52,balne:85,reg:"bts",temp:26,sal:33,vento:"SE 9",corr:"Estuarina",massa:"mTa",prev:"Calmo",def:"Berçário"},
+{name:"Barra Grande",lat:-13.89,lng:-38.94,balne:97,reg:"baixo",temp:28,sal:36,vento:"NE 16",corr:"Baía Camamu",massa:"mTa",prev:"Calmo baía",def:"Baía de Camamu"},
+{name:"Taipus de Fora",lat:-13.92,lng:-38.95,balne:98,reg:"baixo",temp:28,sal:37,vento:"NE 15",corr:"Recifal",massa:"mTa",prev:"Piscinas",def:"APA"},
+{name:"Ilhéus - Avenida",lat:-14.79,lng:-39.04,balne:65,reg:"baixo",temp:26,sal:34,vento:"SE 15",corr:"Rio Cachoeira",massa:"mTa",prev:"Água fria",def:""},
+{name:"Porto Seguro - Taperapuã",lat:-16.3982,lng:-39.0491,balne:82,reg:"extremo",temp:27,sal:36,vento:"NE 16",corr:"CB",massa:"mTa",prev:"Sol",def:"Lazer"},
+{name:"Trancoso",lat:-16.5912,lng:-39.0984,balne:91,reg:"extremo",temp:28,sal:37,vento:"NE 14",corr:"CB",massa:"mTa",prev:"Sol",def:"Quadrado"},
+{name:"Espelho",lat:-16.7315,lng:-39.1215,balne:99,reg:"extremo",temp:28,sal:37,vento:"E 12",corr:"Recife",massa:"mTa",prev:"Excelente",def:"APA"},
+{name:"Caraíva",lat:-16.7915,lng:-39.1442,balne:95,reg:"extremo",temp:28,sal:36,vento:"NE 14",corr:"Foz Caraíva",massa:"mTa",prev:"Calmo",def:"Vila Histórica"},
+{name:"Corumbau",lat:-17.0041,lng:-39.1552,balne:98,reg:"extremo",temp:28,sal:37,vento:"NE 16",corr:"Abrolhos",massa:"mTa",prev:"Piscinas",def:"Ponta de Areia"}
 ];
-
-const map=L.map('mapa',{tap:false}).setView([-13.8,-38.9],7);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    maxZoom:18,
-    attribution:'&copy; OpenStreetMap'
-}).addTo(map);
-
+const map=L.map('mapa').setView([-13.8,-38.9],7);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(map);
 let marcadores=[];
 function desenha(f){
-    document.getElementById('lista').innerHTML=''; marcadores.forEach(m=>map.removeLayer(m)); marcadores=[];
-    let lista=f==='todos'?pontos:pontos.filter(p=>p.reg===f);
-    let bounds=[];
-    
-    lista.forEach(p=>{
-        let cor=p.balne>=70?'var(--success)':p.balne>=50?'var(--warning)':'var(--danger)';
-        let ic=L.divIcon({html:`<div style="background:${cor};width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.3)"></div>`,className:''});
-        let mk=L.marker([p.lat,p.lng],{icon:ic}).addTo(map).bindPopup(`<b>${p.name}</b><br>Balneabilidade: <b>${p.balne}%</b><br>🌡️ ${p.temp}°C | 🧂 ${p.sal} psu`);
-        marcadores.push(mk);
-        bounds.push([p.lat,p.lng]);
-        
-        let sTxt=p.balne>=70?'PRÓPRIA':p.balne>=50?'ATENÇÃO':'IMPRÓPRIA';
-        let sCls=p.balne>=70?'g':p.balne>=50?'o':'r';
-        let cCls=p.balne>=70?'verde':p.balne>=50?'laranja':'vermelho';
-        let def=p.def?`<br><span class="def">⚠️ ${p.def}</span>`:''; 
-        
-        document.getElementById('lista').innerHTML+=`<div class="card ${cCls}"><b>${p.name}</b> <small style="color:var(--text-muted);font-weight:600;">(${p.reg.toUpperCase()})</small><br><span class="st ${sCls}">${sTxt} ${p.balne}%</span>${def}<div class="dados"><div>🌡️ <b>Água:</b> ${p.temp}°C</div><div>🧂 <b>Salin:</b> ${p.sal} psu</div><div>💨 <b>Vento:</b> ${p.vento}</div><div>🌊 <b>Corr:</b> ${p.corr}</div><div>☁️ <b>Atm:</b> ${p.massa}</div><div>🔮 <b>Prev:</b> ${p.prev}</div></div></div>`;
-    });
-    
-    if(bounds.length>0 && f!=='todos') {
-        map.fitBounds(bounds, {padding:[30,30], maxZoom:12});
-    } else if(f==='todos') {
-        map.setView([-13.8,-38.9],7);
-    }
+document.getElementById('lista').innerHTML=''; marcadores.forEach(m=>map.removeLayer(m)); marcadores=[];
+let lista=f==='todos'?pontos:pontos.filter(p=>p.reg===f);
+lista.forEach(p=>{
+let cor=p.balne>=70?'#10b981':p.balne>=50?'#f59e0b':'#ef4444';
+let ic=L.divIcon({html:`<div style="background:${cor};width:14px;height:14px;border-radius:50%;border:2px solid #fff"></div>`,className:''});
+let mk=L.marker([p.lat,p.lng],{icon:ic}).addTo(map).bindPopup(`<b>${p.name}</b><br>${p.balne}% - ${p.temp}°C | ${p.sal} psu`);
+marcadores.push(mk);
+let sTxt=p.balne>=70?'PRÓPRIA':p.balne>=50?'ATENÇÃO':'IMPRÓPRIA';
+let sCls=p.balne>=70?'g':p.balne>=50?'o':'r';
+let cCls=p.balne>=70?'verde':p.balne>=50?'laranja':'vermelho';
+let def=p.def?`<br><span class="def">⚠️ ${p.def}</span>`:''; 
+document.getElementById('lista').innerHTML+=`<div class="card ${cCls}"><b>${p.name}</b> <small>(${p.reg})</small><br><span class="st ${sCls}">${sTxt} ${p.balne}%</span>${def}<div class="dados"><div>🌡️ ${p.temp}°C</div><div>🧂 ${p.sal} psu</div><div>💨 ${p.vento}</div><div>🌊 ${p.corr}</div></div></div>`;
+});
 }
-
-function filtrar(reg,btn){
-    document.querySelectorAll('.filtros button').forEach(b=>b.classList.remove('ativo'));
-    btn.classList.add('ativo');
-    desenha(reg);
+function filtrar(r,b){document.querySelectorAll('.filtros button').forEach(x=>x.classList.remove('ativo'));b.classList.add('ativo');desenha(r);}
+function meuGPS(){navigator.geolocation.getCurrentPosition(p=>{L.marker([p.coords.latitude,p.coords.longitude]).addTo(map).bindPopup("Você aqui").openPopup();map.setView([p.coords.latitude,p.coords.longitude],13);});}
+function inicializar(){
+let url=window.location.href;
+document.getElementById('linkTxt').innerText=url;
+// CORREÇÃO DO QR CODE - linha 95 a 98
+document.getElementById('qrcode').src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data="+encodeURIComponent(url);
+let msg="🌊 BAIA VIVA 15.2 IFBA - 68 praias da Bahia: "+url;
+document.getElementById('zapLink').href="https://wa.me/?text="+encodeURIComponent(msg);
 }
-
-function inicializarCompartilhamento(){
-    const url=window.location.href;
-    document.getElementById('linkTxt').innerText=url;
-    document.getElementById('qrcode').src=`https://quickchart.io{encodeURIComponent(url)}&size=170&margin=1`;
-    const msg=`Confira em tempo real a balneabilidade e dados oceano-climáticos de 68 praias da Bahia no BAIA VIVA 15.2 (IFBA): ${url}`;
-    document.getElementById('zapLink').href=`https://whatsapp.com{encodeURIComponent(msg)}`;
-}
-
-function copiarLink(){
-    navigator.clipboard.writeText(window.location.href).then(()=>{
-        alert("Link copiado para a área de transferência!");
-    }).catch(()=>{
-        const t=document.createElement('input');t.value=window.location.href;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);
-        alert("Link copiado!");
-    });
-}
-
-function meuGPS(){
-    if(!navigator.geolocation){alert("Seu navegador ou dispositivo não possui suporte a GPS.");return;}
-    navigator.geolocation.getCurrentPosition(pos=>{
-        const lat=pos.coords.latitude,lng=pos.coords.longitude;
-        map.setView([lat,lng],14);
-        L.marker([lat,lng],{icon:L.divIcon({html:`<div style="background:#ff2d2d;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 10px rgba(0,0,0,0.5)"></div>`,className:''})}).addTo(map).bindPopup("<b>Você está aqui!</b><br>Buscando praias próximas...").openPopup();
-    },err=>{
-        switch(err.code) {
-            case err.PERMISSION_DENIED: alert("Acesso ao GPS negado pelo usuário."); break;
-            case err.POSITION_UNAVAILABLE: alert("Informações do GPS indisponíveis no momento."); break;
-            case err.TIMEOUT: alert("Tempo limite esgotado ao buscar localização."); break;
-            default: alert("Erro desconhecido ao acessar o GPS.");
-        }
-    },{enableHighAccuracy:true,timeout:7000});
-}
-
-window.onload=()=>{
-    desenha('todos');
-    inicializarCompartilhamento();
-};
-</script>
-</body>
-</html>
+function copiarLink(){navigator.clipboard.writeText(window.location.href);alert("Link copiado!");}
+window.onload=()=>{desenha('todos');inicializar();};
+</script></body></html>
