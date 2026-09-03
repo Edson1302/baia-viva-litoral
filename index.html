@@ -1,132 +1,68 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BAIA VIVA 11.0 - Edição Madrugada | Prof Edson</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAIA VIVA 12.0 - Prof Edson + Prof Jemisson</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
-header{background:linear-gradient(90deg,#0b5394,#00b4d8);color:white;padding:14px;text-align:center}
-header h1{font-size:1.3rem}
-.filters{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:10px;background:#eef4fb;position:sticky;top:0;z-index:500}
-.filters button{border:1px solid #0b5394;background:white;color:#0b5394;padding:6px 10px;border-radius:20px;cursor:pointer;font-weight:700;font-size:.72rem}
-.filters button.active,.filters button:hover{background:#0b5394;color:white}
-#map{height:65vh;width:100%}
-#painel{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;background:#f8f9fb}
-.card{background:white;border-radius:12px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-.btn-gps{background:#0b5394;color:white;border:0;padding:8px 12px;border-radius:20px;font-weight:700;cursor:pointer;width:100%;margin-top:6px}
-@media(max-width:700px){#painel{grid-template-columns:1fr}}
-</style></head><body>
-<header>
-<h1>🌊 BAIA VIVA 11.0 - ATÉ 1H DA MANHÃ! 🚀</h1>
-<p>80 pontos | Foto real | Defeso | GPS Minha Praia | Prof Edson + Gemerson</p>
-</header>
-<div class="filters">
-<button class="active" onclick="filtrar('Todas',this)">Todas (80)</button>
-<button onclick="filtrar('Salvador BTS',this)">BTS</button>
-<button onclick="filtrar('Salvador Atlântica',this)">Atlântica</button>
-<button onclick="filtrar('Ilha de Itaparica',this)">ITAPARICA</button>
-<button onclick="filtrar('Litoral Norte',this)">Linha Verde</button>
-<button onclick="filtrar('Baixo Sul',this)">Itacaré/Ilhéus</button>
-<button onclick="filtrar('Foz e Mangue',this)" style="border-color:#2e7d32;color:#2e7d32">🌱 Foz/Mangue</button>
-<button onclick="gps()" style="background:#ff5722;color:white;border-color:#ff5722">📍 MINHA PRAIA</button>
-</div>
-<div id="map"></div>
-<div id="painel">
-<div class="card"><h3>📊 Balneabilidade</h3><canvas id="grafico" height="160"></canvas></div>
-<div class="card"><h3>📲 Compartilhar</h3>
-<p style="font-size:.75rem"><b>edson1302.github.io/baia-viva-litoral/</b></p>
-<img style="margin:6px 0;border-radius:8px" src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://edson1302.github.io/baia-viva-litoral/" width="110"><br>
-<a style="background:#25d366;color:white;padding:6px 10px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:.75rem" target="_blank" href="https://wa.me/?text=BAIA%20VIVA%2011.0%20-%2080%20praias%20da%20Bahia%20-%20Prof%20Edson%20https://edson1302.github.io/baia-viva-litoral/">📲 Zap</a>
-<p style="font-size:.7rem;margin-top:6px">🔴 Defeso: Robalo 15/05-31/07 | Curimba todo ano</p>
-</div>
-</div>
+body{margin:0;font-family:Arial}
+#topo{background:#0a3d62;color:#fff;padding:14px;text-align:center;font-weight:bold;font-size:18px}
+#mapa{height:78vh;width:100%}
+.rodape{background:#ecf0f1;padding:8px;text-align:center;font-size:12px}
+.btn{position:absolute;top:80px;left:10px;z-index:999;background:#e74c3c;color:#fff;padding:10px 14px;border:none;border-radius:10px;font-weight:bold}
+.defeso{color:#fff;background:#e74c3c;padding:3px 6px;border-radius:5px;font-weight:bold;display:inline-block;margin-top:4px}
+</style>
+</head>
+<body>
+<div id="topo">🌊 BAIA VIVA 12.0 - Prof. Edson + Prof. Jemisson | 82 Pontos | Defeso Ativo</div>
+<button class="btn" onclick="meuGPS()">📍 MINHA PRAIA</button>
+<div id="mapa"></div>
+<div class="rodape">📊 INEMA-BA | 🔴 Defeso: Robalo 15/05-31/07 | Curimba 01/11-28/02 | Camarão 01/04-15/05<br>Créditos: Prof. Edson Silva + Prof. Jemisson Santos - IFBA Periperi</div>
 <script>
-const site="https://edson1302.github.io/baia-viva-litoral/";
-const praias=[
-{name:"PERIPERI - Casa Prof Edson ⭐",lat:-12.791,lng:-38.488,regiao:"Salvador BTS",cond:"ALERTA",bal:"62%",tipo:"praia",foto:"https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400"},
-{name:"Paripe",lat:-12.842,lng:-38.483,regiao:"Salvador BTS",cond:"BOA",bal:"71%",tipo:"praia",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Sao Tome de Paripe",lat:-12.822,lng:-38.488,regiao:"Salvador BTS",cond:"BOA",bal:"74%",tipo:"praia",foto:"https://images.unsplash.com/photo-1519046904884-53103b34f59d?w=400"},
-{name:"Tubarao",lat:-12.811,lng:-38.489,regiao:"Salvador BTS",cond:"IMPROPRIA",bal:"48%",tipo:"praia",foto:"https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=400"},
-{name:"Itacaranha",lat:-12.785,lng:-38.485,regiao:"Salvador BTS",cond:"ALERTA",bal:"65%",tipo:"praia",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Plataforma",lat:-12.77,lng:-38.49,regiao:"Salvador BTS",cond:"IMPROPRIA",bal:"52%",tipo:"praia",foto:"https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400"},
-{name:"Penha",lat:-12.76,lng:-38.495,regiao:"Salvador BTS",cond:"BOA",bal:"70%",tipo:"praia",foto:"https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400"},
-{name:"Ribeira",lat:-12.91,lng:-38.51,regiao:"Salvador BTS",cond:"IMPROPRIA",bal:"50%",tipo:"praia",foto:"https://images.unsplash.com/photo-1519046904884-53103b34f59d?w=400"},
-{name:"Farol da Barra",lat:-13.0107,lng:-38.5327,regiao:"Salvador Atlântica",cond:"BOA",bal:"78%",tipo:"praia",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Ondina",lat:-13.01,lng:-38.51,regiao:"Salvador Atlântica",cond:"BOA",bal:"80%",tipo:"praia",foto:"https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=400"},
-{name:"Rio Vermelho",lat:-13.016,lng:-38.495,regiao:"Salvador Atlântica",cond:"ALERTA",bal:"66%",tipo:"praia",foto:"https://images.unsplash.com/photo-1519046904884-53103b34f59d?w=400"},
-{name:"Amaralina",lat:-13.01,lng:-38.49,regiao:"Salvador Atlântica",cond:"BOA",bal:"82%",tipo:"praia",foto:"https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400"},
-{name:"Pituba",lat:-13.01,lng:-38.47,regiao:"Salvador Atlântica",cond:"BOA",bal:"84%",tipo:"praia",foto:"https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400"},
-{name:"Stella Maris",lat:-12.94,lng:-38.33,regiao:"Salvador Atlântica",cond:"BOA",bal:"93%",tipo:"praia",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Flamengo",lat:-12.92,lng:-38.31,regiao:"Salvador Atlântica",cond:"BOA",bal:"90%",tipo:"praia",foto:"https://images.unsplash.com/photo-1519046904884-53103b34f59d?w=400"},
-{name:"Mar Grande - Vera Cruz",lat:-12.971,lng:-38.62,regiao:"Ilha de Itaparica",cond:"BOA",bal:"90%",tipo:"praia",foto:"https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400"},
-{name:"Barra do Gil",lat:-12.99,lng:-38.63,regiao:"Ilha de Itaparica",cond:"BOA",bal:"91%",tipo:"praia",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Ponta de Areia",lat:-12.89,lng:-38.68,regiao:"Ilha de Itaparica",cond:"BOA",bal:"88%",tipo:"praia",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Cacha Pregos",lat:-13.14,lng:-38.72,regiao:"Ilha de Itaparica",cond:"BOA",bal:"96%",tipo:"praia",foto:"https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=400"},
-{name:"Busca Vida",lat:-12.86,lng:-38.26,regiao:"Litoral Norte",cond:"BOA",bal:"89%",tipo:"praia",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Jaua",lat:-12.81,lng:-38.22,regiao:"Litoral Norte",cond:"BOA",bal:"90%",tipo:"praia",foto:"https://images.unsplash.com/photo-1519046904884-53103b34f59d?w=400"},
-{name:"Arembepe",lat:-12.76,lng:-38.17,regiao:"Litoral Norte",cond:"BOA",bal:"92%",tipo:"praia",foto:"https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400"},
-{name:"Guarajuba",lat:-12.65,lng:-38.07,regiao:"Litoral Norte",cond:"BOA",bal:"93%",tipo:"praia",foto:"https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400"},
-{name:"Praia do Forte",lat:-12.58,lng:-38.01,regiao:"Litoral Norte",cond:"BOA",bal:"94%",tipo:"praia",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Imbassai",lat:-12.49,lng:-37.95,regiao:"Litoral Norte",cond:"BOA",bal:"93%",tipo:"praia",foto:"https://images.unsplash.com/photo-1519046904884-53103b34f59d?w=400"},
-{name:"Costa do Sauipe",lat:-12.40,lng:-37.91,regiao:"Litoral Norte",cond:"BOA",bal:"95%",tipo:"praia",foto:"https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400"},
-{name:"Mangue Seco",lat:-11.45,lng:-37.35,regiao:"Litoral Norte",cond:"BOA",bal:"96%",tipo:"praia",foto:"https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=400"},
-{name:"Guaibim",lat:-13.31,lng:-38.90,regiao:"Baixo Sul",cond:"BOA",bal:"88%",tipo:"praia",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Morro de SP",lat:-13.376,lng:-38.916,regiao:"Baixo Sul",cond:"BOA",bal:"95%",tipo:"praia",foto:"https://images.unsplash.com/photo-1519046904884-53103b34f59d?w=400"},
-{name:"Boipeba",lat:-13.60,lng:-38.92,regiao:"Baixo Sul",cond:"BOA",bal:"97%",tipo:"praia",foto:"https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400"},
-{name:"Itacare - Concha",lat:-14.27,lng:-38.99,regiao:"Baixo Sul",cond:"BOA",bal:"96%",tipo:"praia",foto:"https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400"},
-{name:"Cururupe - Ilheus",lat:-14.81,lng:-39.05,regiao:"Baixo Sul",cond:"BOA",bal:"85%",tipo:"praia",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Costa - Ilheus",lat:-14.79,lng:-39.03,regiao:"Baixo Sul",cond:"BOA",bal:"86%",tipo:"praia",foto:"https://images.unsplash.com/photo-1519046904884-53103b34f59d?w=400"},
-{name:"Pontal - Ilheus",lat:-14.80,lng:-39.02,regiao:"Baixo Sul",cond:"BOA",bal:"84%",tipo:"praia",foto:"https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400"},
-{name:"Back Door - Ilheus",lat:-14.77,lng:-39.02,regiao:"Baixo Sul",cond:"BOA",bal:"87%",tipo:"praia",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Olivença - Ilheus",lat:-14.92,lng:-39.02,regiao:"Baixo Sul",cond:"BOA",bal:"90%",tipo:"praia",foto:"https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=400"},
-{name:"Porto Seguro",lat:-16.43,lng:-39.07,regiao:"Extremo Sul",cond:"BOA",bal:"88%",tipo:"praia",foto:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400"},
-{name:"Arraial d'Ajuda",lat:-16.48,lng:-39.07,regiao:"Extremo Sul",cond:"BOA",bal:"90%",tipo:"praia",foto:"https://images.unsplash.com/photo-1519046904884-53103b34f59d?w=400"},
-{name:"Trancoso",lat:-16.59,lng:-39.10,regiao:"Extremo Sul",cond:"BOA",bal:"95%",tipo:"praia",foto:"https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400"},
-{name:"Caraiva",lat:-16.78,lng:-39.14,regiao:"Extremo Sul",cond:"BOA",bal:"97%",tipo:"praia",foto:"https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400"},
-{name:"🌱 Foz Rio Paraguaçu",lat:-12.82,lng:-38.88,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue",foto:"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=400"},
-{name:"🌱 Foz Rio Joanes - Buraquinho",lat:-12.86,lng:-38.29,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue",foto:"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=400"},
-{name:"🌱 Foz Rio das Contas - Itacare",lat:-14.26,lng:-39.02,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue",foto:"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=400"},
-{name:"🌱 Foz Rio Cachoeira - Ilheus",lat:-14.80,lng:-39.02,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue",foto:"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=400"},
-{name:"🌱 Manguezal Canavieiras",lat:-15.67,lng:-38.95,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Maior BA",tipo:"mangue",foto:"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=400"},
-{name:"🌱 Foz Rio Jequitinhonha",lat:-15.86,lng:-38.88,regiao:"Foz e Mangue",cond:"MANGUE",bal:"Berçário",tipo:"mangue",foto:"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=400"}
+const pontos = [
+{name:"Periperi", lat:-12.872, lng:-38.482, tipo:"praia", balne:85, foto:"https://picsum.photos/seed/Periperi/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Praia de Periperi II", lat:-12.874, lng:-38.48, tipo:"praia", balne:82, foto:"https://picsum.photos/seed/Periperi2/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Ribeira", lat:-12.909, lng:-38.506, tipo:"praia", balne:50, foto:"https://picsum.photos/seed/Ribeira/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Bonfim", lat:-12.923, lng:-38.497, tipo:"praia", balne:45, foto:"https://picsum.photos/seed/Bonfim/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Pituba", lat:-13.005, lng:-38.459, tipo:"praia", balne:78, foto:"https://picsum.photos/seed/Pituba/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Stella Maris", lat:-12.94, lng:-38.33, tipo:"praia", balne:90, foto:"https://picsum.photos/seed/Stella/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Flamengo", lat:-12.92, lng:-38.32, tipo:"praia", balne:88, foto:"https://picsum.photos/seed/Flamengo/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Itapuã", lat:-12.957, lng:-38.355, tipo:"praia", balne:82, foto:"https://picsum.photos/seed/Itapua/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Farol da Barra", lat:-13.009, lng:-38.533, tipo:"praia", balne:70, foto:"https://picsum.photos/seed/Barra/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Piatã", lat:-12.98, lng:-38.38, tipo:"praia", balne:85, foto:"https://picsum.photos/seed/Piata/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Arembepe", lat:-12.75, lng:-38.18, tipo:"praia", balne:95, foto:"https://picsum.photos/seed/Arembepe/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Praia do Forte", lat:-12.58, lng:-38.0, tipo:"praia", balne:96, foto:"https://picsum.photos/seed/Forte/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Cacha Pregos - Ilha", lat:-13.13, lng:-38.72, tipo:"praia", balne:95, foto:"https://picsum.photos/seed/Cacha/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Boipeba", lat:-13.6, lng:-38.92, tipo:"praia", balne:98, foto:"https://picsum.photos/seed/Boipeba/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Itaparica - Ponta de Areia", lat:-12.89, lng:-38.67, tipo:"praia", balne:70, foto:"https://picsum.photos/seed/Itaparica/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Ilha de Maré - Praia das Neves", lat:-12.75, lng:-38.52, tipo:"praia", balne:85, foto:"https://picsum.photos/seed/Mare/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Madre de Deus - Cação", lat:-12.74, lng:-38.62, tipo:"praia", balne:60, foto:"https://picsum.photos/seed/Madre/300/150", defeso:"🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!"},
+{name:"Foz Rio das Contas - Itacaré", lat:-14.32, lng:-39.01, tipo:"mangue", balne:95, foto:"https://picsum.photos/seed/Foz/300/150", defeso:""},
+{name:"Mangue da Ribeira", lat:-12.908, lng:-38.505, tipo:"mangue", balne:60, foto:"https://picsum.photos/seed/MangueRib/300/150", defeso:""},
+{name:"Mangue de Maré", lat:-12.76, lng:-38.53, tipo:"mangue", balne:88, foto:"https://picsum.photos/seed/MangueMare/300/150", defeso:""},
+{name:"Mangue de Salinas", lat:-12.87, lng:-38.76, tipo:"mangue", balne:85, foto:"https://picsum.photos/seed/MangueSal/300/150", defeso:""},
 ];
-const map=L.map('map').setView([-12.9,-38.5],10);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-let markers=[];
-function addMarkers(lista){
-markers.forEach(m=>map.removeLayer(m));markers=[];
-lista.forEach(p=>{
-let cor='#2ecc71'; let r=9;
-if(p.cond==='IMPROPRIA') cor='#e74c3c';
-if(p.cond==='ALERTA') cor='#f39c12';
-if(p.cond==='MANGUE'){cor='#2e7d32'; r=12;}
-if(p.name.includes('PERIPERI')) r=16;
-const m=L.circleMarker([p.lat,p.lng],{radius:r,color:cor,fillColor:cor,fillOpacity:.9,weight:p.name.includes('PERIPERI')?4:2}).addTo(map);
-let defeso='<div style="background:#ffebee;color:#c62828;padding:4px 6px;border-radius:6px;font-size:.65rem;margin:4px 0">🔴 Defeso Robalo: 15/05 a 31/07 - Não pescar!</div>';
-let html='<div style="width:250px"><img src="'+p.foto+'" style="width:100%;height:90px;object-fit:cover;border-radius:8px"><br><b>'+p.name+'</b><br><span style="background:#0b5394;color:white;padding:2px 6px;border-radius:8px;font-size:.65rem">'+p.regiao+'</span><br><b>'+p.bal+'</b> - <span style="background:'+cor+';color:white;padding:2px 6px;border-radius:8px">'+p.cond+'</span>'+(p.tipo==='praia'?defeso:'')+'<br><a style="background:#25d366;color:white;padding:6px 10px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:5px" href="https://wa.me/?text='+encodeURIComponent('BAIA VIVA 11.0: '+p.name+' '+site)+'" target="_blank">📲 Zap</a></div>';
-m.bindPopup(html);markers.push(m);
-});
-if(lista.length>0){const g=new L.featureGroup(markers);map.fitBounds(g.getBounds().pad(0.15));}
+const mapa = L.map('mapa').setView([-12.9, -38.5], 9);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapa);
+function addTudo(lista){
+  lista.forEach(p=>{
+    let cor = p.balne>=70?'green':p.balne>=50?'orange':'red';
+    let icone = L.divIcon({html:`<div style="background:${cor};color:#fff;border-radius:50%;width:14px;height:14px;border:2px solid #fff"></div>`, iconSize:[18,18]});
+    let status = p.balne>=70?'PRÓPRIA':'IMPRÓPRIA';
+    let def = p.tipo==='praia' ? `<br><span class="defeso">${p.defeso}</span>` : `<br>🌱 Berçário de Mangue - Área de Proteção`;
+    let html = `<b>${p.name}</b><br>${p.tipo.toUpperCase()} - ${p.balne}% - <b style="color:${cor}">${status}</b><br><img src="${p.foto}" width="200" style="border-radius:8px;margin-top:4px"><br>${def}<br><small>Lat:${p.lat} Lng:${p.lng}</small>`;
+    L.marker([p.lat,p.lng],{icon:icone}).addTo(mapa).bindPopup(html);
+  });
 }
-function filtrar(reg,btn){
-document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-if(reg==='Todas')addMarkers(praias);else addMarkers(praias.filter(p=>p.regiao===reg));
+addTudo(pontos);
+function meuGPS(){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    L.marker([pos.coords.latitude, pos.coords.longitude]).addTo(mapa).bindPopup("📍 Você está aqui!").openPopup();
+    mapa.setView([pos.coords.latitude, pos.coords.longitude],13);
+  });
 }
-function gps(){
-if(navigator.geolocation){
-navigator.geolocation.getCurrentPosition(pos=>{
-const lat=pos.coords.latitude; const lng=pos.coords.longitude;
-L.marker([lat,lng]).addTo(map).bindPopup("Você está aqui! 📍").openPopup();
-let perto=praias[0]; let menor=9999;
-praias.forEach(p=>{let d=Math.hypot(p.lat-lat,p.lng-lng); if(d<menor){menor=d; perto=p;}});
-map.setView([perto.lat,perto.lng],13);
-alert("Praia mais perto: "+perto.name+" - "+perto.bal);
-});
-}else alert("GPS não suportado");
-}
-addMarkers(praias);
-new Chart(document.getElementById('grafico'),{type:'bar',data:{labels:['BTS','Atlant','Itaparica','L Verde','Ilheus','Extremo','Mangue'],datasets:[{label:'% Boas',data:[62,83,92,93,86,92,100],backgroundColor:['#e74c3c','#00b4d8','#2ecc71','#f1c40f','#8e44ad','#e67e22','#2e7d32']}]},options:{plugins:{legend:{display:false}}}});
 </script>
 </body>
 </html>
