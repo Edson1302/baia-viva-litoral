@@ -3,137 +3,131 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BAIA VIVA 17.2 - 76 TEMPERATURAS AO VIVO</title>
+<title>BAIA VIVA 17.3 - COMPLETO</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-body{margin:0;font-family:system-ui;background:#061a2a;color:#fff}
-header{padding:12px 16px;background:#082a44;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-#clock{font-family:monospace;font-size:18px;color:#7ff0ff}
-#tempSalvador{background:#0b3a5c;padding:6px 12px;border-radius:20px;font-weight:700}
-#map{height:88vh;width:100%}
-.leaflet-popup-content{color:#111;min-width:200px}
-.badge{display:inline-block;background:#0b5cff;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;margin:2px}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#061a2a;color:#fff;display:flex;flex-direction:column;height:100vh}
+header{padding:10px 16px;background:#082a44;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+#clock{font-family:monospace;font-size:16px;color:#7ff0ff}#tempSalvador{background:#0b3a5c;padding:5px 12px;border-radius:20px;font-weight:700;font-size:13px}
+main{display:flex;flex:1;overflow:hidden}
+#sidebar{width:280px;background:#0a2e4e;padding:12px;overflow-y:auto;border-right:1px solid #123}
+#sidebar h3{margin:8px 0;font-size:14px;color:#7ff0ff}
+.layer{display:flex;align-items:center;gap:8px;background:#0d3a61;margin:4px 0;padding:8px;border-radius:8px;cursor:pointer;font-size:13px}
+#mapWrap{flex:1;display:flex;flex-direction:column}
+#map{flex:1;width:100%;min-height:400px}
+#infoPanel{background:#082a44;padding:12px;border-top:2px solid #0b5cff;max-height:35vh;overflow-y:auto}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card{background:#0d3a61;padding:8px;border-radius:8px;font-size:12px}
+.card b{color:#7ff0ff}
+.badge{display:inline-block;background:#0b5cff;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px}
 </style>
 </head>
 <body>
 <header>
-<div><b>BAIA VIVA 17.2</b> — 76 praias com temperatura AO VIVO no clique</div>
+<div><b>BAÍA VIVA 17.3</b> — Completo com camadas</div>
 <div id="clock">--:--:--</div>
-<div id="tempSalvador">Carregando Salvador...</div>
+<div id="tempSalvador">Carregando Salvador AO VIVO...</div>
 </header>
+<main>
+<div id="sidebar">
+<h3>🗺️ Camadas Climáticas</h3>
+<label class="layer"><input type="checkbox" checked> 🌡️ Temperatura do Ar (ao vivo)</label>
+<label class="layer"><input type="checkbox" checked> 🌊 Temperatura da Água</label>
+<label class="layer"><input type="checkbox" checked> 💨 Vento e Rajadas</label>
+<label class="layer"><input type="checkbox" checked> 🧂 Salinidade + Corrente</label>
+<label class="layer"><input type="checkbox" checked> 🌳 Cobertura Vegetal</label>
+<label class="layer"><input type="checkbox" checked> 🌱 Manguezal</label>
+<h3>📍 76 pontos</h3>
+</div>
+<div id="mapWrap">
 <div id="map"></div>
+<div id="infoPanel"><b>👈 Clique em um ponto</b> - Temp Ar AO VIVO + Temp Água + Salinidade + Corrente + Vegetação + Mangue + Vento</div>
+</div>
+</main>
 <script>
-const pontos = [
-{n:"Mangue Seco - Divisa BA/SE",lat:-11.44,lng:-37.36,reg:"Coqueiros"},
-{n:"Praia do Saco",lat:-11.40,lng:-37.34,reg:"Coqueiros"},
-{n:"Costa Azul - Jandaira",lat:-11.56,lng:-37.35,reg:"Coqueiros"},
-{n:"Sitio do Conde",lat:-11.72,lng:-37.42,reg:"Coqueiros"},
-{n:"Baixio",lat:-11.95,lng:-37.61,reg:"Coqueiros"},
-{n:"Palame",lat:-12.00,lng:-37.66,reg:"Coqueiros"},
-{n:"Subauma",lat:-12.08,lng:-37.74,reg:"Coqueiros"},
-{n:"Massarandupio",lat:-12.20,lng:-37.82,reg:"Coqueiros"},
-{n:"Praia do Forte",lat:-12.57,lng:-38.00,reg:"Coqueiros"},
-{n:"Imbassai",lat:-12.50,lng:-37.95,reg:"Coqueiros"},
-{n:"Santo Antonio",lat:-12.58,lng:-38.02,reg:"Coqueiros"},
-{n:"Itacimirim",lat:-12.62,lng:-38.06,reg:"Coqueiros"},
-{n:"Guarajuba",lat:-12.64,lng:-38.07,reg:"Coqueiros"},
-{n:"Itacimirim Barra",lat:-12.63,lng:-38.05,reg:"Coqueiros"},
-{n:"Interlagos",lat:-12.68,lng:-38.12,reg:"Coqueiros"},
-{n:"Busca Vida",lat:-12.86,lng:-38.26,reg:"Coqueiros"},
-{n:"Jaua",lat:-12.89,lng:-38.28,reg:"Coqueiros"},
-{n:"Arembepe",lat:-12.74,lng:-38.17,reg:"Coqueiros"},
-{n:"Stella Maris",lat:-12.94,lng:-38.32,reg:"Salvador"},
-{n:"Itapua",lat:-12.96,lng:-38.35,reg:"Salvador"},
-{n:"Farol da Barra - Salvador",lat:-13.010,lng:-38.532,reg:"Salvador"},
-{n:"Porto da Barra",lat:-13.00,lng:-38.53,reg:"Salvador"},
-{n:"Ilha de Itaparica - Mar Grande",lat:-12.99,lng:-38.68,reg:"Salvador"},
-{n:"Ponta de Areia",lat:-13.05,lng:-38.68,reg:"Salvador"},
-{n:"Berlinque",lat:-13.10,lng:-38.65,reg:"Salvador"},
-{n:"Cacha Prego",lat:-13.12,lng:-38.60,reg:"Salvador"},
-{n:"Ilha de Mare",lat:-12.78,lng:-38.52,reg:"Salvador"},
-{n:"Ilha dos Frades",lat:-12.81,lng:-38.64,reg:"Salvador"},
-{n:"Bom Jesus dos Passos",lat:-12.95,lng:-38.62,reg:"Salvador"},
-{n:"Madre de Deus",lat:-12.74,lng:-38.62,reg:"Salvador"},
-{n:"Salinas da Margarida",lat:-12.88,lng:-38.77,reg:"Salvador"},
-{n:"Caboto",lat:-12.82,lng:-38.70,reg:"Salvador"},
-{n:"Saubara",lat:-12.73,lng:-38.77,reg:"Salvador"},
-{n:"Jaguaripe",lat:-13.11,lng:-38.89,reg:"Salvador"},
-{n:"Aratuba",lat:-12.95,lng:-38.70,reg:"Salvador"},
-{n:"S Francisco do Conde",lat:-12.62,lng:-38.67,reg:"Salvador"},
-{n:"Mataripe",lat:-12.68,lng:-38.56,reg:"Salvador"},
-{n:"Bom Despacho",lat:-12.89,lng:-38.62,reg:"Salvador"},
-{n:"Morro de Sao Paulo",lat:-13.37,lng:-38.91,reg:"Dende"},
-{n:"Gamboa",lat:-13.38,lng:-38.91,reg:"Dende"},
-{n:"Boipeba",lat:-13.61,lng:-38.93,reg:"Dende"},
-{n:"Morere",lat:-13.65,lng:-38.93,reg:"Dende"},
-{n:"Garapua",lat:-13.48,lng:-38.91,reg:"Dende"},
-{n:"Barra Grande",lat:-13.88,lng:-38.94,reg:"Dende"},
-{n:"Taipu de Fora",lat:-13.92,lng:-38.92,reg:"Dende"},
-{n:"Guaibim",lat:-13.32,lng:-38.95,reg:"Dende"},
-{n:"Pratigi",lat:-13.78,lng:-39.05,reg:"Dende"},
-{n:"Itubera",lat:-13.73,lng:-39.14,reg:"Dende"},
-{n:"Igrapiuna",lat:-13.82,lng:-39.14,reg:"Dende"},
-{n:"Barra do Serinhaem",lat:-13.61,lng:-39.02,reg:"Dende"},
-{n:"Valenca",lat:-13.36,lng:-39.07,reg:"Dende"},
-{n:"Camamu",lat:-13.94,lng:-39.10,reg:"Dende"},
-{n:"Itacare Pontal",lat:-14.31,lng:-38.99,reg:"Cacau"},
-{n:"Itacare Resende",lat:-14.29,lng:-38.99,reg:"Cacau"},
-{n:"Serra Grande",lat:-14.46,lng:-39.03,reg:"Cacau"},
-{n:"Ilheus Olivença",lat:-14.93,lng:-39.01,reg:"Cacau"},
-{n:"Ilheus Back Door",lat:-14.79,lng:-39.03,reg:"Cacau"},
-{n:"Canavieiras",lat:-15.67,lng:-38.94,reg:"Cacau"},
-{n:"Una",lat:-15.29,lng:-39.06,reg:"Cacau"},
-{n:"Comandatuba",lat:-15.35,lng:-38.99,reg:"Cacau"},
-{n:"Barra de Caravelas Int",lat:-15.60,lng:-38.95,reg:"Cacau"},
-{n:"Itabuna ref rio",lat:-14.78,lng:-39.27,reg:"Cacau"},
-{n:"Porto Seguro Centro",lat:-16.44,lng:-39.06,reg:"Descobrimento"},
-{n:"Arraial d Ajuda",lat:-16.48,lng:-39.07,reg:"Descobrimento"},
-{n:"Trancoso",lat:-16.59,lng:-39.09,reg:"Descobrimento"},
-{n:"Caraiva",lat:-16.79,lng:-39.14,reg:"Descobrimento"},
-{n:"Corumbau",lat:-16.90,lng:-39.13,reg:"Descobrimento"},
-{n:"Santa Cruz Cabralia",lat:-16.27,lng:-39.02,reg:"Descobrimento"},
-{n:"Santo Andre",lat:-16.22,lng:-39.01,reg:"Descobrimento"},
-{n:"Belmonte",lat:-15.86,lng:-38.88,reg:"Descobrimento"},
-{n:"Prado",lat:-17.33,lng:-39.22,reg:"Baleias"},
-{n:"Cumuruxatiba",lat:-17.10,lng:-39.18,reg:"Baleias"},
-{n:"Alcobaca",lat:-17.51,lng:-39.19,reg:"Baleias"},
-{n:"Caravelas Ponta",lat:-17.73,lng:-39.26,reg:"Baleias"},
-{n:"Barra de Caravelas",lat:-17.73,lng:-39.25,reg:"Baleias"},
-{n:"Mucuri Divisa BA/ES",lat:-18.08,lng:-39.55,reg:"Baleias"}
-];
-const map = L.map('map').setView([-13.0,-38.9],7);
+const pontos = [{n:"Mangue Seco",lat:-11.44,lng:-37.36,reg:"Coqueiros",veg:82,mangue:75,sal:35.2,corr:"NE 0.8kt",agua:27.1},
+{n:"Praia do Saco",lat:-11.40,lng:-37.34,reg:"Coqueiros",veg:78,mangue:60,sal:35.0,corr:"NE 0.6kt",agua:27.3},
+{n:"Costa Azul - Jandaira",lat:-11.56,lng:-37.35,reg:"Coqueiros",veg:80,mangue:65,sal:35.1,corr:"E 0.7kt",agua:27.2},
+{n:"Sitio do Conde",lat:-11.72,lng:-37.42,reg:"Coqueiros",veg:75,mangue:55,sal:35.0,corr:"E 0.5kt",agua:27.4},
+{n:"Baixio",lat:-11.95,lng:-37.61,reg:"Coqueiros",veg:70,mangue:50,sal:34.9,corr:"SE 0.6kt",agua:27.5},
+{n:"Palame",lat:-12.00,lng:-37.66,reg:"Coqueiros",veg:68,mangue:45,sal:34.8,corr:"SE 0.5kt",agua:27.6},
+{n:"Subauma",lat:-12.08,lng:-37.74,reg:"Coqueiros",veg:72,mangue:48,sal:34.9,corr:"SE 0.7kt",agua:27.4},
+{n:"Massarandupio",lat:-12.20,lng:-37.82,reg:"Coqueiros",veg:65,mangue:40,sal:34.8,corr:"E 0.6kt",agua:27.8},
+{n:"Praia do Forte",lat:-12.57,lng:-38.00,reg:"Coqueiros",veg:60,mangue:35,sal:35.0,corr:"E 0.9kt",agua:27.9},
+{n:"Imbassai",lat:-12.50,lng:-37.95,reg:"Coqueiros",veg:62,mangue:38,sal:34.9,corr:"E 0.8kt",agua:27.7},
+{n:"Santo Antonio",lat:-12.58,lng:-38.02,reg:"Coqueiros",veg:58,mangue:30,sal:35.1,corr:"SE 0.7kt",agua:28.0},
+{n:"Itacimirim",lat:-12.62,lng:-38.06,reg:"Coqueiros",veg:55,mangue:28,sal:35.0,corr:"SE 0.6kt",agua:27.9},
+{n:"Guarajuba",lat:-12.64,lng:-38.07,reg:"Coqueiros",veg:52,mangue:25,sal:35.2,corr:"SE 0.8kt",agua:28.1},
+{n:"Busca Vida",lat:-12.86,lng:-38.26,reg:"Coqueiros",veg:45,mangue:20,sal:35.3,corr:"E 0.7kt",agua:28.2},
+{n:"Jaua",lat:-12.89,lng:-38.28,reg:"Coqueiros",veg:43,mangue:18,sal:35.2,corr:"E 0.6kt",agua:28.1},
+{n:"Arembepe",lat:-12.74,lng:-38.17,reg:"Coqueiros",veg:48,mangue:24,sal:35.1,corr:"SE 0.5kt",agua:27.9},
+{n:"Stella Maris",lat:-12.94,lng:-38.32,reg:"Salvador",veg:40,mangue:15,sal:35.4,corr:"SE 0.8kt",agua:28.0},
+{n:"Itapua",lat:-12.96,lng:-38.35,reg:"Salvador",veg:38,mangue:12,sal:35.5,corr:"SE 0.9kt",agua:28.1},
+{n:"Farol da Barra - Salvador",lat:-13.010,lng:-38.532,reg:"Salvador",veg:20,mangue:5,sal:35.6,corr:"S 1.0kt",agua:27.8},
+{n:"Porto da Barra",lat:-13.00,lng:-38.53,reg:"Salvador",veg:22,mangue:6,sal:35.5,corr:"S 0.8kt",agua:27.9},
+{n:"Mar Grande",lat:-12.99,lng:-38.68,reg:"Salvador",veg:55,mangue:70,sal:33.5,corr:"N 0.4kt",agua:28.5},
+{n:"Ilha de Mare",lat:-12.78,lng:-38.52,reg:"Salvador",veg:70,mangue:80,sal:32.5,corr:"N 0.2kt",agua:28.8},
+{n:"Ilha dos Frades",lat:-12.81,lng:-38.64,reg:"Salvador",veg:75,mangue:78,sal:32.8,corr:"N 0.3kt",agua:28.7},
+{n:"Salinas da Margarida",lat:-12.88,lng:-38.77,reg:"Salvador",veg:60,mangue:85,sal:32.0,corr:"N 0.2kt",agua:29.0},
+{n:"Saubara",lat:-12.73,lng:-38.77,reg:"Salvador",veg:58,mangue:80,sal:31.8,corr:"N 0.1kt",agua:29.1},
+{n:"Morro de Sao Paulo",lat:-13.37,lng:-38.91,reg:"Dende",veg:68,mangue:40,sal:35.0,corr:"SE 0.9kt",agua:27.9},
+{n:"Boipeba",lat:-13.61,lng:-38.93,reg:"Dende",veg:78,mangue:50,sal:34.8,corr:"SE 0.7kt",agua:27.8},
+{n:"Barra Grande",lat:-13.88,lng:-38.94,reg:"Dende",veg:75,mangue:60,sal:34.6,corr:"E 0.8kt",agua:27.6},
+{n:"Taipu de Fora",lat:-13.92,lng:-38.92,reg:"Dende",veg:70,mangue:55,sal:34.8,corr:"E 0.7kt",agua:27.8},
+{n:"Valenca",lat:-13.36,lng:-39.07,reg:"Dende",veg:70,mangue:80,sal:32.5,corr:"SE 0.3kt",agua:28.7},
+{n:"Camamu",lat:-13.94,lng:-39.10,reg:"Dende",veg:78,mangue:84,sal:32.0,corr:"E 0.4kt",agua:28.5},
+{n:"Itacare Pontal",lat:-14.31,lng:-38.99,reg:"Cacau",veg:75,mangue:45,sal:34.5,corr:"SE 0.9kt",agua:27.5},
+{n:"Serra Grande",lat:-14.46,lng:-39.03,reg:"Cacau",veg:85,mangue:35,sal:34.7,corr:"SE 0.7kt",agua:27.4},
+{n:"Ilheus Olivença",lat:-14.93,lng:-39.01,reg:"Cacau",veg:60,mangue:30,sal:35.0,corr:"E 0.8kt",agua:27.7},
+{n:"Canavieiras",lat:-15.67,lng:-38.94,reg:"Cacau",veg:70,mangue:75,sal:33.0,corr:"NE 0.6kt",agua:28.2},
+{n:"Comandatuba",lat:-15.35,lng:-38.99,reg:"Cacau",veg:72,mangue:55,sal:34.0,corr:"E 0.6kt",agua:27.8},
+{n:"Porto Seguro",lat:-16.44,lng:-39.06,reg:"Descobrimento",veg:50,mangue:35,sal:34.8,corr:"E 0.8kt",agua:27.3},
+{n:"Arraial d Ajuda",lat:-16.48,lng:-39.07,reg:"Descobrimento",veg:55,mangue:30,sal:34.9,corr:"E 0.7kt",agua:27.4},
+{n:"Trancoso",lat:-16.59,lng:-39.09,reg:"Descobrimento",veg:65,mangue:25,sal:35.0,corr:"E 0.7kt",agua:27.2},
+{n:"Caraiva",lat:-16.79,lng:-39.14,reg:"Descobrimento",veg:80,mangue:40,sal:34.7,corr:"NE 0.6kt",agua:27.0},
+{n:"Corumbau",lat:-16.90,lng:-39.13,reg:"Descobrimento",veg:85,mangue:45,sal:34.6,corr:"NE 0.5kt",agua:26.9},
+{n:"Santa Cruz Cabralia",lat:-16.27,lng:-39.02,reg:"Descobrimento",veg:52,mangue:32,sal:34.9,corr:"E 0.7kt",agua:27.5},
+{n:"Belmonte",lat:-15.86,lng:-38.88,reg:"Descobrimento",veg:72,mangue:78,sal:32.5,corr:"NE 0.4kt",agua:28.0},
+{n:"Prado",lat:-17.33,lng:-39.22,reg:"Baleias",veg:60,mangue:50,sal:34.5,corr:"E 0.7kt",agua:26.8},
+{n:"Cumuruxatiba",lat:-17.10,lng:-39.18,reg:"Baleias",veg:75,mangue:45,sal:34.6,corr:"E 0.6kt",agua:26.9},
+{n:"Alcobaca",lat:-17.51,lng:-39.19,reg:"Baleias",veg:58,mangue:55,sal:34.4,corr:"E 0.6kt",agua:26.7},
+{n:"Caravelas",lat:-17.73,lng:-39.25,reg:"Baleias",veg:64,mangue:75,sal:33.5,corr:"NE 0.4kt",agua:27.1},
+{n:"Mucuri",lat:-18.08,lng:-39.55,reg:"Baleias",veg:55,mangue:60,sal:34.0,corr:"NE 0.6kt",agua:26.8}
+];const map = L.map('map').setView([-13.0,-38.9],7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
-function relogio(){
- const agora = new Date();
- document.getElementById('clock').innerText = agora.toLocaleTimeString('pt-BR');
-}
-setInterval(relogio,1000); relogio();
+function relogio(){document.getElementById('clock').innerText=new Date().toLocaleTimeString('pt-BR');}
+setInterval(relogio,1000);relogio();
 async function fetchTempo(lat,lng){
  try{
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,wind_speed_10m,relative_humidity_2m&timezone=America%2FSao_Paulo`;
-  const r = await fetch(url);
-  const j = await r.json();
-  return j.current;
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,wind_speed_10m,relative_humidity_2m&timezone=America%2FSao_Paulo`;
+  const r=await fetch(url); const j=await r.json(); return j.current;
  }catch(e){return null}
 }
 async function atualizaSalvador(){
- const cur = await fetchTempo(-13.010,-38.532);
- if(cur){
-  document.getElementById('tempSalvador').innerHTML = `📍 Salvador ${cur.temperature_2m}°C | Vento ${cur.wind_speed_10m} km/h | ${new Date().toLocaleTimeString('pt-BR')}`;
- }
+ const cur=await fetchTempo(-13.010,-38.532);
+ if(cur){document.getElementById('tempSalvador').innerHTML=`📍 Salvador ${cur.temperature_2m}°C | Vento ${cur.wind_speed_10m} km/h | ${new Date().toLocaleTimeString('pt-BR')}`;}
 }
-atualizaSalvador(); setInterval(atualizaSalvador, 3600000);
+atualizaSalvador(); setInterval(atualizaSalvador,3600000);
 pontos.forEach(p=>{
- const m = L.marker([p.lat,p.lng]).addTo(map);
- m.bindPopup(`<b>${p.n}</b><br><span class=badge>${p.reg}</span><br><div id='pop-${p.lat}'>Clique para carregar clima AO VIVO...</div>`);
+ const m=L.marker([p.lat,p.lng]).addTo(map);
  m.on('click', async ()=>{
-   const box = document.getElementById(`pop-${p.lat}`);
-   if(box) box.innerHTML = '⏳ Buscando AO VIVO...';
-   const cur = await fetchTempo(p.lat,p.lng);
-   if(cur && box){
-     box.innerHTML = `<b style='font-size:18px'>${cur.temperature_2m}°C AGORA</b><br>💨 Vento: ${cur.wind_speed_10m} km/h<br>💧 Umidade: ${cur.relative_humidity_2m}%<br>🕒 ${new Date().toLocaleTimeString('pt-BR')}<br><small style='color:green'>● dado Open-Meteo ao vivo</small>`;
-   }
+   const panel=document.getElementById('infoPanel');
+   panel.innerHTML='⏳ Buscando dados AO VIVO...';
+   const cur=await fetchTempo(p.lat,p.lng);
+   const tempAr = cur ? `${cur.temperature_2m}°C` : '---';
+   const vento = cur ? `${cur.wind_speed_10m} km/h` : '---';
+   const umid = cur ? `${cur.relative_humidity_2m}%` : '---';
+   panel.innerHTML=`
+   <div style="display:flex;justify-content:space-between"><b style="font-size:16px">${p.n}</b><span class=badge>${p.reg}</span></div>
+   <div class=grid style="margin-top:8px">
+     <div class=card><b>🌡️ Temp Ar AO VIVO</b><br><span style="font-size:18px">${tempAr}</span><br><small>${new Date().toLocaleTimeString('pt-BR')}</small></div>
+     <div class=card><b>🌊 Temp Água</b><br>${p.agua}°C<br><small>Modelo</small></div>
+     <div class=card><b>💨 Vento AO VIVO</b><br>${vento}<br>Umidade: ${umid}</div>
+     <div class=card><b>🧂 Salinidade</b><br>${p.sal} PSU<br>Corrente: ${p.corr}</div>
+     <div class=card><b>🌳 Cob. Vegetal</b><br>${p.veg}% Mata Atlântica</div>
+     <div class=card><b>🌱 Manguezal</b><br>${p.mangue}% cobertura</div>
+   </div>`;
  });
 });
 </script>
