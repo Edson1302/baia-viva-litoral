@@ -1,62 +1,141 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BAIA VIVA 17.0 - 76 Praias COMPLETO</title>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BAIA VIVA 17.2 - 76 TEMPERATURAS AO VIVO</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui;background:#eef6fb}
-.h{background:linear-gradient(90deg,#0b3d91,#0e5ab8);color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
-.h h1{font-size:18px}.b{background:#0ec5c5;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700}
-.f{background:#fff;padding:10px 12px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid #dde6ef}
-.f button{border:1px solid #c7d6e6;background:#f5f9fd;padding:7px 12px;border-radius:20px;cursor:pointer;font-weight:600;font-size:12px}
-.f button.on{background:#0b3d91;color:#fff}
-.m{display:grid;grid-template-columns:360px 1fr;gap:12px;padding:12px}@media(max-width:900px){.m{grid-template-columns:1fr}} 
-#map{height:520px;border-radius:14px} .list{display:flex;flex-direction:column;gap:10px;max-height:520px;overflow:auto}
-.card{background:#fff;border-radius:12px;padding:10px 12px;box-shadow:0 2px 10px rgba(0,0,0,.06);border-left:5px solid #22c55e}
-.card.IMPROPRIA{border-left-color:#ef4444}.card.ATENCAO{border-left-color:#f59e0b}
-.sco{font-size:17px;font-weight:800}
-.meta{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-top:6px;font-size:10px} .meta div{background:#f5f7f9;padding:5px;border-radius:6px;text-align:center}
-</style></head>
+body{margin:0;font-family:system-ui;background:#061a2a;color:#fff}
+header{padding:12px 16px;background:#082a44;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+#clock{font-family:monospace;font-size:18px;color:#7ff0ff}
+#tempSalvador{background:#0b3a5c;padding:6px 12px;border-radius:20px;font-weight:700}
+#map{height:88vh;width:100%}
+.leaflet-popup-content{color:#111;min-width:200px}
+.badge{display:inline-block;background:#0b5cff;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;margin:2px}
+</style>
+</head>
 <body>
-<div class="h"><h1>BAIA VIVA 17.0 - FORMATADO - 76 Pontos | COMPLETAO</h1><div class="b" id="badge">76 Pontos</div></div>
-<div class="f">
-<button class="on" data-f="TODAS">TODAS (76)</button>
-<button data-f="SALVADOR">SALVADOR (15)</button>
-<button data-f="SUBURBIO">SUBURBIO (6)</button>
-<button data-f="BTS">BTS (8)</button>
-<button data-f="LITORAL N">LITORAL N (15)</button>
-<button data-f="BAIXO SUL">BAIXO SUL (14)</button>
-<button data-f="EXTREMO SUL">EXTREMO SUL (18)</button>
-</div>
-<div style="padding:8px 12px;font-size:11px;background:#fff;margin:0 12px;border-radius:8px">Total: <span id="t"></span> | Proprias: <span id="p"></span> | Atencao: <span id="a"></span> | Impropria: <span id="i"></span> | CONAMA 274/2000</div>
-<div class="m"><div class="list" id="list"></div><div id="map"></div></div>
+<header>
+<div><b>BAIA VIVA 17.2</b> — 76 praias com temperatura AO VIVO no clique</div>
+<div id="clock">--:--:--</div>
+<div id="tempSalvador">Carregando Salvador...</div>
+</header>
+<div id="map"></div>
 <script>
-const DATA=[
-{name:"Porto da Barra",reg:"SALVADOR",lat:-13.007,lng:-38.533,ph:7.8,ecoli:63,status:"PROPRIA",score:95},{name:"Farol da Barra",reg:"SALVADOR",lat:-13.01,lng:-38.533,ph:8.1,ecoli:59,status:"PROPRIA",score:89},{name:"Ondina - Buracao",reg:"SALVADOR",lat:-13.015,lng:-38.514,ph:8.5,ecoli:525,status:"ATENCAO",score:60},{name:"Rio Vermelho",reg:"SALVADOR",lat:-13.021,lng:-38.49,ph:8.4,ecoli:750,status:"IMPROPRIA",score:48},{name:"Amaralina",reg:"SALVADOR",lat:-13.028,lng:-38.479,ph:7.9,ecoli:430,status:"ATENCAO",score:65},{name:"Pituba",reg:"SALVADOR",lat:-13.035,lng:-38.46,ph:7.7,ecoli:380,status:"PROPRIA",score:72},{name:"Jardim de Alah",reg:"SALVADOR",lat:-13.045,lng:-38.445,ph:7.6,ecoli:290,status:"PROPRIA",score:78},{name:"Stella Maris",reg:"SALVADOR",lat:-12.941,lng:-38.324,ph:8.0,ecoli:110,status:"PROPRIA",score:88},{name:"Flamengo",reg:"SALVADOR",lat:-12.913,lng:-38.284,ph:8.1,ecoli:85,status:"PROPRIA",score:92},{name:"Itapua",reg:"SALVADOR",lat:-12.953,lng:-38.358,ph:7.9,ecoli:210,status:"PROPRIA",score:80},{name:"Jaguaribe",reg:"SALVADOR",lat:-12.971,lng:-38.383,ph:7.8,ecoli:240,status:"PROPRIA",score:79},{name:"Piata",reg:"SALVADOR",lat:-12.963,lng:-38.363,ph:8.0,ecoli:130,status:"PROPRIA",score:86},{name:"Patamares",reg:"SALVADOR",lat:-12.95,lng:-38.34,ph:8.0,ecoli:125,status:"PROPRIA",score:87},{name:"Farol de Itapua",reg:"SALVADOR",lat:-12.958,lng:-38.355,ph:7.9,ecoli:195,status:"PROPRIA",score:81},{name:"Corsario",reg:"SALVADOR",lat:-13.02,lng:-38.475,ph:7.7,ecoli:410,status:"ATENCAO",score:64},{name:"Ribeira",reg:"SUBURBIO",lat:-12.914,lng:-38.496,ph:7.5,ecoli:890,status:"IMPROPRIA",score:45},{name:"Bonfim",reg:"SUBURBIO",lat:-12.923,lng:-38.508,ph:7.4,ecoli:920,status:"IMPROPRIA",score:42},{name:"Boa Viagem",reg:"SUBURBIO",lat:-12.932,lng:-38.514,ph:7.6,ecoli:670,status:"ATENCAO",score:55},{name:"Periperi",reg:"SUBURBIO",lat:-12.872,lng:-38.482,ph:7.3,ecoli:1200,status:"IMPROPRIA",score:35},{name:"Paripe",reg:"SUBURBIO",lat:-12.848,lng:-38.471,ph:7.4,ecoli:1050,status:"IMPROPRIA",score:38},{name:"Tubarao",reg:"SUBURBIO",lat:-12.86,lng:-38.475,ph:7.5,ecoli:980,status:"IMPROPRIA",score:40},{name:"Ilha de Mare - Santana",reg:"BTS",lat:-12.744,lng:-38.529,ph:8.2,ecoli:45,status:"PROPRIA",score:94},{name:"Bom Jesus dos Passos",reg:"BTS",lat:-12.759,lng:-38.513,ph:8.1,ecoli:52,status:"PROPRIA",score:93},{name:"Madre de Deus",reg:"BTS",lat:-12.741,lng:-38.62,ph:7.8,ecoli:180,status:"PROPRIA",score:82},{name:"Paramana - Mare",reg:"BTS",lat:-12.738,lng:-38.545,ph:8.2,ecoli:48,status:"PROPRIA",score:95},{name:"Ponta - Mare",reg:"BTS",lat:-12.732,lng:-38.518,ph:8.3,ecoli:38,status:"PROPRIA",score:96},{name:"Itaparica - Ponta Areia",reg:"BTS",lat:-12.891,lng:-38.678,ph:7.9,ecoli:165,status:"PROPRIA",score:84},{name:"Vera Cruz - Cacha Pregos",reg:"BTS",lat:-13.08,lng:-38.63,ph:8.1,ecoli:72,status:"PROPRIA",score:92},{name:"Jiribatuba",reg:"BTS",lat:-13.02,lng:-38.65,ph:8.0,ecoli:90,status:"PROPRIA",score:90},{name:"Jaua",reg:"LITORAL N",lat:-12.7,lng:-38.07,ph:8.0,ecoli:120,status:"PROPRIA",score:87},{name:"Arembepe",reg:"LITORAL N",lat:-12.742,lng:-38.168,ph:8.0,ecoli:95,status:"PROPRIA",score:90},{name:"Guarajuba",reg:"LITORAL N",lat:-12.648,lng:-38.069,ph:8.2,ecoli:70,status:"PROPRIA",score:93},{name:"Itacimirim",reg:"LITORAL N",lat:-12.619,lng:-38.053,ph:8.1,ecoli:65,status:"PROPRIA",score:94},{name:"Praia do Forte",reg:"LITORAL N",lat:-12.58,lng:-38.008,ph:8.1,ecoli:80,status:"PROPRIA",score:91},{name:"Imbassai",reg:"LITORAL N",lat:-12.481,lng:-37.964,ph:8.0,ecoli:110,status:"PROPRIA",score:88},{name:"Santo Antonio",reg:"LITORAL N",lat:-12.4,lng:-37.9,ph:7.9,ecoli:140,status:"PROPRIA",score:85},{name:"Massarandupio",reg:"LITORAL N",lat:-12.324,lng:-37.826,ph:8.2,ecoli:55,status:"PROPRIA",score:95},{name:"Baixio",reg:"LITORAL N",lat:-12.11,lng:-37.702,ph:8.3,ecoli:40,status:"PROPRIA",score:96},{name:"Mangue Seco",reg:"LITORAL N",lat:-11.438,lng:-37.347,ph:8.3,ecoli:30,status:"PROPRIA",score:98},{name:"Subauma",reg:"LITORAL N",lat:-12.25,lng:-37.78,ph:8.1,ecoli:68,status:"PROPRIA",score:93},{name:"Barra do Jacuipe",reg:"LITORAL N",lat:-12.685,lng:-38.058,ph:7.9,ecoli:155,status:"PROPRIA",score:84},{name:"Busca Vida",reg:"LITORAL N",lat:-12.87,lng:-38.27,ph:8.0,ecoli:105,status:"PROPRIA",score:89},{name:"Sitio do Conde",reg:"LITORAL N",lat:-11.73,lng:-37.58,ph:8.2,ecoli:50,status:"PROPRIA",score:95},{name:"Sauipe",reg:"LITORAL N",lat:-12.45,lng:-37.92,ph:8.1,ecoli:82,status:"PROPRIA",score:91},{name:"Morro de SP",reg:"BAIXO SUL",lat:-13.376,lng:-38.916,ph:8.0,ecoli:100,status:"PROPRIA",score:89},{name:"Boipeba - Morere",reg:"BAIXO SUL",lat:-13.623,lng:-38.929,ph:8.2,ecoli:48,status:"PROPRIA",score:96},{name:"Barra Grande",reg:"BAIXO SUL",lat:-13.383,lng:-38.95,ph:8.1,ecoli:60,status:"PROPRIA",score:94},{name:"Itacare - Resende",reg:"BAIXO SUL",lat:-14.278,lng:-38.994,ph:7.9,ecoli:150,status:"PROPRIA",score:84},{name:"Itacarezinho",reg:"BAIXO SUL",lat:-14.327,lng:-38.99,ph:8.2,ecoli:50,status:"PROPRIA",score:95},{name:"Olivenca",reg:"BAIXO SUL",lat:-14.946,lng:-39.023,ph:7.7,ecoli:320,status:"ATENCAO",score:68},{name:"Tiririca - Itacare",reg:"BAIXO SUL",lat:-14.29,lng:-38.996,ph:7.8,ecoli:170,status:"PROPRIA",score:83},{name:"Havaizinho",reg:"BAIXO SUL",lat:-14.31,lng:-38.992,ph:8.0,ecoli:95,status:"PROPRIA",score:90},{name:"Engenhoca",reg:"BAIXO SUL",lat:-14.3,lng:-38.994,ph:8.1,ecoli:75,status:"PROPRIA",score:92},{name:"Garapua",reg:"BAIXO SUL",lat:-13.48,lng:-38.92,ph:8.3,ecoli:35,status:"PROPRIA",score:97},{name:"Gamboa",reg:"BAIXO SUL",lat:-13.4,lng:-38.9,ph:8.2,ecoli:55,status:"PROPRIA",score:94},{name:"Cairu",reg:"BAIXO SUL",lat:-13.485,lng:-38.95,ph:8.0,ecoli:110,status:"PROPRIA",score:88},{name:"Taipu de Fora",reg:"BAIXO SUL",lat:-13.93,lng:-38.915,ph:8.3,ecoli:32,status:"PROPRIA",score:98},{name:"Ilheus - Milionarios",reg:"EXTREMO SUL",lat:-14.788,lng:-39.036,ph:7.6,ecoli:450,status:"ATENCAO",score:62},{name:"Ilheus - Batuba",reg:"EXTREMO SUL",lat:-14.812,lng:-39.05,ph:7.5,ecoli:520,status:"ATENCAO",score:60},{name:"Canavieiras",reg:"EXTREMO SUL",lat:-15.675,lng:-38.948,ph:7.8,ecoli:200,status:"PROPRIA",score:81},{name:"Corumbau",reg:"EXTREMO SUL",lat:-16.896,lng:-39.121,ph:8.4,ecoli:25,status:"PROPRIA",score:99},{name:"Caraiva",reg:"EXTREMO SUL",lat:-16.789,lng:-39.146,ph:8.3,ecoli:35,status:"PROPRIA",score:97},{name:"Trancoso",reg:"EXTREMO SUL",lat:-16.59,lng:-39.098,ph:8.1,ecoli:75,status:"PROPRIA",score:90},{name:"Arraial dAjuda",reg:"EXTREMO SUL",lat:-16.483,lng:-39.067,ph:7.9,ecoli:180,status:"PROPRIA",score:83},{name:"Porto Seguro - Taperapua",reg:"EXTREMO SUL",lat:-16.443,lng:-39.065,ph:7.7,ecoli:350,status:"ATENCAO",score:66},{name:"Santa Cruz Cabralia",reg:"EXTREMO SUL",lat:-16.277,lng:-39.024,ph:7.9,ecoli:160,status:"PROPRIA",score:82},{name:"Santo Andre",reg:"EXTREMO SUL",lat:-16.205,lng:-38.996,ph:8.2,ecoli:55,status:"PROPRIA",score:94},{name:"Belmonte",reg:"EXTREMO SUL",lat:-15.863,lng:-38.882,ph:7.8,ecoli:210,status:"PROPRIA",score:79},{name:"Prado",reg:"EXTREMO SUL",lat:-17.338,lng:-39.219,ph:8.0,ecoli:120,status:"PROPRIA",score:87},{name:"Cumuruxatiba",reg:"EXTREMO SUL",lat:-17.098,lng:-39.178,ph:8.2,ecoli:42,status:"PROPRIA",score:96},{name:"Mucuri",reg:"EXTREMO SUL",lat:-18.084,lng:-39.554,ph:7.9,ecoli:155,status:"PROPRIA",score:84},{name:"Alcobaca",reg:"EXTREMO SUL",lat:-17.52,lng:-39.196,ph:7.8,ecoli:190,status:"PROPRIA",score:81},{name:"Nova Vicosa",reg:"EXTREMO SUL",lat:-17.89,lng:-39.37,ph:7.7,ecoli:230,status:"PROPRIA",score:78},{name:"Ponta do Corumbau",reg:"EXTREMO SUL",lat:-16.95,lng:-39.13,ph:8.4,ecoli:28,status:"PROPRIA",score:99},{name:"Espelho",reg:"EXTREMO SUL",lat:-16.52,lng:-39.09,ph:8.1,ecoli:70,status:"PROPRIA",score:93},{name:"Curuipe - Ilheus",reg:"EXTREMO SUL",lat:-14.8,lng:-39.03,ph:7.6,ecoli:380,status:"ATENCAO",score:65}
+const pontos = [
+{n:"Mangue Seco - Divisa BA/SE",lat:-11.44,lng:-37.36,reg:"Coqueiros"},
+{n:"Praia do Saco",lat:-11.40,lng:-37.34,reg:"Coqueiros"},
+{n:"Costa Azul - Jandaira",lat:-11.56,lng:-37.35,reg:"Coqueiros"},
+{n:"Sitio do Conde",lat:-11.72,lng:-37.42,reg:"Coqueiros"},
+{n:"Baixio",lat:-11.95,lng:-37.61,reg:"Coqueiros"},
+{n:"Palame",lat:-12.00,lng:-37.66,reg:"Coqueiros"},
+{n:"Subauma",lat:-12.08,lng:-37.74,reg:"Coqueiros"},
+{n:"Massarandupio",lat:-12.20,lng:-37.82,reg:"Coqueiros"},
+{n:"Praia do Forte",lat:-12.57,lng:-38.00,reg:"Coqueiros"},
+{n:"Imbassai",lat:-12.50,lng:-37.95,reg:"Coqueiros"},
+{n:"Santo Antonio",lat:-12.58,lng:-38.02,reg:"Coqueiros"},
+{n:"Itacimirim",lat:-12.62,lng:-38.06,reg:"Coqueiros"},
+{n:"Guarajuba",lat:-12.64,lng:-38.07,reg:"Coqueiros"},
+{n:"Itacimirim Barra",lat:-12.63,lng:-38.05,reg:"Coqueiros"},
+{n:"Interlagos",lat:-12.68,lng:-38.12,reg:"Coqueiros"},
+{n:"Busca Vida",lat:-12.86,lng:-38.26,reg:"Coqueiros"},
+{n:"Jaua",lat:-12.89,lng:-38.28,reg:"Coqueiros"},
+{n:"Arembepe",lat:-12.74,lng:-38.17,reg:"Coqueiros"},
+{n:"Stella Maris",lat:-12.94,lng:-38.32,reg:"Salvador"},
+{n:"Itapua",lat:-12.96,lng:-38.35,reg:"Salvador"},
+{n:"Farol da Barra - Salvador",lat:-13.010,lng:-38.532,reg:"Salvador"},
+{n:"Porto da Barra",lat:-13.00,lng:-38.53,reg:"Salvador"},
+{n:"Ilha de Itaparica - Mar Grande",lat:-12.99,lng:-38.68,reg:"Salvador"},
+{n:"Ponta de Areia",lat:-13.05,lng:-38.68,reg:"Salvador"},
+{n:"Berlinque",lat:-13.10,lng:-38.65,reg:"Salvador"},
+{n:"Cacha Prego",lat:-13.12,lng:-38.60,reg:"Salvador"},
+{n:"Ilha de Mare",lat:-12.78,lng:-38.52,reg:"Salvador"},
+{n:"Ilha dos Frades",lat:-12.81,lng:-38.64,reg:"Salvador"},
+{n:"Bom Jesus dos Passos",lat:-12.95,lng:-38.62,reg:"Salvador"},
+{n:"Madre de Deus",lat:-12.74,lng:-38.62,reg:"Salvador"},
+{n:"Salinas da Margarida",lat:-12.88,lng:-38.77,reg:"Salvador"},
+{n:"Caboto",lat:-12.82,lng:-38.70,reg:"Salvador"},
+{n:"Saubara",lat:-12.73,lng:-38.77,reg:"Salvador"},
+{n:"Jaguaripe",lat:-13.11,lng:-38.89,reg:"Salvador"},
+{n:"Aratuba",lat:-12.95,lng:-38.70,reg:"Salvador"},
+{n:"S Francisco do Conde",lat:-12.62,lng:-38.67,reg:"Salvador"},
+{n:"Mataripe",lat:-12.68,lng:-38.56,reg:"Salvador"},
+{n:"Bom Despacho",lat:-12.89,lng:-38.62,reg:"Salvador"},
+{n:"Morro de Sao Paulo",lat:-13.37,lng:-38.91,reg:"Dende"},
+{n:"Gamboa",lat:-13.38,lng:-38.91,reg:"Dende"},
+{n:"Boipeba",lat:-13.61,lng:-38.93,reg:"Dende"},
+{n:"Morere",lat:-13.65,lng:-38.93,reg:"Dende"},
+{n:"Garapua",lat:-13.48,lng:-38.91,reg:"Dende"},
+{n:"Barra Grande",lat:-13.88,lng:-38.94,reg:"Dende"},
+{n:"Taipu de Fora",lat:-13.92,lng:-38.92,reg:"Dende"},
+{n:"Guaibim",lat:-13.32,lng:-38.95,reg:"Dende"},
+{n:"Pratigi",lat:-13.78,lng:-39.05,reg:"Dende"},
+{n:"Itubera",lat:-13.73,lng:-39.14,reg:"Dende"},
+{n:"Igrapiuna",lat:-13.82,lng:-39.14,reg:"Dende"},
+{n:"Barra do Serinhaem",lat:-13.61,lng:-39.02,reg:"Dende"},
+{n:"Valenca",lat:-13.36,lng:-39.07,reg:"Dende"},
+{n:"Camamu",lat:-13.94,lng:-39.10,reg:"Dende"},
+{n:"Itacare Pontal",lat:-14.31,lng:-38.99,reg:"Cacau"},
+{n:"Itacare Resende",lat:-14.29,lng:-38.99,reg:"Cacau"},
+{n:"Serra Grande",lat:-14.46,lng:-39.03,reg:"Cacau"},
+{n:"Ilheus Olivença",lat:-14.93,lng:-39.01,reg:"Cacau"},
+{n:"Ilheus Back Door",lat:-14.79,lng:-39.03,reg:"Cacau"},
+{n:"Canavieiras",lat:-15.67,lng:-38.94,reg:"Cacau"},
+{n:"Una",lat:-15.29,lng:-39.06,reg:"Cacau"},
+{n:"Comandatuba",lat:-15.35,lng:-38.99,reg:"Cacau"},
+{n:"Barra de Caravelas Int",lat:-15.60,lng:-38.95,reg:"Cacau"},
+{n:"Itabuna ref rio",lat:-14.78,lng:-39.27,reg:"Cacau"},
+{n:"Porto Seguro Centro",lat:-16.44,lng:-39.06,reg:"Descobrimento"},
+{n:"Arraial d Ajuda",lat:-16.48,lng:-39.07,reg:"Descobrimento"},
+{n:"Trancoso",lat:-16.59,lng:-39.09,reg:"Descobrimento"},
+{n:"Caraiva",lat:-16.79,lng:-39.14,reg:"Descobrimento"},
+{n:"Corumbau",lat:-16.90,lng:-39.13,reg:"Descobrimento"},
+{n:"Santa Cruz Cabralia",lat:-16.27,lng:-39.02,reg:"Descobrimento"},
+{n:"Santo Andre",lat:-16.22,lng:-39.01,reg:"Descobrimento"},
+{n:"Belmonte",lat:-15.86,lng:-38.88,reg:"Descobrimento"},
+{n:"Prado",lat:-17.33,lng:-39.22,reg:"Baleias"},
+{n:"Cumuruxatiba",lat:-17.10,lng:-39.18,reg:"Baleias"},
+{n:"Alcobaca",lat:-17.51,lng:-39.19,reg:"Baleias"},
+{n:"Caravelas Ponta",lat:-17.73,lng:-39.26,reg:"Baleias"},
+{n:"Barra de Caravelas",lat:-17.73,lng:-39.25,reg:"Baleias"},
+{n:"Mucuri Divisa BA/ES",lat:-18.08,lng:-39.55,reg:"Baleias"}
 ];
-const map=L.map('map').setView([-13.5,-39.0],7);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-let marks=[],cur='TODAS';
-const col=s=>s==='PROPRIA'?'#22c55e':s==='ATENCAO'?'#f59e0b':'#ef4444';
-function draw(){
-const LST=document.getElementById('list');LST.innerHTML='';marks.forEach(m=>map.removeLayer(m));marks=[];
-const F=cur==='TODAS'?DATA:DATA.filter(d=>d.reg===cur);
-document.getElementById('t').textContent=F.length;
-document.getElementById('p').textContent=F.filter(d=>d.status==='PROPRIA').length;
-document.getElementById('a').textContent=F.filter(d=>d.status==='ATENCAO').length;
-document.getElementById('i').textContent=F.filter(d=>d.status==='IMPROPRIA').length;
-document.getElementById('badge').textContent=F.length+' Pontos | '+cur;
-F.forEach(p=>{
-const m=L.circleMarker([p.lat,p.lng],{radius:7,color:col(p.status),fillColor:col(p.status),fillOpacity:.9}).addTo(map);
-m.bindPopup(`<b>${p.name}</b><br>${p.reg} | pH ${p.ph} | E.coli ${p.ecoli}<br><b>${p.status} ${p.score}%</b>`);
-marks.push(m);
-const d=document.createElement('div');d.className='card '+p.status;
-d.innerHTML=`<div style="display:flex;justify-content:space-between"><b style="font-size:13px">${p.name}</b><span style="font-size:10px;background:${col(p.status)};color:#fff;padding:2px 7px;border-radius:10px">${p.status}</span></div><div class="sco" style="color:${col(p.status)}">${p.score}% ${p.status}</div><div class="meta"><div>pH<br>${p.ph}</div><div>E.coli<br>${p.ecoli}</div><div>UV<br>5</div><div>Vento<br>12</div></div><small>${p.reg}</small>`;
-d.onclick=()=>{map.setView([p.lat,p.lng],12);m.openPopup()};
-LST.appendChild(d);
-});
+const map = L.map('map').setView([-13.0,-38.9],7);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+function relogio(){
+ const agora = new Date();
+ document.getElementById('clock').innerText = agora.toLocaleTimeString('pt-BR');
 }
-document.querySelectorAll('.f button').forEach(b=>b.onclick=e=>{document.querySelectorAll('.f button').forEach(x=>x.classList.remove('on'));e.target.classList.add('on');cur=e.target.dataset.f;draw()});
-draw();
+setInterval(relogio,1000); relogio();
+async function fetchTempo(lat,lng){
+ try{
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,wind_speed_10m,relative_humidity_2m&timezone=America%2FSao_Paulo`;
+  const r = await fetch(url);
+  const j = await r.json();
+  return j.current;
+ }catch(e){return null}
+}
+async function atualizaSalvador(){
+ const cur = await fetchTempo(-13.010,-38.532);
+ if(cur){
+  document.getElementById('tempSalvador').innerHTML = `📍 Salvador ${cur.temperature_2m}°C | Vento ${cur.wind_speed_10m} km/h | ${new Date().toLocaleTimeString('pt-BR')}`;
+ }
+}
+atualizaSalvador(); setInterval(atualizaSalvador, 3600000);
+pontos.forEach(p=>{
+ const m = L.marker([p.lat,p.lng]).addTo(map);
+ m.bindPopup(`<b>${p.n}</b><br><span class=badge>${p.reg}</span><br><div id='pop-${p.lat}'>Clique para carregar clima AO VIVO...</div>`);
+ m.on('click', async ()=>{
+   const box = document.getElementById(`pop-${p.lat}`);
+   if(box) box.innerHTML = '⏳ Buscando AO VIVO...';
+   const cur = await fetchTempo(p.lat,p.lng);
+   if(cur && box){
+     box.innerHTML = `<b style='font-size:18px'>${cur.temperature_2m}°C AGORA</b><br>💨 Vento: ${cur.wind_speed_10m} km/h<br>💧 Umidade: ${cur.relative_humidity_2m}%<br>🕒 ${new Date().toLocaleTimeString('pt-BR')}<br><small style='color:green'>● dado Open-Meteo ao vivo</small>`;
+   }
+ });
+});
 </script>
-</body></html>
+</body>
+</html>
