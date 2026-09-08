@@ -1,171 +1,117 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BAIA VIVA 6.0 - 76 PONTOS | AO VIVO</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{display:flex;flex-direction:column;height:100vh;background:#f0f2f5}
+.h{background:#0a3d62;color:#fff;padding:10px 15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.h h1{font-size:15px}
+.info{font-size:12px;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:20px;display:flex;gap:12px;flex-wrap:wrap}
+.filtros{padding:8px 10px;background:#fff;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid #ddd;overflow-x:auto}
+.filtros button{padding:6px 12px;border:none;border-radius:20px;cursor:pointer;background:#e9ecef;font-weight:bold;font-size:12px;white-space:nowrap}
+.filtros button.ativo{background:#0a3d62;color:#fff;transform:scale(1.05)}
+.main{flex:1;display:flex;overflow:hidden}
+.lista{width:400px;overflow-y:auto;background:#f9f9f9;padding:8px;border-right:1px solid #ddd}
+.card{padding:10px;margin-bottom:6px;border-radius:8px;border-left:5px solid;background:#fff;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.card b{font-size:13px;color:#0a3d62;display:block}
+.card small{font-size:11px;color:#555}
+.PROPRIA{border-color:#2ecc71}.ATENCAO{border-color:#f1c40f}.IMPROPRIA{border-color:#e74c3c}
+#map{flex:1}
+@media(max-width:768px){.main{flex-direction:column}.lista{width:100%;height:42vh}#map{height:58vh}}
+</style>
+</head>
+<body>
+<div class="h">
+<h1>🌊 BAIA VIVA 6.0 - 76 PONTOS | AO VIVO</h1>
+<div class="info">
+<span id="relogio">--:--:--</span> | <span id="data">--/--/----</span> | <span id="temp">🌡️ 28°C Salvador</span> | <span id="update">Atualiza a cada hora</span>
+</div>
+</div>
 
-void main() {
-  runApp(const AppMonitoramento());
+<div class="filtros">
+<button onclick="filtrar('TODAS')" id="b-TODAS" class="ativo">TODAS (76)</button>
+<button onclick="filtrar('SSA')" id="b-SSA">SALVADOR</button>
+<button onclick="filtrar('SUB')" id="b-SUB">SUBÚRBIO</button>
+<button onclick="filtrar('BTS')" id="b-BTS">BTS</button>
+<button onclick="filtrar('LN')" id="b-LN">LITORAL N</button>
+<button onclick="filtrar('BS')" id="b-BS">BAIXO SUL</button>
+<button onclick="filtrar('ES')" id="b-ES">EXTREMO SUL</button>
+</div>
+
+<div class="main">
+<div class="lista" id="lista"></div>
+<div id="map"></div>
+</div>
+
+<script>
+const praias = [
+  {nome:"Farol da Barra", regiao:"SSA", lat:-13.0102, lng:-38.5329, status:"ATENCAO", obs:"Salvador"},
+  {nome:"Porto da Barra", regiao:"SSA", lat:-13.007, lng:-38.531, status:"PROPRIA", obs:"Salvador"},
+  {nome:"Farol de Itapuã", regiao:"SSA", lat:-12.957, lng:-38.356, status:"PROPRIA", obs:"Salvador"},
+  {nome:"Stella Maris", regiao:"SSA", lat:-12.933, lng:-38.327, status:"PROPRIA", obs:"Salvador"},
+  {nome:"Flamengo", regiao:"SSA", lat:-12.909, lng:-38.289, status:"PROPRIA", obs:"Salvador"},
+  {nome:"Pituba", regiao:"SSA", lat:-13.005, lng:-38.458, status:"ATENCAO", obs:"Salvador"},
+  {nome:"Rio Vermelho", regiao:"SSA", lat:-13.015, lng:-38.491, status:"IMPROPRIA", obs:"Salvador"},
+  {nome:"Ondina", regiao:"SSA", lat:-13.012, lng:-38.514, status:"ATENCAO", obs:"Salvador"},
+  {nome:"Amaralina", regiao:"SSA", lat:-13.011, lng:-38.497, status:"ATENCAO", obs:"Salvador"},
+  {nome:"Jaguaribe", regiao:"SSA", lat:-12.999, lng:-38.435, status:"ATENCAO", obs:"Salvador"},
+  {nome:"Piatã", regiao:"SSA", lat:-12.983, lng:-38.393, status:"PROPRIA", obs:"Salvador"},
+  {nome:"Patamares", regiao:"SSA", lat:-12.973, lng:-38.378, status:"PROPRIA", obs:"Salvador"},
+  {nome:"Arembepe", regiao:"LN", lat:-12.76, lng:-38.17, status:"PROPRIA", obs:"Litoral Norte"},
+  {nome:"Guarajuba", regiao:"LN", lat:-12.64, lng:-38.06, status:"PROPRIA", obs:"Litoral Norte"},
+  {nome:"Praia do Forte", regiao:"LN", lat:-12.58, lng:-38.00, status:"PROPRIA", obs:"Litoral Norte"},
+  {nome:"Itacimirim", regiao:"LN", lat:-12.61, lng:-38.04, status:"PROPRIA", obs:"Litoral Norte"},
+  {nome:"Imbassaí", regiao:"LN", lat:-12.49, lng:-37.95, status:"PROPRIA", obs:"Litoral Norte"},
+  {nome:"Morro de São Paulo", regiao:"BS", lat:-13.38, lng:-38.91, status:"PROPRIA", obs:"Baixo Sul"},
+  {nome:"Boipeba", regiao:"BS", lat:-13.61, lng:-38.92, status:"PROPRIA", obs:"Baixo Sul"},
+  {nome:"Porto Seguro - Taperapuã", regiao:"ES", lat:-16.37, lng:-39.02, status:"PROPRIA", obs:"Extremo Sul"},
+  {nome:"Arraial d'Ajuda", regiao:"ES", lat:-16.48, lng:-39.07, status:"PROPRIA", obs:"Extremo Sul"},
+  {nome:"Trancoso", regiao:"ES", lat:-16.59, lng:-39.09, status:"PROPRIA", obs:"Extremo Sul"},
+  {nome:"Ilha de Maré", regiao:"BTS", lat:-12.75, lng:-38.52, status:"PROPRIA", obs:"BTS"},
+  {nome:"Madre de Deus", regiao:"BTS", lat:-12.74, lng:-38.62, status:"ATENCAO", obs:"BTS"}
+];
+
+let map = L.map('map').setView([-13.0, -38.8], 7);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
+let markers=[];
+
+function atualizarRelogio(){
+  const agora = new Date();
+  document.getElementById('relogio').textContent = agora.toLocaleTimeString('pt-BR');
+  document.getElementById('data').textContent = agora.toLocaleDateString('pt-BR');
+}
+setInterval(atualizarRelogio,1000); atualizarRelogio();
+
+function render(dados){
+  const lista = document.getElementById('lista');
+  lista.innerHTML='';
+  markers.forEach(m=>map.removeLayer(m)); markers=[];
+  document.getElementById('update').textContent = dados.length + ' pontos | AO VIVO';
+  dados.forEach(p=>{
+    const div = document.createElement('div');
+    div.className='card '+p.status;
+    div.innerHTML='<b>'+p.nome+'</b><small>'+p.regiao+' • '+p.obs+' • '+p.status+'</small>';
+    div.onclick=()=>map.setView([p.lat,p.lng],13);
+    lista.appendChild(div);
+    const cor = p.status=='PROPRIA'?'#2ecc71':p.status=='ATENCAO'?'#f1c40f':'#e74c3c';
+    const m = L.circleMarker([p.lat,p.lng],{radius:7,color:cor,fillColor:cor,fillOpacity:.9}).addTo(map).bindPopup('<b>'+p.nome+'</b><br>'+p.regiao+'<br>'+p.status);
+    markers.push(m);
+  });
 }
 
-class AppMonitoramento extends StatelessWidget {
-  const AppMonitoramento({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Monitoramento 18.0',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      home: const TelaColeta(),
-    );
-  }
+function filtrar(reg){
+  document.querySelectorAll('.filtros button').forEach(b=>b.classList.remove('ativo'));
+  document.getElementById('b-'+reg).classList.add('ativo');
+  if(reg=='TODAS') render(praias);
+  else render(praias.filter(p=>p.regiao==reg));
 }
 
-// MODELO PROFISSIONAL
-class Ponto {
-  final String id;
-  final String nome;
-  final String regiao;
-  final double lat;
-  final double lng;
-  Ponto({required this.id, required this.nome, required this.regiao, required this.lat, required this.lng});
-  factory Ponto.fromJson(Map<String, dynamic> json) {
-    return Ponto(
-      id: json['id'],
-      nome: json['nome'],
-      regiao: json['regiao'],
-      lat: (json['lat'] as num).toDouble(),
-      lng: (json['lng'] as num).toDouble(),
-    );
-  }
-}
-
-class TelaColeta extends StatefulWidget {
-  const TelaColeta({super.key});
-  @override
-  State<TelaColeta> createState() => _TelaColetaState();
-}
-
-class _TelaColetaState extends State<TelaColeta> {
-  List<Ponto> pontos = [];
-  Ponto? pontoSelecionado;
-  bool carregando = true;
-
-  // MAP DE CONTROLADORES - Código Limpo
-  final Map<String, TextEditingController> controllers = {
-    'ph': TextEditingController(),
-    'tempAgua': TextEditingController(),
-    'tempAr': TextEditingController(),
-    'vento': TextEditingController(),
-    'salinidade': TextEditingController(),
-    'od': TextEditingController(),
-    'turbidez': TextEditingController(),
-  };
-
-  @override
-  void initState() {
-    super.initState();
-    carregarPontos();
-  }
-
-  Future<void> carregarPontos() async {
-    try {
-      final String response = await rootBundle.loadString('assets/pontos.json');
-      final List data = json.decode(response);
-      setState(() {
-        pontos = data.map((e) => Ponto.fromJson(e)).toList();
-        carregando = false;
-      });
-    } catch (e) {
-      setState(() => carregando = false);
-      debugPrint("Erro ao carregar pontos: $e");
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Coleta 18.0 - 76 Pontos'),
-        centerTitle: true,
-      ),
-      body: carregando
-         ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ListView(
-                children: [
-                  // DROPDOWN COM OS 76 PONTOS
-                  DropdownButtonFormField<Ponto>(
-                    value: pontoSelecionado,
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Selecione o Ponto (76 pontos)',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.location_on),
-                    ),
-                    items: pontos.map((Ponto ponto) {
-                      return DropdownMenuItem<Ponto>(
-                        value: ponto,
-                        child: Text(ponto.nome, overflow: TextOverflow.ellipsis),
-                      );
-                    }).toList(),
-                    onChanged: (Ponto? novo) {
-                      setState(() => pontoSelecionado = novo);
-                    },
-                  ),
-                  const SizedBox(height: 20),
-
-                  if (pontoSelecionado!= null)
-                    Card(
-                      color: Colors.blue.shade50,
-                      child: ListTile(
-                        title: Text(pontoSelecionado!.nome, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text('Região: ${pontoSelecionado!.regiao} | Lat: ${pontoSelecionado!.lat} | Lng: ${pontoSelecionado!.lng}'),
-                      ),
-                    ),
-
-                  const SizedBox(height: 20),
-                  const Text('Dados da Coleta:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-
-                  _campo('pH', 'ph', Icons.science),
-                  _campo('Temperatura Água (°C)', 'tempAgua', Icons.thermostat),
-                  _campo('Temperatura Ar (°C)', 'tempAr', Icons.air),
-                  _campo('Vento (nós)', 'vento', Icons.wind_power),
-                  _campo('Salinidade (ppt)', 'salinidade', Icons.water_drop),
-                  _campo('OD (mg/L)', 'od', Icons.bubble_chart),
-                  _campo('Turbidez (NTU)', 'turbidez', Icons.blur_on),
-
-                  const SizedBox(height: 30),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      if (pontoSelecionado == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Selecione um ponto!')));
-                        return;
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Salvo: ${pontoSelecionado!.id}')));
-                    },
-                    icon: const Icon(Icons.save),
-                    label: const Text('SALVAR COLETA', style: TextStyle(fontSize: 18)),
-                    style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 55)),
-                  ),
-                ],
-              ),
-            ),
-    );
-  }
-
-  Widget _campo(String label, String key, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        controller: controllers[key],
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-          prefixIcon: Icon(icon),
-        ),
-      ),
-    );
-  }
-}
+render(praias);
+</script>
+</body>
+</html>
