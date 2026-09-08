@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="description" content="Baía Viva 6.9.2 Final Mapa OK - Prof. Edson Freitas Alves - Zap 71 99241-8354 - Orient. Prof. Jemisson">
+<meta name="description" content="Baía Viva 6.9.3 88 Praias Orla BTS Salvador Completa - Prof. Edson Freitas Alves - Zap 71 99241-8354 - Orient. Prof. Jemisson">
 <meta name="theme-color" content="#0a3d62">
-<title>BAIA VIVA 6.9.2 FINAL MAPA OK - EDSON FREITAS ALVES - ZAP 71992418354</title>
+<title>BAIA VIVA 6.9.3 88 PRAIAS ORLA BTS COMPLETA - EDSON FREITAS ALVES - ZAP 71992418354</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -60,7 +60,7 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;background:#f
 </head>
 <body>
 <div class="h">
-<h1>🌊 BAIA VIVA 6.9.2 FINAL MAPA OK | IDEALIZADOR PROF. EDSON FREITAS ALVES | ORIENT. PROF. JEMISSON | ZAP 71 99241-8354</h1>
+<h1>🌊 BAIA VIVA 6.9.3 88 PRAIAS ORLA BTS COMPLETA | IDEALIZADOR PROF. EDSON FREITAS ALVES | ORIENT. PROF. JEMISSON | ZAP 71 99241-8354</h1>
 <div class="info">
 <span id="relogio"></span> | <span id="visitantes">0 visitantes</span>
 <button class="btn btn-check" onclick="abrirCheckin()">📲 CHECK-IN ZAP</button>
@@ -68,10 +68,10 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;background:#f
 </div>
 </div>
 <div class="filtros">
-<button onclick="filtrar('TODAS')" id="b-TODAS" class="ativo">TODAS (76)</button>
-<button onclick="filtrar('SSA')" id="b-SSA">SALVADOR</button>
+<button onclick="filtrar('TODAS')" id="b-TODAS" class="ativo">TODAS (88)</button>
+<button onclick="filtrar('SSA')" id="b-SSA">SALVADOR ATL</button>
+<button onclick="filtrar('BTS')" id="b-BTS">BTS + SALVADOR BTS (24)</button>
 <button onclick="filtrar('SUB')" id="b-SUB">SUBURBIO</button>
-<button onclick="filtrar('BTS')" id="b-BTS">BTS</button>
 <button onclick="filtrar('LN')" id="b-LN">LITORAL N</button>
 <button onclick="filtrar('BS')" id="b-BS">BAIXO SUL</button>
 <button onclick="filtrar('ES')" id="b-ES">EXTREMO SUL</button>
@@ -80,7 +80,7 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;background:#f
 <div class="lista" id="lista"></div>
 <div id="map"></div>
 </div>
-<button class="btn-toggle-lista" id="btnLista" onclick="toggleLista()">☰ VER PRAIAS (76)</button>
+<button class="btn-toggle-lista" id="btnLista" onclick="toggleLista()">☰ VER PRAIAS (88)</button>
 <div class="barra-mobile">
 <button class="btn btn-check" onclick="abrirCheckin()">📲 CHECK-IN ZAP</button>
 <button class="btn btn-painel" onclick="abrirPainel()">📊 PAINEL</button>
@@ -88,7 +88,7 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;background:#f
 <div class="modal" id="modalDetalhe"><div class="box" id="boxDetalhe"></div></div>
 <div class="modal" id="modalCheck"><div class="box">
 <h2>🌊 Passaporte Baía Viva - Zap Ativo 71 99241-8354</h2>
-<small>Prof. Edson Freitas Alves | Orient. Prof. Jemisson</small>
+<small>Prof. Edson Freitas Alves | Orient. Prof. Jemisson | 6.9.3 88 Praias</small>
 <input id="nome" placeholder="Seu nome completo">
 <input id="contato" placeholder="Seu WhatsApp com DDD" inputmode="numeric">
 <select id="praiaVisitada"></select>
@@ -103,7 +103,7 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;background:#f
 <button class="btn-cancel" onclick="fecharCheckin()">Cancelar</button>
 </div></div>
 <div class="modal" id="modalPainel"><div class="box">
-<h2>📊 Painel - 6.9.2 Mapa OK - Prof. Jemisson</h2>
+<h2>📊 Painel - 6.9.3 88 Praias Orla BTS Completa - Prof. Jemisson</h2>
 <small id="dataPainel"></small>
 <div class="filtro-tempo">
 <button onclick="setPeriodo('hoje')" id="p-hoje" class="ativo">HOJE</button>
@@ -113,7 +113,7 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;background:#f
 <div class="stat">
 <div><b id="tTotal">0</b><small>Total</small></div>
 <div><b id="tHoje">0</b><small>Hoje</small></div>
-<div><b id="tPraias">76</b><small>Praias</small></div>
+<div><b id="tPraias">88</b><small>Praias</small></div>
 <div><b id="tMedia">0</b><small>Média/dia</small></div>
 </div>
 <canvas id="grafTempo" height="150"></canvas>
@@ -121,7 +121,7 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;background:#f
 <canvas id="grafPraia" height="150" style="margin-top:12px"></canvas>
 <div class="previsao" id="previsaoBox"><b>🌤️ PREVISÃO 10 DIAS - SALVADOR</b><div id="previsaoDados" style="margin-top:8px"><small>Carregando...</small></div></div>
 <div id="historico" style="margin-top:10px"></div>
-<button class="btn-salvar" onclick="exportar()" style="background:#0a3d62;margin-top:10px">📥 Exportar CSV - TCC - Prof Edson</button>
+<button class="btn-salvar" onclick="exportar()" style="background:#0a3d62;margin-top:10px">📥 Exportar CSV - TCC - Prof Edson - 88 Praias</button>
 <button class="btn-cancel" onclick="fecharPainel()">Fechar</button>
 </div></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -148,6 +148,18 @@ const praias = [
 {nome:"Jardim de Alah",regiao:"SSA",lat:-13.005,lng:-38.465,status:"IMPROPRIA",maritimidade:"Mar aberto - Baixa",vegetacao:"Urbana",temp:"27.4°C",costa:"Areia + foz",uso:"Urbano"},
 {nome:"Boca do Rio",regiao:"SSA",lat:-12.988,lng:-38.405,status:"ATENCAO",maritimidade:"Foz rio - Baixa",vegetacao:"Manguezal",temp:"27.5°C",costa:"Areia fina",uso:"Pesca"},
 {nome:"Placaford",regiao:"SSA",lat:-12.941,lng:-38.341,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga",temp:"26.8°C",costa:"Areia média",uso:"Local"},
+{nome:"Boa Viagem",regiao:"BTS",lat:-12.925,lng:-38.504,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Amendoeiras + urbana",temp:"28.2°C",costa:"Areia escura + Pedra da Sereia",uso:"Histórico"},
+{nome:"Bonfim",regiao:"BTS",lat:-12.923,lng:-38.508,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Urbana",temp:"28.1°C",costa:"Areia + Igreja",uso:"Religioso"},
+{nome:"Monte Serrat",regiao:"BTS",lat:-12.929,lng:-38.517,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mata + Amendoeiras",temp:"28°C",costa:"Areia + Ponta",uso:"Turístico"},
+{nome:"Roma",regiao:"BTS",lat:-12.917,lng:-38.497,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Urbana",temp:"28.3°C",costa:"Areia escura",uso:"Tradicional"},
+{nome:"Cajaíba",regiao:"BTS",lat:-12.911,lng:-38.495,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mangue residual",temp:"28.2°C",costa:"Areia lamosa",uso:"Pesca"},
+{nome:"Penha - BTS Ribeira",regiao:"BTS",lat:-12.908,lng:-38.499,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Amendoeiras",temp:"28°C",costa:"Areia escura",uso:"Festa da Penha"},
+{nome:"Inema",regiao:"BTS",lat:-12.895,lng:-38.512,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mata + coqueiral",temp:"27.9°C",costa:"Areia clara",uso:"Militar"},
+{nome:"Itapagipe",regiao:"BTS",lat:-12.915,lng:-38.502,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Urbana",temp:"28.1°C",costa:"Areia + pedras",uso:"Comunidade"},
+{nome:"Pedra Furada - Monte Serrat",regiao:"BTS",lat:-12.932,lng:-38.522,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Costão",temp:"27.8°C",costa:"Costão + mirante",uso:"Turismo"},
+{nome:"Humaitá",regiao:"BTS",lat:-12.928,lng:-38.512,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Amendoeiras",temp:"28°C",costa:"Areia + Farol",uso:"Enseada"},
+{nome:"Boa Viagem - Sereia",regiao:"BTS",lat:-12.9265,lng:-38.505,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Amendoeiras",temp:"28.2°C",costa:"Areia + Pedra",uso:"Foto"},
+{nome:"Penha de França",regiao:"BTS",lat:-12.9075,lng:-38.501,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Urbana",temp:"28°C",costa:"Areia + Igreja",uso:"Cultural"},
 {nome:"Penha - Ribeira",regiao:"SUB",lat:-12.907,lng:-38.5,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Amendoeiras",temp:"28°C",costa:"Areia escura",uso:"Tradicional"},
 {nome:"Tubarão",regiao:"SUB",lat:-12.86,lng:-38.48,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Manguezal",temp:"28°C",costa:"Areia fina",uso:"Pesqueira"},
 {nome:"Paripe",regiao:"SUB",lat:-12.84,lng:-38.47,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Manguezal",temp:"28.2°C",costa:"Areia lamosa",uso:"Pesca"},
@@ -205,20 +217,16 @@ const praias = [
 {nome:"Nova Viçosa",regiao:"ES",lat:-17.89,lng:-39.37,status:"PROPRIA",maritimidade:"Mar aberto - Baixa",vegetacao:"Mangue + restinga",temp:"25.6°C",costa:"Areia + mangue",uso:"Pesca"},
 {nome:"Coroa Vermelha",regiao:"ES",lat:-16.32,lng:-39,status:"ATENCAO",maritimidade:"Mar aberto - Baixa",vegetacao:"Restinga",temp:"25.6°C",costa:"Recifes + cruz",uso:"Histórico"}
 ];
-
-// CORRECAO MAPA - VOLTA OSM PARA NAO DAR API KEY REQUIRED
 let map = L.map('map',{zoomControl:false}).setView([-13,-38.8],7);
 L.control.zoom({position:'topright'}).addTo(map);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
 maxZoom:18,
-attribution:'© OpenStreetMap | Baía Viva 6.9.2 FINAL MAPA OK - Prof. Edson Freitas Alves | Orient. Prof. Jemisson | Zap 71 99241-8354'
+attribution:'© OpenStreetMap | Baía Viva 6.9.3 88 Praias - Prof. Edson Freitas Alves | Orient. Prof. Jemisson | Zap 71 99241-8354'
 }).addTo(map);
-
 let markers = [];
 let chartTempo, chartMotivo, chartPraia;
 let periodoAtual = 'hoje';
 let listaAberta = false;
-
 function getLocalSafe(){
  try{
   let d = localStorage.getItem('visitantes_bv');
@@ -229,7 +237,6 @@ function getLocalSafe(){
   return [];
  }
 }
-
 function relogio(){
  document.getElementById('relogio').textContent = new Date().toLocaleTimeString('pt-BR');
  document.getElementById('visitantes').textContent = getLocalSafe().length + ' visitantes';
@@ -237,17 +244,13 @@ function relogio(){
 }
 setInterval(relogio,1000);
 relogio();
-
 function toggleLista(){
  const l = document.getElementById('lista');
  listaAberta =!listaAberta;
  l.classList.toggle('aberta', listaAberta);
  relogio();
- if(listaAberta){
-  map.invalidateSize();
- }
+ if(listaAberta){map.invalidateSize();}
 }
-
 async function buscarPrevisao(lat,lng,id){
  try{
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max&timezone=America%2FBahia&forecast_days=10`;
@@ -269,7 +272,6 @@ async function buscarPrevisao(lat,lng,id){
   document.getElementById(id).innerHTML = "<small>⚠️ Sem internet - previsão indisponível</small>";
  }
 }
-
 function abrirDetalhe(p){
  document.getElementById('boxDetalhe').innerHTML = `
  <h2>📍 ${p.nome}</h2>
@@ -286,11 +288,8 @@ function abrirDetalhe(p){
  `;
  document.getElementById('modalDetalhe').classList.add('ativo');
  buscarPrevisao(p.lat,p.lng,'prevPraia');
- if(window.innerWidth<=768 && listaAberta){
-  toggleLista();
- }
+ if(window.innerWidth<=768 && listaAberta){toggleLista();}
 }
-
 function render(dados){
  const l = document.getElementById('lista');
  l.innerHTML = '';
@@ -308,56 +307,32 @@ function render(dados){
   markers.push(mk);
  });
 }
-
 function filtrar(r){
  document.querySelectorAll('.filtros button').forEach(b=>b.classList.remove('ativo'));
  document.getElementById('b-'+r).classList.add('ativo');
- if(r=='TODAS'){
-  render(praias);
- }else{
-  render(praias.filter(p=>p.regiao==r));
- }
- if(window.innerWidth<=768 &&!listaAberta){
-  toggleLista();
- }
+ if(r=='TODAS'){render(praias);}else{render(praias.filter(p=>p.regiao==r));}
+ if(window.innerWidth<=768 &&!listaAberta){toggleLista();}
 }
-
 function abrirCheckin(){
  document.getElementById('praiaVisitada').innerHTML = praias.map(p=>`<option>${p.nome}</option>`).join('');
  document.getElementById('modalCheck').classList.add('ativo');
 }
-
 function abrirCheckinEspecifico(nome){
  abrirCheckin();
  document.getElementById('praiaVisitada').value = nome;
 }
-
-function fecharCheckin(){
- document.getElementById('modalCheck').classList.remove('ativo');
-}
-
+function fecharCheckin(){document.getElementById('modalCheck').classList.remove('ativo');}
 function salvarVisitante(){
  const n = document.getElementById('nome').value.trim();
  const c = document.getElementById('contato').value.trim();
  const pr = document.getElementById('praiaVisitada').value;
  const mo = document.getElementById('motivo').value;
- if(!n){
-  alert('Digite seu nome');
-  return;
- }
+ if(!n){alert('Digite seu nome');return;}
  let ls = getLocalSafe();
- ls.push({
-  nome:n,
-  contato:c,
-  praia:pr,
-  motivo:mo,
-  data:new Date().toLocaleString('pt-BR'),
-  dia:new Date().toISOString().slice(0,10),
-  timestamp:Date.now()
- });
+ ls.push({nome:n,contato:c,praia:pr,motivo:mo,data:new Date().toLocaleString('pt-BR'),dia:new Date().toISOString().slice(0,10),timestamp:Date.now()});
  localStorage.setItem('visitantes_bv',JSON.stringify(ls));
  const seuNumero = "5571992418354";
- const mensagem = `🌊 *NOVO CHECK-IN - BAIA VIVA 6.9.2 MAPA OK*%0A%0A👤 *Nome:* ${encodeURIComponent(n)}%0A📱 *Contato:* ${encodeURIComponent(c)}%0A📍 *Praia:* ${encodeURIComponent(pr)}%0A🎯 *Motivo:* ${encodeURIComponent(mo)}%0A🕐 *Data:* ${encodeURIComponent(new Date().toLocaleString('pt-BR'))}%0A%0A_Plataforma Prof. Edson Freitas Alves | Orient. Prof. Jemisson - Zap 71 99241-8354_`;
+ const mensagem = `🌊 *NOVO CHECK-IN - BAIA VIVA 6.9.3 88 PRAIAS*%0A%0A👤 *Nome:* ${encodeURIComponent(n)}%0A📱 *Contato:* ${encodeURIComponent(c)}%0A📍 *Praia:* ${encodeURIComponent(pr)}%0A🎯 *Motivo:* ${encodeURIComponent(mo)}%0A🕐 *Data:* ${encodeURIComponent(new Date().toLocaleString('pt-BR'))}%0A%0A_Plataforma Prof. Edson Freitas Alves | Orient. Prof. Jemisson - Zap 71 99241-8354_`;
  window.open(`https://wa.me/${seuNumero}?text=${mensagem}`,'_blank');
  alert('✅ Check-in salvo! Abrindo seu WhatsApp 71 99241-8354 com os dados...');
  fecharCheckin();
@@ -365,31 +340,20 @@ function salvarVisitante(){
  document.getElementById('nome').value = '';
  document.getElementById('contato').value = '';
 }
-
 function setPeriodo(p){
  periodoAtual = p;
  document.querySelectorAll('.filtro-tempo button').forEach(b=>b.classList.remove('ativo'));
  document.getElementById('p-'+p).classList.add('ativo');
  abrirPainel();
 }
-
 function getFiltradosPorPeriodo(){
  let ls = getLocalSafe();
  let hoje = new Date().toISOString().slice(0,10);
- if(periodoAtual=='hoje'){
-  return ls.filter(v=>v.dia==hoje);
- }
- if(periodoAtual=='10'){
-  let lim = Date.now() - 10*24*60*60*1000;
-  return ls.filter(v=> (v.timestamp||0) >= lim);
- }
- if(periodoAtual=='30'){
-  let lim = Date.now() - 30*24*60*60*1000;
-  return ls.filter(v=> (v.timestamp||0) >= lim);
- }
+ if(periodoAtual=='hoje'){return ls.filter(v=>v.dia==hoje);}
+ if(periodoAtual=='10'){let lim = Date.now() - 10*24*60*60*1000;return ls.filter(v=> (v.timestamp||0) >= lim);}
+ if(periodoAtual=='30'){let lim = Date.now() - 30*24*60*60*1000;return ls.filter(v=> (v.timestamp||0) >= lim);}
  return ls;
 }
-
 function abrirPainel(){
  let lsTotal = getLocalSafe();
  let ls = getFiltradosPorPeriodo();
@@ -431,25 +395,17 @@ function abrirPainel(){
  document.getElementById('modalPainel').classList.add('ativo');
  buscarPrevisao(-13.0,-38.5,'previsaoDados');
 }
-
-function fecharPainel(){
- document.getElementById('modalPainel').classList.remove('ativo');
-}
-
+function fecharPainel(){document.getElementById('modalPainel').classList.remove('ativo');}
 function exportar(){
  let ls = getLocalSafe();
- if(ls.length==0){
-  alert('Sem dados');
-  return;
- }
+ if(ls.length==0){alert('Sem dados');return;}
  let csv = 'Nome,Contato,Praia,Motivo,Data,Dia,Timestamp\n' + ls.map(v=>`"${v.nome}","${v.contato}","${v.praia}","${v.motivo}","${v.data}","${v.dia}","${v.timestamp}"`).join('\n');
  let blob = new Blob([csv],{type:'text/csv'});
  let a = document.createElement('a');
  a.href = URL.createObjectURL(blob);
- a.download = 'baia_viva_6.9.2_MAPA_OK_TCC_Edson_Freitas.csv';
+ a.download = 'baia_viva_6.9.3_88_PRAIAS_BTS_COMPLETA_TCC_Edson_Freitas.csv';
  a.click();
 }
-
 render(praias);
 map.invalidateSize();
 </script>
