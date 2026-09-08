@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="description" content="Baía Viva 6.9.1 Final Full Lines - Prof. Edson Freitas Alves - Zap 71 99241-8354 - Orient. Prof. Jemisson">
+<meta name="description" content="Baía Viva 6.9.2 Final Mapa OK - Prof. Edson Freitas Alves - Zap 71 99241-8354 - Orient. Prof. Jemisson">
 <meta name="theme-color" content="#0a3d62">
-<title>BAIA VIVA 6.9.1 FINAL FULL - EDSON FREITAS ALVES - ZAP 71992418354</title>
+<title>BAIA VIVA 6.9.2 FINAL MAPA OK - EDSON FREITAS ALVES - ZAP 71992418354</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -48,11 +48,10 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;background:#f
 .previsao{background:linear-gradient(135deg,#0a3d62,#2ecc71);color:#fff;padding:10px;border-radius:10px;margin:10px 0;font-size:12px}
 .previsao-dia{display:flex;justify-content:space-between;background:rgba(255,255,255,0.15);padding:6px 8px;border-radius:6px;margin:4px 0}
 @media(max-width:768px){
-.h.info.btn{display:none}
 .main{flex-direction:column}
 .lista{position:fixed;bottom:70px;left:0;right:0;height:50vh;width:100%;z-index:998;border-radius:16px 16px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.2);transform:translateY(100%);transition:transform.3s ease;background:#fff;padding:12px}
 .lista.aberta{transform:translateY(0)}
- #map{height:100%;width:100%}
+#map{height:100%;width:100%}
 .barra-mobile{display:flex}
 .btn-toggle-lista{display:block}
 .stat{grid-template-columns:1fr 1fr}
@@ -61,7 +60,7 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;background:#f
 </head>
 <body>
 <div class="h">
-<h1>🌊 BAIA VIVA 6.9.1 FULL LINES | IDEALIZADOR PROF. EDSON FREITAS ALVES | ORIENT. PROF. JEMISSON | ZAP 71 99241-8354</h1>
+<h1>🌊 BAIA VIVA 6.9.2 FINAL MAPA OK | IDEALIZADOR PROF. EDSON FREITAS ALVES | ORIENT. PROF. JEMISSON | ZAP 71 99241-8354</h1>
 <div class="info">
 <span id="relogio"></span> | <span id="visitantes">0 visitantes</span>
 <button class="btn btn-check" onclick="abrirCheckin()">📲 CHECK-IN ZAP</button>
@@ -104,7 +103,7 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;background:#f
 <button class="btn-cancel" onclick="fecharCheckin()">Cancelar</button>
 </div></div>
 <div class="modal" id="modalPainel"><div class="box">
-<h2>📊 Painel - 6.9.1 Full Lines - Prof. Jemisson</h2>
+<h2>📊 Painel - 6.9.2 Mapa OK - Prof. Jemisson</h2>
 <small id="dataPainel"></small>
 <div class="filtro-tempo">
 <button onclick="setPeriodo('hoje')" id="p-hoje" class="ativo">HOJE</button>
@@ -128,7 +127,6 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;background:#f
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// 76 PRAIAS - VERSAO EXPANDIDA FULL LINES - PROF EDSON FREITAS ALVES
 const praias = [
 {nome:"Farol da Barra",regiao:"SSA",lat:-13.0102,lng:-38.5329,status:"ATENCAO",maritimidade:"Mar aberto - Alta energia",vegetacao:"Coqueiral + urbana",temp:"27°C",costa:"Costão + areia fina",uso:"Turístico"},
 {nome:"Porto da Barra",regiao:"SSA",lat:-13.007,lng:-38.531,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Amendoeiras",temp:"27.5°C",costa:"Areia fina clara",uso:"Banho"},
@@ -208,11 +206,12 @@ const praias = [
 {nome:"Coroa Vermelha",regiao:"ES",lat:-16.32,lng:-39,status:"ATENCAO",maritimidade:"Mar aberto - Baixa",vegetacao:"Restinga",temp:"25.6°C",costa:"Recifes + cruz",uso:"Histórico"}
 ];
 
+// CORRECAO MAPA - VOLTA OSM PARA NAO DAR API KEY REQUIRED
 let map = L.map('map',{zoomControl:false}).setView([-13,-38.8],7);
 L.control.zoom({position:'topright'}).addTo(map);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
 maxZoom:18,
-attribution:'© CARTO | Baía Viva 6.9.1 - Prof. Edson Freitas Alves'
+attribution:'© OpenStreetMap | Baía Viva 6.9.2 FINAL MAPA OK - Prof. Edson Freitas Alves | Orient. Prof. Jemisson | Zap 71 99241-8354'
 }).addTo(map);
 
 let markers = [];
@@ -358,7 +357,7 @@ function salvarVisitante(){
  });
  localStorage.setItem('visitantes_bv',JSON.stringify(ls));
  const seuNumero = "5571992418354";
- const mensagem = `🌊 *NOVO CHECK-IN - BAIA VIVA 6.9.1 FINAL FULL*%0A%0A👤 *Nome:* ${encodeURIComponent(n)}%0A📱 *Contato:* ${encodeURIComponent(c)}%0A📍 *Praia:* ${encodeURIComponent(pr)}%0A🎯 *Motivo:* ${encodeURIComponent(mo)}%0A🕐 *Data:* ${encodeURIComponent(new Date().toLocaleString('pt-BR'))}%0A%0A_Plataforma Prof. Edson Freitas Alves | Orient. Prof. Jemisson - Zap 71 99241-8354 - Full Lines_`;
+ const mensagem = `🌊 *NOVO CHECK-IN - BAIA VIVA 6.9.2 MAPA OK*%0A%0A👤 *Nome:* ${encodeURIComponent(n)}%0A📱 *Contato:* ${encodeURIComponent(c)}%0A📍 *Praia:* ${encodeURIComponent(pr)}%0A🎯 *Motivo:* ${encodeURIComponent(mo)}%0A🕐 *Data:* ${encodeURIComponent(new Date().toLocaleString('pt-BR'))}%0A%0A_Plataforma Prof. Edson Freitas Alves | Orient. Prof. Jemisson - Zap 71 99241-8354_`;
  window.open(`https://wa.me/${seuNumero}?text=${mensagem}`,'_blank');
  alert('✅ Check-in salvo! Abrindo seu WhatsApp 71 99241-8354 com os dados...');
  fecharCheckin();
@@ -447,7 +446,7 @@ function exportar(){
  let blob = new Blob([csv],{type:'text/csv'});
  let a = document.createElement('a');
  a.href = URL.createObjectURL(blob);
- a.download = 'baia_viva_6.9.1_FULL_LINES_TCC_Edson_Freitas.csv';
+ a.download = 'baia_viva_6.9.2_MAPA_OK_TCC_Edson_Freitas.csv';
  a.click();
 }
 
