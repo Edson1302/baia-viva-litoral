@@ -3,44 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BAIA VIVA 6.1 - 76 PONTOS + PASSAPORTE | AO VIVO</title>
+<title>BAIA VIVA 6.2 - PAINEL TRANSPARÊNCIA</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
 body{display:flex;flex-direction:column;height:100vh;background:#f0f2f5}
-.h{background:#0a3d62;color:#fff;padding:10px 15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-.h h1{font-size:14px}
-.info{font-size:11px;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.btn-check{background:#2ecc71;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:12px}
-.btn-check:hover{background:#27ae60}
-.filtros{padding:8px 10px;background:#fff;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid #ddd;overflow-x:auto}
-.filtros button{padding:6px 12px;border:none;border-radius:20px;cursor:pointer;background:#e9ecef;font-weight:bold;font-size:12px;white-space:nowrap}
+.h{background:#0a3d62;color:#fff;padding:10px 15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.h h1{font-size:13px}
+.info{font-size:11px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.btn{border:none;padding:7px 12px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:11px}
+.btn-check{background:#2ecc71;color:#fff}.btn-painel{background:#f39c12;color:#fff}
+.filtros{padding:8px 10px;background:#fff;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid #ddd}
+.filtros button{padding:6px 12px;border:none;border-radius:20px;cursor:pointer;background:#e9ecef;font-weight:bold;font-size:11px}
 .filtros button.ativo{background:#0a3d62;color:#fff}
 .main{flex:1;display:flex;overflow:hidden}
-.lista{width:400px;overflow-y:auto;background:#f9f9f9;padding:8px;border-right:1px solid #ddd}
-.card{padding:10px;margin-bottom:6px;border-radius:8px;border-left:5px solid;background:#fff;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.1)}
-.card b{font-size:13px;color:#0a3d62;display:block}
-.card small{font-size:11px;color:#555}
+.lista{width:380px;overflow-y:auto;background:#f9f9f9;padding:8px;border-right:1px solid #ddd}
+.card{padding:9px;margin-bottom:6px;border-radius:8px;border-left:5px solid;background:#fff;cursor:pointer;font-size:12px}
 .PROPRIA{border-color:#2ecc71}.ATENCAO{border-color:#f1c40f}.IMPROPRIA{border-color:#e74c3c}
 #map{flex:1}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:9999;justify-content:center;align-items:center;padding:15px}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:9999;justify-content:center;align-items:center;padding:12px}
 .modal.ativo{display:flex}
-.form-box{background:#fff;padding:20px;border-radius:12px;width:100%;max-width:380px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
-.form-box h2{color:#0a3d62;margin-bottom:10px;font-size:18px}
-.form-box input,.form-box select{width:100%;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:8px;font-size:14px}
-.form-box button{width:100%;padding:12px;margin-top:10px;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
-.btn-salvar{background:#0a3d62;color:#fff}
-.btn-cancel{background:#e9ecef;color:#333}
-@media(max-width:768px){.main{flex-direction:column}.lista{width:100%;height:40vh}#map{height:60vh}}
+.box{background:#fff;padding:18px;border-radius:12px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto}
+.box h2{color:#0a3d62;font-size:16px;margin-bottom:8px}
+.box input,.box select{width:100%;padding:9px;margin:5px 0;border:1px solid #ddd;border-radius:8px;font-size:13px}
+.box button{width:100%;padding:10px;margin-top:8px;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
+.btn-salvar{background:#0a3d62;color:#fff}.btn-cancel{background:#e9ecef}
+.barra{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:12px}
+.barra.fill{height:14px;background:#2ecc71;border-radius:10px}
+.item-visit{border-bottom:1px solid #eee;padding:6px 0;font-size:12px}
+@media(max-width:768px){.main{flex-direction:column}.lista{width:100%;height:38vh}#map{height:62vh}}
 </style>
 </head>
 <body>
 <div class="h">
-<h1>🌊 BAIA VIVA 6.1 - 76 PONTOS</h1>
+<h1>🌊 BAIA VIVA 6.2 - 76 PONTOS + PAINEL</h1>
 <div class="info">
-<span id="relogio">--:--:--</span> | <span id="visitantes">0 visitantes</span>
-<button class="btn-check" onclick="abrirCheckin()">🌊 FAZER CHECK-IN</button>
+<span id="relogio"></span> | <span id="visitantes">0 visitantes</span>
+<button class="btn btn-check" onclick="abrirCheckin()">CHECK-IN</button>
+<button class="btn btn-painel" onclick="abrirPainel()">📊 PAINEL</button>
 </div>
 </div>
 <div class="filtros">
@@ -52,32 +53,32 @@ body{display:flex;flex-direction:column;height:100vh;background:#f0f2f5}
 <button onclick="filtrar('BS')" id="b-BS">BAIXO SUL</button>
 <button onclick="filtrar('ES')" id="b-ES">EXTREMO SUL</button>
 </div>
-<div class="main">
-<div class="lista" id="lista"></div>
-<div id="map"></div>
-</div>
+<div class="main"><div class="lista" id="lista"></div><div id="map"></div></div>
 
-<div class="modal" id="modal">
-<div class="form-box">
-<h2>🌊 Passaporte Baía Viva</h2>
-<p style="font-size:12px;color:#555;margin-bottom:10px">Fase 1 - Cadastro de Visitantes (Sugestão Luzia)</p>
+<!-- MODAL CHECKIN -->
+<div class="modal" id="modalCheck"><div class="box">
+<h2>🌊 Passaporte Baía Viva</h2><small style="color:#777">Fase 1 - Luzia</small>
 <input id="nome" placeholder="Seu nome">
 <input id="contato" placeholder="WhatsApp ou Email">
 <select id="praiaVisitada"></select>
-<select id="motivo">
-<option value="lazer">Lazer / Banho</option>
-<option value="turismo">Turismo</option>
-<option value="pesquisa">Pesquisa / Mestrado</option>
-<option value="morador">Morador local</option>
-<option value="trabalho">Trabalho</option>
-</select>
-<button class="btn-salvar" onclick="salvarVisitante()">✅ CONFIRMAR CHECK-IN</button>
+<select id="motivo"><option value="lazer">Lazer / Banho</option><option value="turismo">Turismo</option><option value="pesquisa">Pesquisa / Mestrado</option><option value="morador">Morador</option><option value="trabalho">Trabalho</option></select>
+<button class="btn-salvar" onclick="salvarVisitante()">✅ CONFIRMAR</button>
 <button class="btn-cancel" onclick="fecharCheckin()">Cancelar</button>
-</div>
-</div>
+</div></div>
+
+<!-- MODAL PAINEL FASE 2 -->
+<div class="modal" id="modalPainel"><div class="box">
+<h2>📊 Painel de Transparência - Fase 2 Luzia</h2>
+<div id="stats"></div>
+<div id="grafico" style="margin-top:10px"></div>
+<h3 style="margin-top:12px;font-size:14px;color:#0a3d62">Últimos Check-ins</h3>
+<div id="historico"></div>
+<button class="btn-cancel" onclick="fecharPainel()" style="margin-top:10px">Fechar</button>
+<button class="btn-salvar" onclick="exportar()" style="background:#2ecc71;margin-top:6px">📥 Exportar CSV pro TCC</button>
+</div></div>
 
 <script>
-const praias = [
+const praias=[
 {nome:"Farol da Barra",regiao:"SSA",lat:-13.0102,lng:-38.5329,status:"ATENCAO",obs:"Salvador"},
 {nome:"Porto da Barra",regiao:"SSA",lat:-13.007,lng:-38.531,status:"PROPRIA",obs:"Salvador"},
 {nome:"Farol de Itapuã",regiao:"SSA",lat:-12.957,lng:-38.356,status:"PROPRIA",obs:"Salvador"},
@@ -158,50 +159,34 @@ const praias = [
 let map=L.map('map').setView([-13,-38.8],7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
 let markers=[];
-function atualizarRelogio(){
-document.getElementById('relogio').textContent=new Date().toLocaleTimeString('pt-BR');
-let total=JSON.parse(localStorage.getItem('visitantes_bv')||'[]').length;
-document.getElementById('visitantes').textContent=total+' visitantes';
+function relogio(){document.getElementById('relogio').textContent=new Date().toLocaleTimeString('pt-BR');let t=JSON.parse(localStorage.getItem('visitantes_bv')||'[]').length;document.getElementById('visitantes').textContent=t+' visitantes';}
+setInterval(relogio,1000);relogio();
+function render(dados){const l=document.getElementById('lista');l.innerHTML='';markers.forEach(m=>map.removeLayer(m));markers=[];dados.forEach(p=>{const d=document.createElement('div');d.className='card '+p.status;d.innerHTML='<b>'+p.nome+'</b><small>'+p.regiao+' • '+p.obs+' • '+p.status+'</small>';d.onclick=()=>map.setView([p.lat,p.lng],13);l.appendChild(d);const cor=p.status=='PROPRIA'?'#2ecc71':p.status=='ATENCAO'?'#f1c40f':'#e74c3c';const mk=L.circleMarker([p.lat,p.lng],{radius:7,color:cor,fillColor:cor,fillOpacity:.9}).addTo(map).bindPopup('<b>'+p.nome+'</b><br>'+p.status);markers.push(mk);});}
+function filtrar(r){document.querySelectorAll('.filtros button').forEach(b=>b.classList.remove('ativo'));document.getElementById('b-'+r).classList.add('ativo');if(r=='TODAS')render(praias);else render(praias.filter(p=>p.regiao==r));}
+function abrirCheckin(){document.getElementById('praiaVisitada').innerHTML=praias.map(p=>'<option>'+p.nome+'</option>').join('');document.getElementById('modalCheck').classList.add('ativo');}
+function fecharCheckin(){document.getElementById('modalCheck').classList.remove('ativo');}
+function salvarVisitante(){const n=document.getElementById('nome').value;const c=document.getElementById('contato').value;const pr=document.getElementById('praiaVisitada').value;const mo=document.getElementById('motivo').value;if(!n){alert('Nome?');return;}let ls=JSON.parse(localStorage.getItem('visitantes_bv')||'[]');ls.push({nome:n,contato:c,praia:pr,motivo:mo,data:new Date().toLocaleString('pt-BR')});localStorage.setItem('visitantes_bv',JSON.stringify(ls));alert('🌊 Bem-vindo, '+n+'! Check-in em '+pr);fecharCheckin();relogio();document.getElementById('nome').value='';document.getElementById('contato').value='';}
+function abrirPainel(){
+let ls=JSON.parse(localStorage.getItem('visitantes_bv')||'[]');
+let total=ls.length;
+let porMotivo={};let porPraia={};
+ls.forEach(v=>{porMotivo[v.motivo]=(porMotivo[v.motivo]||0)+1;porPraia[v.praia]=(porPraia[v.praia]||0)+1;});
+document.getElementById('stats').innerHTML='<b>Total: '+total+' visitantes</b><br><small>'+new Date().toLocaleDateString('pt-BR')+'</small>';
+let grafHtml='';
+for(let m in porMotivo){let pct=(porMotivo[m]/total*100).toFixed(0);grafHtml+='<div class="barra"><span style="width:80px">'+m+'</span><div class="fill" style="width:'+pct+'%"></div><span>'+porMotivo[m]+'</span></div>';}
+document.getElementById('grafico').innerHTML='<b>Por motivo:</b>'+grafHtml;
+let hist=ls.slice(-10).reverse().map(v=>'<div class="item-visit"><b>'+v.nome+'</b> - '+v.praia+'<br><small>'+v.motivo+' • '+v.data+'</small></div>').join('')||'<small>Nenhum ainda</small>';
+document.getElementById('historico').innerHTML=hist;
+document.getElementById('modalPainel').classList.add('ativo');
 }
-setInterval(atualizarRelogio,1000);atualizarRelogio();
-function render(dados){
-const lista=document.getElementById('lista');lista.innerHTML='';
-markers.forEach(m=>map.removeLayer(m));markers=[];
-dados.forEach(p=>{
-const div=document.createElement('div');
-div.className='card '+p.status;
-div.innerHTML='<b>'+p.nome+'</b><small>'+p.regiao+' • '+p.obs+' • '+p.status+'</small>';
-div.onclick=()=>map.setView([p.lat,p.lng],13);
-lista.appendChild(div);
-const cor=p.status=='PROPRIA'?'#2ecc71':p.status=='ATENCAO'?'#f1c40f':'#e74c3c';
-const m=L.circleMarker([p.lat,p.lng],{radius:7,color:cor,fillColor:cor,fillOpacity:.9}).addTo(map).bindPopup('<b>'+p.nome+'</b><br>'+p.regiao+'<br>'+p.status);
-markers.push(m);
-});
-}
-function filtrar(reg){
-document.querySelectorAll('.filtros button').forEach(b=>b.classList.remove('ativo'));
-document.getElementById('b-'+reg).classList.add('ativo');
-if(reg=='TODAS')render(praias); else render(praias.filter(p=>p.regiao==reg));
-}
-function abrirCheckin(){
-const sel=document.getElementById('praiaVisitada');
-sel.innerHTML=praias.map(p=>'<option>'+p.nome+'</option>').join('');
-document.getElementById('modal').classList.add('ativo');
-}
-function fecharCheckin(){document.getElementById('modal').classList.remove('ativo');}
-function salvarVisitante(){
-const nome=document.getElementById('nome').value;
-const contato=document.getElementById('contato').value;
-const praia=document.getElementById('praiaVisitada').value;
-const motivo=document.getElementById('motivo').value;
-if(!nome){alert('Coloca seu nome!');return;}
-let lista=JSON.parse(localStorage.getItem('visitantes_bv')||'[]');
-lista.push({nome,contato,praia,motivo,data:new Date().toLocaleString('pt-BR')});
-localStorage.setItem('visitantes_bv',JSON.stringify(lista));
-alert('🌊 Bem-vindo, '+nome+'! Check-in feito em '+praia+'! Obrigado - dado salvo pra pesquisa do mestrado!');
-fecharCheckin();
-atualizarRelogio();
-document.getElementById('nome').value='';document.getElementById('contato').value='';
+function fecharPainel(){document.getElementById('modalPainel').classList.remove('ativo');}
+function exportar(){
+let ls=JSON.parse(localStorage.getItem('visitantes_bv')||'[]');
+if(ls.length==0){alert('Sem dados ainda');return;}
+let csv='Nome,Contato,Praia,Motivo,Data\n'+ls.map(v=>'"'+v.nome+'","'+v.contato+'","'+v.praia+'","'+v.motivo+'","'+v.data+'"').join('\n');
+let blob=new Blob([csv],{type:'text/csv'});
+let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='visitantes_baia_viva_TCC.csv';a.click();
+alert('CSV baixado! Manda pro Prof. Gemerson!');
 }
 render(praias);
 </script>
