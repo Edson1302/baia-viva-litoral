@@ -1,49 +1,73 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Baía Viva 6.8 - Prof. Edson Freitas Alves - Zap Ativo - Monitoramento BTS - Orient. Prof. Jemisson">
-<title>BAIA VIVA 6.8 - ZAP 71 99241-8354 - EDSON FREITAS ALVES</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="description" content="Baía Viva 6.9.1 Final Full Lines - Prof. Edson Freitas Alves - Zap 71 99241-8354 - Orient. Prof. Jemisson">
+<meta name="theme-color" content="#0a3d62">
+<title>BAIA VIVA 6.9.1 FINAL FULL - EDSON FREITAS ALVES - ZAP 71992418354</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{display:flex;flex-direction:column;height:100vh;background:#f0f2f5}
-.h{background:#0a3d62;color:#fff;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
-.h h1{font-size:10px;line-height:1.2}.info{font-size:11px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.btn{border:none;padding:7px 12px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:11px}
-.btn-check{background:#25D366;color:#fff}.btn-painel{background:#f39c12;color:#fff}
-.filtros{padding:8px 10px;background:#fff;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid #ddd}
-.filtros button{padding:6px 12px;border:none;border-radius:20px;cursor:pointer;background:#e9ecef;font-weight:bold;font-size:11px}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{display:flex;flex-direction:column;height:100vh;height:100dvh;background:#f0f2f5;overflow:hidden}
+.h{background:#0a3d62;color:#fff;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap}
+.h h1{font-size:10px;line-height:1.3;flex:1}
+.info{font-size:11px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.btn{border:none;padding:10px 14px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:12px;min-height:44px}
+.btn-check{background:#25D366;color:#fff}
+.btn-painel{background:#f39c12;color:#fff}
+.filtros{padding:8px 10px;background:#fff;display:flex;gap:6px;overflow-x:auto;white-space:nowrap;border-bottom:1px solid #ddd;flex-shrink:0}
+.filtros::-webkit-scrollbar{display:none}
+.filtros button{padding:8px 14px;border:none;border-radius:20px;cursor:pointer;background:#e9ecef;font-weight:bold;font-size:11px;flex-shrink:0;min-height:38px}
 .filtros button.ativo{background:#0a3d62;color:#fff}
-.main{flex:1;display:flex;overflow:hidden}
+.main{flex:1;display:flex;overflow:hidden;position:relative}
 .lista{width:380px;overflow-y:auto;background:#f9f9f9;padding:8px;border-right:1px solid #ddd}
-.card{padding:9px;margin-bottom:6px;border-radius:8px;border-left:5px solid;background:#fff;cursor:pointer;font-size:12px}
-.PROPRIA{border-color:#2ecc71}.ATENCAO{border-color:#f1c40f}.IMPROPRIA{border-color:#e74c3c}
-#map{flex:1}
+.card{padding:11px;margin-bottom:6px;border-radius:8px;border-left:5px solid;background:#fff;cursor:pointer;font-size:12px;line-height:1.3}
+.PROPRIA{border-color:#2ecc71}
+.ATENCAO{border-color:#f1c40f}
+.IMPROPRIA{border-color:#e74c3c}
+#map{flex:1;z-index:1}
+.barra-mobile{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;padding:8px 10px;border-top:1px solid #ddd;z-index:1000;gap:8px}
+.barra-mobile button{flex:1;min-height:48px;font-size:13px;border-radius:12px}
+.btn-toggle-lista{display:none;position:fixed;bottom:75px;left:50%;transform:translateX(-50%);z-index:999;background:#0a3d62;color:#fff;padding:12px 20px;border-radius:30px;border:none;font-weight:bold;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:9999;justify-content:center;align-items:center;padding:10px}
 .modal.ativo{display:flex}
 .box{background:#fff;padding:16px;border-radius:12px;width:100%;max-width:580px;max-height:95vh;overflow-y:auto}
 .box h2{color:#0a3d62;font-size:16px;margin-bottom:4px}
-.box input,.box select{width:100%;padding:9px;margin:5px 0;border:1px solid #ddd;border-radius:8px;font-size:13px}
-.box button{width:100%;padding:10px;margin-top:8px;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
-.btn-salvar{background:#25D366;color:#fff}.btn-cancel{background:#e9ecef}
+.box input,.box select{width:100%;padding:12px;margin:6px 0;border:1px solid #ddd;border-radius:10px;font-size:16px;min-height:44px}
+.box button{width:100%;padding:12px;margin-top:8px;border:none;border-radius:10px;font-weight:bold;cursor:pointer;min-height:48px}
+.btn-salvar{background:#25D366;color:#fff}
+.btn-cancel{background:#e9ecef}
 .stat{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin:10px 0}
 .stat div{background:#f0f2f5;padding:10px;border-radius:8px;text-align:center}
 .stat b{font-size:18px;color:#0a3d62;display:block}
-.dado-geo{background:#eaf6ff;padding:6px 8px;border-radius:6px;margin:4px 0;font-size:12px;border-left:3px solid #0a3d62}
+.dado-geo{background:#eaf6ff;padding:7px 8px;border-radius:6px;margin:4px 0;font-size:12px;border-left:3px solid #0a3d62}
 .filtro-tempo{display:flex;gap:6px;margin:10px 0}
-.filtro-tempo button{flex:1;padding:8px;border:none;border-radius:20px;font-weight:bold;cursor:pointer;background:#e9ecef;font-size:11px}
+.filtro-tempo button{flex:1;padding:10px;border:none;border-radius:20px;font-weight:bold;cursor:pointer;background:#e9ecef;font-size:11px;min-height:40px}
 .filtro-tempo button.ativo{background:#0a3d62;color:#fff}
 .previsao{background:linear-gradient(135deg,#0a3d62,#2ecc71);color:#fff;padding:10px;border-radius:10px;margin:10px 0;font-size:12px}
 .previsao-dia{display:flex;justify-content:space-between;background:rgba(255,255,255,0.15);padding:6px 8px;border-radius:6px;margin:4px 0}
-@media(max-width:768px){.main{flex-direction:column}.lista{width:100%;height:35vh}#map{height:65vh}.stat{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){
+.h.info.btn{display:none}
+.main{flex-direction:column}
+.lista{position:fixed;bottom:70px;left:0;right:0;height:50vh;width:100%;z-index:998;border-radius:16px 16px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.2);transform:translateY(100%);transition:transform.3s ease;background:#fff;padding:12px}
+.lista.aberta{transform:translateY(0)}
+ #map{height:100%;width:100%}
+.barra-mobile{display:flex}
+.btn-toggle-lista{display:block}
+.stat{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
-<div class="h"><h1>🌊 BAIA VIVA 6.8 - ZAP ATIVO | IDEALIZADOR PROF. EDSON FREITAS ALVES | ORIENT. PROF. JEMISSON | 71 99241-8354</h1>
-<div class="info"><span id="relogio"></span> | <span id="visitantes">0 visitantes</span>
+<div class="h">
+<h1>🌊 BAIA VIVA 6.9.1 FULL LINES | IDEALIZADOR PROF. EDSON FREITAS ALVES | ORIENT. PROF. JEMISSON | ZAP 71 99241-8354</h1>
+<div class="info">
+<span id="relogio"></span> | <span id="visitantes">0 visitantes</span>
 <button class="btn btn-check" onclick="abrirCheckin()">📲 CHECK-IN ZAP</button>
-<button class="btn btn-painel" onclick="abrirPainel()">📊 PAINEL</button></div></div>
+<button class="btn btn-painel" onclick="abrirPainel()">📊 PAINEL</button>
+</div>
+</div>
 <div class="filtros">
 <button onclick="filtrar('TODAS')" id="b-TODAS" class="ativo">TODAS (76)</button>
 <button onclick="filtrar('SSA')" id="b-SSA">SALVADOR</button>
@@ -53,38 +77,59 @@ body{display:flex;flex-direction:column;height:100vh;background:#f0f2f5}
 <button onclick="filtrar('BS')" id="b-BS">BAIXO SUL</button>
 <button onclick="filtrar('ES')" id="b-ES">EXTREMO SUL</button>
 </div>
-<div class="main"><div class="lista" id="lista"></div><div id="map"></div></div>
+<div class="main">
+<div class="lista" id="lista"></div>
+<div id="map"></div>
+</div>
+<button class="btn-toggle-lista" id="btnLista" onclick="toggleLista()">☰ VER PRAIAS (76)</button>
+<div class="barra-mobile">
+<button class="btn btn-check" onclick="abrirCheckin()">📲 CHECK-IN ZAP</button>
+<button class="btn btn-painel" onclick="abrirPainel()">📊 PAINEL</button>
+</div>
 <div class="modal" id="modalDetalhe"><div class="box" id="boxDetalhe"></div></div>
 <div class="modal" id="modalCheck"><div class="box">
-<h2>🌊 Passaporte Baía Viva - Zap Ativo</h2><small>Idealizador Prof. Edson Freitas Alves | Orientação Prof. Jemisson<br>Seu check-in vai pro WhatsApp 71 99241-8354</small>
-<input id="nome" placeholder="Seu nome completo"><input id="contato" placeholder="Seu WhatsApp com DDD">
+<h2>🌊 Passaporte Baía Viva - Zap Ativo 71 99241-8354</h2>
+<small>Prof. Edson Freitas Alves | Orient. Prof. Jemisson</small>
+<input id="nome" placeholder="Seu nome completo">
+<input id="contato" placeholder="Seu WhatsApp com DDD" inputmode="numeric">
 <select id="praiaVisitada"></select>
-<select id="motivo"><option value="lazer">Lazer / Banho</option><option value="turismo">Turismo</option><option value="pesquisa">Pesquisa / Mestrado</option><option value="morador">Morador</option><option value="trabalho">Trabalho</option></select>
-<button class="btn-salvar" onclick="salvarVisitante()">📲 CONFIRMAR E ENVIAR NO ZAP</button>
-<button class="btn-cancel" onclick="fecharCheckin()">Cancelar</button></div></div>
+<select id="motivo">
+<option value="lazer">Lazer / Banho</option>
+<option value="turismo">Turismo</option>
+<option value="pesquisa">Pesquisa / Mestrado</option>
+<option value="morador">Morador</option>
+<option value="trabalho">Trabalho</option>
+</select>
+<button class="btn-salvar" onclick="salvarVisitante()">📲 CONFIRMAR E ENVIAR NO ZAP 71 99241-8354</button>
+<button class="btn-cancel" onclick="fecharCheckin()">Cancelar</button>
+</div></div>
 <div class="modal" id="modalPainel"><div class="box">
-<h2>📊 Painel + Tendências + Zap</h2><small id="dataPainel"></small>
+<h2>📊 Painel - 6.9.1 Full Lines - Prof. Jemisson</h2>
+<small id="dataPainel"></small>
 <div class="filtro-tempo">
 <button onclick="setPeriodo('hoje')" id="p-hoje" class="ativo">HOJE</button>
 <button onclick="setPeriodo('10')" id="p-10">10 DIAS</button>
 <button onclick="setPeriodo('30')" id="p-30">30 DIAS</button>
 </div>
-<div class="stat"><div><b id="tTotal">0</b><small>Total</small></div><div><b id="tHoje">0</b><small>Hoje</small></div><div><b id="tPraias">76</b><small>Praias</small></div><div><b id="tMedia">0</b><small>Média/dia</small></div></div>
+<div class="stat">
+<div><b id="tTotal">0</b><small>Total</small></div>
+<div><b id="tHoje">0</b><small>Hoje</small></div>
+<div><b id="tPraias">76</b><small>Praias</small></div>
+<div><b id="tMedia">0</b><small>Média/dia</small></div>
+</div>
 <canvas id="grafTempo" height="150"></canvas>
 <canvas id="grafMotivo" height="150" style="margin-top:12px"></canvas>
 <canvas id="grafPraia" height="150" style="margin-top:12px"></canvas>
-<div class="previsao" id="previsaoBox">
-<b>🌤️ PREVISÃO 10 DIAS - SALVADOR</b>
-<div id="previsaoDados" style="margin-top:8px"><small>Carregando...</small></div>
-</div>
+<div class="previsao" id="previsaoBox"><b>🌤️ PREVISÃO 10 DIAS - SALVADOR</b><div id="previsaoDados" style="margin-top:8px"><small>Carregando...</small></div></div>
 <div id="historico" style="margin-top:10px"></div>
-<button class="btn-salvar" onclick="exportar()" style="background:#0a3d62;margin-top:10px">📥 Exportar CSV - TCC</button>
-<button class="btn-cancel" onclick="fecharPainel()">Fechar</button></div></div>
-
+<button class="btn-salvar" onclick="exportar()" style="background:#0a3d62;margin-top:10px">📥 Exportar CSV - TCC - Prof Edson</button>
+<button class="btn-cancel" onclick="fecharPainel()">Fechar</button>
+</div></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-const praias=[
+// 76 PRAIAS - VERSAO EXPANDIDA FULL LINES - PROF EDSON FREITAS ALVES
+const praias = [
 {nome:"Farol da Barra",regiao:"SSA",lat:-13.0102,lng:-38.5329,status:"ATENCAO",maritimidade:"Mar aberto - Alta energia",vegetacao:"Coqueiral + urbana",temp:"27°C",costa:"Costão + areia fina",uso:"Turístico"},
 {nome:"Porto da Barra",regiao:"SSA",lat:-13.007,lng:-38.531,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Amendoeiras",temp:"27.5°C",costa:"Areia fina clara",uso:"Banho"},
 {nome:"Farol de Itapuã",regiao:"SSA",lat:-12.957,lng:-38.356,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga",temp:"27°C",costa:"Areia + recifes",uso:"Turístico"},
@@ -162,70 +207,252 @@ const praias=[
 {nome:"Nova Viçosa",regiao:"ES",lat:-17.89,lng:-39.37,status:"PROPRIA",maritimidade:"Mar aberto - Baixa",vegetacao:"Mangue + restinga",temp:"25.6°C",costa:"Areia + mangue",uso:"Pesca"},
 {nome:"Coroa Vermelha",regiao:"ES",lat:-16.32,lng:-39,status:"ATENCAO",maritimidade:"Mar aberto - Baixa",vegetacao:"Restinga",temp:"25.6°C",costa:"Recifes + cruz",uso:"Histórico"}
 ];
-let map=L.map('map').setView([-13,-38.8],7);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
-let markers=[],chartTempo,chartMotivo,chartPraia,periodoAtual='hoje';
-function getLocalSafe(){ try{ let d=localStorage.getItem('visitantes_bv'); if(!d) return []; return JSON.parse(d)||[]; }catch(e){ localStorage.setItem('visitantes_bv',JSON.stringify([])); return []; } }
-function relogio(){document.getElementById('relogio').textContent=new Date().toLocaleTimeString('pt-BR');document.getElementById('visitantes').textContent=getLocalSafe().length+' visitantes';}
-setInterval(relogio,1000);relogio();
-async function buscarPrevisao(lat,lng,elementoId){
+
+let map = L.map('map',{zoomControl:false}).setView([-13,-38.8],7);
+L.control.zoom({position:'topright'}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+maxZoom:18,
+attribution:'© CARTO | Baía Viva 6.9.1 - Prof. Edson Freitas Alves'
+}).addTo(map);
+
+let markers = [];
+let chartTempo, chartMotivo, chartPraia;
+let periodoAtual = 'hoje';
+let listaAberta = false;
+
+function getLocalSafe(){
  try{
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max&timezone=America%2FBahia&forecast_days=10`;
-  const r=await fetch(url); if(!r.ok) throw new Error('API'); const j=await r.json();
-  if(!j.daily) throw new Error('sem dados'); let html='';
-  for(let i=0;i<j.daily.time.length;i++){ const data=new Date(j.daily.time[i]).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}); const max=j.daily.temperature_2m_max[i]; const min=j.daily.temperature_2m_min[i]; const chuva=j.daily.precipitation_sum[i]; const vento=j.daily.wind_speed_10m_max[i]; const icone=chuva>5?'🌧️':chuva>0.5?'🌦️':'☀️'; html+=`<div class="previsao-dia"><span>${icone} ${data}</span><span>${min.toFixed(0)}°/${max.toFixed(0)}°</span><span>💧${chuva}mm</span><span>💨${vento.toFixed(0)}km/h</span></div>`; }
-  document.getElementById(elementoId).innerHTML=html + `<small style="opacity:0.8;display:block;margin-top:6px">Open-Meteo • ${lat.toFixed(2)},${lng.toFixed(2)}</small>`;
- }catch(e){ document.getElementById(elementoId).innerHTML="<small>⚠️ Previsão indisponível (sem internet)</small>"; }
+  let d = localStorage.getItem('visitantes_bv');
+  if(!d) return [];
+  return JSON.parse(d) || [];
+ }catch(e){
+  localStorage.setItem('visitantes_bv',JSON.stringify([]));
+  return [];
+ }
 }
+
+function relogio(){
+ document.getElementById('relogio').textContent = new Date().toLocaleTimeString('pt-BR');
+ document.getElementById('visitantes').textContent = getLocalSafe().length + ' visitantes';
+ document.getElementById('btnLista').textContent = (listaAberta? '✕ FECHAR' : '☰ VER PRAIAS') + ' (' + praias.length + ')';
+}
+setInterval(relogio,1000);
+relogio();
+
+function toggleLista(){
+ const l = document.getElementById('lista');
+ listaAberta =!listaAberta;
+ l.classList.toggle('aberta', listaAberta);
+ relogio();
+ if(listaAberta){
+  map.invalidateSize();
+ }
+}
+
+async function buscarPrevisao(lat,lng,id){
+ try{
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max&timezone=America%2FBahia&forecast_days=10`;
+  const r = await fetch(url);
+  if(!r.ok) throw new Error('API');
+  const j = await r.json();
+  let html = '';
+  for(let i=0;i<j.daily.time.length;i++){
+   const data = new Date(j.daily.time[i]).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+   const max = j.daily.temperature_2m_max[i];
+   const min = j.daily.temperature_2m_min[i];
+   const chuva = j.daily.precipitation_sum[i];
+   const vento = j.daily.wind_speed_10m_max[i];
+   const icone = chuva>5?'🌧️':chuva>0.5?'🌦️':'☀️';
+   html += `<div class="previsao-dia"><span>${icone} ${data}</span><span>${min.toFixed(0)}°/${max.toFixed(0)}°</span><span>💧${chuva}mm</span><span>💨${vento.toFixed(0)}km/h</span></div>`;
+  }
+  document.getElementById(id).innerHTML = html;
+ }catch(e){
+  document.getElementById(id).innerHTML = "<small>⚠️ Sem internet - previsão indisponível</small>";
+ }
+}
+
 function abrirDetalhe(p){
-document.getElementById('boxDetalhe').innerHTML=`
-<h2>📍 ${p.nome}</h2><small style="color:${p.status=='PROPRIA'?'#2ecc71':p.status=='ATENCAO'?'#f1c40f':'#e74c3c'};font-weight:bold">● ${p.status} - ${p.regiao}</small>
-<div class="dado-geo"><b>🌊 Maritimidade:</b> ${p.maritimidade}</div>
-<div class="dado-geo"><b>🌿 Vegetação:</b> ${p.vegetacao}</div>
-<div class="dado-geo"><b>🌡️ Temp:</b> ${p.temp}</div>
-<div class="dado-geo"><b>🏖️ Costa:</b> ${p.costa}</div>
-<div class="dado-geo"><b>👥 Uso:</b> ${p.uso}</div>
-<div class="dado-geo" style="background:#fff3cd"><b>📌 Coordenadas:</b> ${p.lat}, ${p.lng} | Prof. Edson Freitas Alves</div>
-<div class="previsao" style="margin-top:10px"><b>🌤️ PREVISÃO 10 DIAS - ${p.nome}</b><div id="prevPraia" style="margin-top:6px"><small>Carregando...</small></div></div>
-<button class="btn-salvar" onclick="document.getElementById('modalDetalhe').classList.remove('ativo'); abrirCheckinEspecifico('${p.nome}')">📲 CHECK-IN ZAP AQUI</button>
-<button class="btn-cancel" onclick="document.getElementById('modalDetalhe').classList.remove('ativo')">Fechar</button>
-`; document.getElementById('modalDetalhe').classList.add('ativo'); buscarPrevisao(p.lat,p.lng,'prevPraia');
+ document.getElementById('boxDetalhe').innerHTML = `
+ <h2>📍 ${p.nome}</h2>
+ <small style="color:${p.status=='PROPRIA'?'#2ecc71':p.status=='ATENCAO'?'#f1c40f':'#e74c3c'};font-weight:bold">● ${p.status} - ${p.regiao}</small>
+ <div class="dado-geo"><b>🌊 Maritimidade:</b> ${p.maritimidade}</div>
+ <div class="dado-geo"><b>🌿 Vegetação:</b> ${p.vegetacao}</div>
+ <div class="dado-geo"><b>🌡️ Temp:</b> ${p.temp}</div>
+ <div class="dado-geo"><b>🏖️ Costa:</b> ${p.costa}</div>
+ <div class="dado-geo"><b>👥 Uso:</b> ${p.uso}</div>
+ <div class="dado-geo" style="background:#fff3cd"><b>📌 Coordenadas:</b> ${p.lat}, ${p.lng} | Prof. Edson Freitas Alves</div>
+ <div class="previsao" style="margin-top:10px"><b>🌤️ PREVISÃO 10 DIAS - ${p.nome}</b><div id="prevPraia" style="margin-top:6px"><small>Carregando...</small></div></div>
+ <button class="btn-salvar" onclick="document.getElementById('modalDetalhe').classList.remove('ativo'); abrirCheckinEspecifico('${p.nome}')">📲 CHECK-IN ZAP AQUI</button>
+ <button class="btn-cancel" onclick="document.getElementById('modalDetalhe').classList.remove('ativo')">Fechar</button>
+ `;
+ document.getElementById('modalDetalhe').classList.add('ativo');
+ buscarPrevisao(p.lat,p.lng,'prevPraia');
+ if(window.innerWidth<=768 && listaAberta){
+  toggleLista();
+ }
 }
-function render(dados){ const l=document.getElementById('lista');l.innerHTML='';markers.forEach(m=>map.removeLayer(m));markers=[]; dados.forEach(p=>{ const d=document.createElement('div');d.className='card '+p.status; d.innerHTML=`<b>${p.nome}</b><br><small>${p.regiao} • ${p.maritimidade} • ${p.status}</small>`; d.onclick=()=>abrirDetalhe(p); l.appendChild(d); const cor=p.status=='PROPRIA'?'#2ecc71':p.status=='ATENCAO'?'#f1c40f':'#e74c3c'; const mk=L.circleMarker([p.lat,p.lng],{radius:7,color:cor,fillColor:cor,fillOpacity:.9}).addTo(map).bindPopup(`<b>${p.nome}</b><br>${p.status}`); mk.on('click',()=>abrirDetalhe(p)); markers.push(mk); }); }
-function filtrar(r){document.querySelectorAll('.filtros button').forEach(b=>b.classList.remove('ativo'));document.getElementById('b-'+r).classList.add('ativo');if(r=='TODAS')render(praias);else render(praias.filter(p=>p.regiao==r));}
-function abrirCheckin(){document.getElementById('praiaVisitada').innerHTML=praias.map(p=>`<option>${p.nome}</option>`).join('');document.getElementById('modalCheck').classList.add('ativo');}
-function abrirCheckinEspecifico(nome){abrirCheckin();document.getElementById('praiaVisitada').value=nome;}
-function fecharCheckin(){document.getElementById('modalCheck').classList.remove('ativo');}
 
-// FUNCAO 6.8 COM SEU ZAP 71 99241-8354 CONFIGURADO
+function render(dados){
+ const l = document.getElementById('lista');
+ l.innerHTML = '';
+ markers.forEach(m=>map.removeLayer(m));
+ markers = [];
+ dados.forEach(p=>{
+  const d = document.createElement('div');
+  d.className = 'card ' + p.status;
+  d.innerHTML = `<b>${p.nome}</b><br><small>${p.regiao} • ${p.maritimidade} • ${p.status}</small>`;
+  d.onclick = () => abrirDetalhe(p);
+  l.appendChild(d);
+  const cor = p.status=='PROPRIA'?'#2ecc71':p.status=='ATENCAO'?'#f1c40f':'#e74c3c';
+  const mk = L.circleMarker([p.lat,p.lng],{radius:7,color:cor,fillColor:cor,fillOpacity:.9}).addTo(map).bindPopup(`<b>${p.nome}</b><br>${p.status}`);
+  mk.on('click',()=>abrirDetalhe(p));
+  markers.push(mk);
+ });
+}
+
+function filtrar(r){
+ document.querySelectorAll('.filtros button').forEach(b=>b.classList.remove('ativo'));
+ document.getElementById('b-'+r).classList.add('ativo');
+ if(r=='TODAS'){
+  render(praias);
+ }else{
+  render(praias.filter(p=>p.regiao==r));
+ }
+ if(window.innerWidth<=768 &&!listaAberta){
+  toggleLista();
+ }
+}
+
+function abrirCheckin(){
+ document.getElementById('praiaVisitada').innerHTML = praias.map(p=>`<option>${p.nome}</option>`).join('');
+ document.getElementById('modalCheck').classList.add('ativo');
+}
+
+function abrirCheckinEspecifico(nome){
+ abrirCheckin();
+ document.getElementById('praiaVisitada').value = nome;
+}
+
+function fecharCheckin(){
+ document.getElementById('modalCheck').classList.remove('ativo');
+}
+
 function salvarVisitante(){
- const n=document.getElementById('nome').value.trim();
- const c=document.getElementById('contato').value.trim();
- const pr=document.getElementById('praiaVisitada').value;
- const mo=document.getElementById('motivo').value;
- if(!n){alert('Digite seu nome');return;}
- let ls=getLocalSafe();
- const registro={nome:n,contato:c,praia:pr,motivo:mo,data:new Date().toLocaleString('pt-BR'),dia:new Date().toISOString().slice(0,10),timestamp:Date.now()};
- ls.push(registro);
+ const n = document.getElementById('nome').value.trim();
+ const c = document.getElementById('contato').value.trim();
+ const pr = document.getElementById('praiaVisitada').value;
+ const mo = document.getElementById('motivo').value;
+ if(!n){
+  alert('Digite seu nome');
+  return;
+ }
+ let ls = getLocalSafe();
+ ls.push({
+  nome:n,
+  contato:c,
+  praia:pr,
+  motivo:mo,
+  data:new Date().toLocaleString('pt-BR'),
+  dia:new Date().toISOString().slice(0,10),
+  timestamp:Date.now()
+ });
  localStorage.setItem('visitantes_bv',JSON.stringify(ls));
-
- // SEU NUMERO CONFIGURADO AQUI - 71 99241-8354
  const seuNumero = "5571992418354";
- const mensagem = `🌊 *NOVO CHECK-IN - BAIA VIVA 6.8*%0A%0A👤 *Nome:* ${encodeURIComponent(n)}%0A📱 *Contato:* ${encodeURIComponent(c)}%0A📍 *Praia:* ${encodeURIComponent(pr)}%0A🎯 *Motivo:* ${encodeURIComponent(mo)}%0A🕐 *Data:* ${encodeURIComponent(new Date().toLocaleString('pt-BR'))}%0A%0A_Plataforma Idealizada por Prof. Edson Freitas Alves | Orient. Prof. Jemisson - Zap 71 99241-8354_`;
- const linkZap = `https://wa.me/${seuNumero}?text=${mensagem}`;
-
+ const mensagem = `🌊 *NOVO CHECK-IN - BAIA VIVA 6.9.1 FINAL FULL*%0A%0A👤 *Nome:* ${encodeURIComponent(n)}%0A📱 *Contato:* ${encodeURIComponent(c)}%0A📍 *Praia:* ${encodeURIComponent(pr)}%0A🎯 *Motivo:* ${encodeURIComponent(mo)}%0A🕐 *Data:* ${encodeURIComponent(new Date().toLocaleString('pt-BR'))}%0A%0A_Plataforma Prof. Edson Freitas Alves | Orient. Prof. Jemisson - Zap 71 99241-8354 - Full Lines_`;
+ window.open(`https://wa.me/${seuNumero}?text=${mensagem}`,'_blank');
  alert('✅ Check-in salvo! Abrindo seu WhatsApp 71 99241-8354 com os dados...');
- window.open(linkZap, '_blank');
-
- fecharCheckin();relogio();
- document.getElementById('nome').value='';document.getElementById('contato').value='';
+ fecharCheckin();
+ relogio();
+ document.getElementById('nome').value = '';
+ document.getElementById('contato').value = '';
 }
-function setPeriodo(p){periodoAtual=p;document.querySelectorAll('.filtro-tempo button').forEach(b=>b.classList.remove('ativo'));document.getElementById('p-'+p).classList.add('ativo');abrirPainel();}
-function getFiltradosPorPeriodo(){ let ls=getLocalSafe(); let hoje=new Date().toISOString().slice(0,10); if(periodoAtual=='hoje') return ls.filter(v=>v.dia==hoje); if(periodoAtual=='10'){let lim=Date.now()-10*24*60*60*1000;return ls.filter(v=> (v.timestamp||0) >= lim);} if(periodoAtual=='30'){let lim=Date.now()-30*24*60*60*1000;return ls.filter(v=> (v.timestamp||0) >= lim);} return ls; }
-function abrirPainel(){ let lsTotal=getLocalSafe(); let ls=getFiltradosPorPeriodo(); document.getElementById('dataPainel').textContent=new Date().toLocaleString('pt-BR') + ' | ' + periodoAtual.toUpperCase() + ' | Prof. Jemisson | Zap 71 99241-8354'; document.getElementById('tTotal').textContent=ls.length; document.getElementById('tHoje').textContent=lsTotal.filter(v=>v.dia==new Date().toISOString().slice(0,10)).length; document.getElementById('tMedia').textContent=periodoAtual=='hoje'?ls.length:(ls.length/(periodoAtual=='10'?10:30)).toFixed(1); let porDia={};ls.forEach(v=>{porDia[v.dia]=(porDia[v.dia]||0)+1;}); let dias=Object.keys(porDia).sort(); let ctxT=document.getElementById('grafTempo');if(chartTempo)chartTempo.destroy(); chartTempo=new Chart(ctxT,{type:'line',data:{labels:dias.length?dias:['Hoje'],datasets:[{label:'Check-ins por dia',data:dias.length?dias.map(d=>porDia[d]):[ls.length],borderColor:'#0a3d62',backgroundColor:'rgba(10,61,98,0.2)',fill:true,tension:0.3}]},options:{plugins:{title:{display:true,text:'Tendência Temporal'}},responsive:true}}); let porMotivo={};ls.forEach(v=>{porMotivo[v.motivo]=(porMotivo[v.motivo]||0)+1;}); let ctxM=document.getElementById('grafMotivo');if(chartMotivo)chartMotivo.destroy(); chartMotivo=new Chart(ctxM,{type:'doughnut',data:{labels:Object.keys(porMotivo).length?Object.keys(porMotivo):['Sem dados'],datasets:[{data:Object.values(porMotivo).length?Object.values(porMotivo):[1],backgroundColor:['#2ecc71','#0a3d62','#f39c12','#e74c3c','#9b59b6']}]},options:{plugins:{title:{display:true,text:'Motivo - '+periodoAtual}},responsive:true}}); let porPraia={};ls.forEach(v=>{porPraia[v.praia]=(porPraia[v.praia]||0)+1;}); let top=Object.entries(porPraia).sort((a,b)=>b[1]-a[1]).slice(0,5); let ctxP=document.getElementById('grafPraia');if(chartPraia)chartPraia.destroy(); chartPraia=new Chart(ctxP,{type:'bar',data:{labels:top.length?top.map(p=>p[0]):['Sem dados'],datasets:[{label:'Check-ins',data:top.length?top.map(p=>p[1]):[0],backgroundColor:'#0a3d62'}]},options:{plugins:{title:{display:true,text:'Top 5 Praias - '+periodoAtual}},responsive:true}}); let hist=ls.slice(-10).reverse().map(v=>`<div style="border-bottom:1px solid #eee;padding:6px 0;font-size:12px"><b>${v.nome}</b> - ${v.praia}<br><small>${v.motivo} • ${v.data}</small></div>`).join('')||'<small>Nenhum visitante no periodo.</small>'; document.getElementById('historico').innerHTML='<b>Historico ('+periodoAtual+')</b>'+hist; document.getElementById('modalPainel').classList.add('ativo'); buscarPrevisao(-13.0,-38.5,'previsaoDados'); }
-function fecharPainel(){document.getElementById('modalPainel').classList.remove('ativo');}
-function exportar(){ let ls=getLocalSafe(); if(ls.length==0){alert('Sem dados');return;} let csv='Nome,Contato,Praia,Motivo,Data,Dia\n'+ls.map(v=>`"${v.nome}","${v.contato}","${v.praia}","${v.motivo}","${v.data}","${v.dia}"`).join('\n'); let blob=new Blob([csv],{type:'text/csv'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='visitantes_baia_viva_6.8_ZAP_71992418354.csv';a.click(); }
+
+function setPeriodo(p){
+ periodoAtual = p;
+ document.querySelectorAll('.filtro-tempo button').forEach(b=>b.classList.remove('ativo'));
+ document.getElementById('p-'+p).classList.add('ativo');
+ abrirPainel();
+}
+
+function getFiltradosPorPeriodo(){
+ let ls = getLocalSafe();
+ let hoje = new Date().toISOString().slice(0,10);
+ if(periodoAtual=='hoje'){
+  return ls.filter(v=>v.dia==hoje);
+ }
+ if(periodoAtual=='10'){
+  let lim = Date.now() - 10*24*60*60*1000;
+  return ls.filter(v=> (v.timestamp||0) >= lim);
+ }
+ if(periodoAtual=='30'){
+  let lim = Date.now() - 30*24*60*60*1000;
+  return ls.filter(v=> (v.timestamp||0) >= lim);
+ }
+ return ls;
+}
+
+function abrirPainel(){
+ let lsTotal = getLocalSafe();
+ let ls = getFiltradosPorPeriodo();
+ document.getElementById('dataPainel').textContent = new Date().toLocaleString('pt-BR') + ' | ' + periodoAtual.toUpperCase() + ' | Prof. Edson 71 99241-8354';
+ document.getElementById('tTotal').textContent = ls.length;
+ document.getElementById('tHoje').textContent = lsTotal.filter(v=>v.dia==new Date().toISOString().slice(0,10)).length;
+ document.getElementById('tMedia').textContent = periodoAtual=='hoje'? ls.length : (ls.length/(periodoAtual=='10'?10:30)).toFixed(1);
+ let porDia = {};
+ ls.forEach(v=>{porDia[v.dia]=(porDia[v.dia]||0)+1;});
+ let dias = Object.keys(porDia).sort();
+ let ctxT = document.getElementById('grafTempo');
+ if(chartTempo) chartTempo.destroy();
+ chartTempo = new Chart(ctxT,{
+  type:'line',
+  data:{labels:dias.length?dias:['Hoje'],datasets:[{label:'Check-ins por dia',data:dias.length?dias.map(d=>porDia[d]):[ls.length],borderColor:'#0a3d62',backgroundColor:'rgba(10,61,98,0.2)',fill:true,tension:0.3}]},
+  options:{plugins:{title:{display:true,text:'Tendência Temporal - '+periodoAtual}},responsive:true}
+ });
+ let porMotivo = {};
+ ls.forEach(v=>{porMotivo[v.motivo]=(porMotivo[v.motivo]||0)+1;});
+ let ctxM = document.getElementById('grafMotivo');
+ if(chartMotivo) chartMotivo.destroy();
+ chartMotivo = new Chart(ctxM,{
+  type:'doughnut',
+  data:{labels:Object.keys(porMotivo).length?Object.keys(porMotivo):['Sem dados'],datasets:[{data:Object.values(porMotivo).length?Object.values(porMotivo):[1],backgroundColor:['#2ecc71','#0a3d62','#f39c12','#e74c3c','#9b59b6']}]},
+  options:{plugins:{title:{display:true,text:'Motivo - '+periodoAtual}},responsive:true}
+ });
+ let porPraia = {};
+ ls.forEach(v=>{porPraia[v.praia]=(porPraia[v.praia]||0)+1;});
+ let top = Object.entries(porPraia).sort((a,b)=>b[1]-a[1]).slice(0,5);
+ let ctxP = document.getElementById('grafPraia');
+ if(chartPraia) chartPraia.destroy();
+ chartPraia = new Chart(ctxP,{
+  type:'bar',
+  data:{labels:top.length?top.map(p=>p[0]):['Sem dados'],datasets:[{label:'Check-ins',data:top.length?top.map(p=>p[1]):[0],backgroundColor:'#0a3d62'}]},
+  options:{plugins:{title:{display:true,text:'Top 5 Praias - '+periodoAtual}},responsive:true}
+ });
+ let hist = ls.slice(-10).reverse().map(v=>`<div style="border-bottom:1px solid #eee;padding:6px 0;font-size:12px"><b>${v.nome}</b> - ${v.praia}<br><small>${v.motivo} • ${v.data}</small></div>`).join('')||'<small>Nenhum visitante no periodo.</small>';
+ document.getElementById('historico').innerHTML = '<b>Historico ('+periodoAtual+')</b>' + hist;
+ document.getElementById('modalPainel').classList.add('ativo');
+ buscarPrevisao(-13.0,-38.5,'previsaoDados');
+}
+
+function fecharPainel(){
+ document.getElementById('modalPainel').classList.remove('ativo');
+}
+
+function exportar(){
+ let ls = getLocalSafe();
+ if(ls.length==0){
+  alert('Sem dados');
+  return;
+ }
+ let csv = 'Nome,Contato,Praia,Motivo,Data,Dia,Timestamp\n' + ls.map(v=>`"${v.nome}","${v.contato}","${v.praia}","${v.motivo}","${v.data}","${v.dia}","${v.timestamp}"`).join('\n');
+ let blob = new Blob([csv],{type:'text/csv'});
+ let a = document.createElement('a');
+ a.href = URL.createObjectURL(blob);
+ a.download = 'baia_viva_6.9.1_FULL_LINES_TCC_Edson_Freitas.csv';
+ a.click();
+}
+
 render(praias);
+map.invalidateSize();
 </script>
 </body>
 </html>
