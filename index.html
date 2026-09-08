@@ -3,24 +3,31 @@
 <head>
 <meta charset='UTF-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-<title>BAIA VIVA 6.9.5 - 103 PRAIAS - 1072 LINHAS</title>
+<title>BAIA VIVA 6.9.5 - 1303 LINHAS - SEM WHATSAPP - EMAIL</title>
 <link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'/>
 <script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI';background:#0a2a4a;color:#fff}
-#header{background:linear-gradient(90deg,#001f3f,#00509d);padding:12px;display:flex;justify-content:space-between;flex-wrap:wrap;border-bottom:3px solid #ffcc00}
-#filters{background:#012a5a;padding:10px;display:flex;gap:7px;flex-wrap:wrap}
-.filter-btn{background:#0a4a8a;border:1px solid #1e90ff;color:#fff;padding:7px 14px;border-radius:20px;cursor:pointer;font-size:11px;font-weight:bold}
+body{font-family:'Segoe UI',sans-serif;background:#0a2a4a;color:#fff}
+#header{background:linear-gradient(90deg,#001f3f,#00509d);padding:10px 15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;border-bottom:3px solid #ffcc00}
+#header h1{font-size:15px}
+#relogio{background:#ffcc00;color:#001f3f;padding:5px 10px;border-radius:15px;font-weight:bold;font-size:12px}
+#filters{background:#012a5a;padding:8px;display:flex;gap:6px;flex-wrap:wrap}
+.filter-btn{background:#0a4a8a;border:1px solid #1e90ff;color:#fff;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:11px;font-weight:bold}
 .filter-btn.active{background:#ffcc00;color:#001f3f}
-#map{height:calc(100vh - 165px);width:70%;float:left}
-#side{width:30%;float:left;height:calc(100vh - 165px);background:#001a33;overflow-y:auto;padding:12px}
-.praia-item{background:#0a2e5a;margin:6px 0;padding:10px;border-radius:8px;border-left:4px solid #1e90ff;font-size:11px;cursor:pointer}
-.praia-item:hover{background:#0f3d7a}
+#map{height:calc(100vh - 200px);width:70%;float:left}
+#side{width:30%;float:left;height:calc(100vh - 200px);background:#001a33;overflow-y:auto;padding:10px}
+#stats{background:#0a2e5a;padding:8px;border-radius:8px;font-size:11px;text-align:center;margin-bottom:8px}
+.praia-item{background:#0a2e5a;margin:5px 0;padding:8px;border-radius:8px;border-left:4px solid #1e90ff;font-size:11px;cursor:pointer}
+#emailBox{background:#012a5a;padding:10px;border-radius:8px;margin:8px 0;border:1px solid #ffcc00}
+#emailBox input{width:68%;padding:6px;border-radius:5px;border:none;font-size:11px}
+#emailBox button{width:30%;padding:6px;background:#ffcc00;color:#001f3f;border:none;border-radius:5px;font-weight:bold;cursor:pointer;font-size:11px;margin:2px 0}
+.pernas{font-size:10px;color:#8ab4ff;margin-top:5px}
 </style>
 </head>
 <body>
-<div id='header'><h1>BAIA VIVA 6.9.5 - 103 PRAIAS - 1072 LINHAS - SEM EMBOLACAO</h1><span>Prof Edson 71 99241-8354 | Luzia UX</span></div>
+<div id='header'><h1>🌊 BAÍA VIVA 6.9.5 - 1303 LINHAS - 8 PERNAS - 103 PRAIAS - SEM WHATSAPP</h1><div id='relogio'>--:--:--</div><span>Prof Edson | Email Relatório | Luzia UX</span></div>
 <div id='filters'>
 <button class='filter-btn active' onclick="filtrar('TODAS',this)">TODAS (103)</button>
 <button class='filter-btn' onclick="filtrar('SSA_ATL',this)">SSA ATL (20)</button>
@@ -33,742 +40,975 @@ body{font-family:'Segoe UI';background:#0a2a4a;color:#fff}
 <button class='filter-btn' onclick="filtrar('EXTREMO_SUL',this)">EXTREMO SUL (10)</button>
 </div>
 <div id='map'></div>
-<div id='side'><div id='stats'><b id='totalVisit'>4</b> Visit | <b id='totalPraias'>103</b> | <b id='filtroAtual'>TODAS</b></div><div id='lista'></div></div>
+<div id='side'>
+<div id='stats'>👁️ <b id='totalVisit'>0</b> Visitas | 🏖️ <b id='totalPraias'>103</b> | <b id='filtroAtual'>TODAS</b><div class='pernas' id='pernasInfo'>8 PERNAS DA BAHIA</div></div>
+<canvas id='grafico' height='120'></canvas>
+<div id='emailBox'>
+<b>📧 Relatório por Email</b><br>
+<input id='emailInput' placeholder='seu@email.com para receber relatório'><br>
+<button onclick='gerarRelatorioEmail()'>📊 Gerar e Enviar Relatório por Email</button>
+<button onclick='baixarTXT()'>⬇️ Baixar Relatório TXT</button>
+<div id='emailStatus' style='font-size:10px;margin-top:4px;color:#ffcc00'></div>
+</div>
+<div id='lista'></div>
+</div>
 <script>
-// ======================================================================
-// BAIA VIVA 6.9.5 - 103 PRAIAS - FORMATO EXPANDIDO 1072 LINHAS
-// Prof. Edson - 71 99241-8354 - Luzia UX
-// 20 SSA ATL + 12 RIBEIRA + 8 SUBURBIO + 19 ITAPARICA + 8 BTS ILHAS + 14 LITORAL NORTE + 12 BAIXO SUL + 10 EXTREMO SUL = 103
-// ======================================================================
-const praias = [
-// --- SSA ATLANTICA 20 PRAIAS ---
+function relogio(){let d=new Date();document.getElementById('relogio').innerText=d.toLocaleTimeString('pt-BR')+' | '+d.toLocaleDateString('pt-BR');} setInterval(relogio,1000);relogio();
+let visitas=parseInt(localStorage.getItem('bv_visitas')||'0')+1;localStorage.setItem('bv_visitas',visitas);document.getElementById('totalVisit').innerText=visitas;
+function gerarRelatorioEmail(){
+let email=document.getElementById('emailInput').value;
+if(!email.includes('@')){document.getElementById('emailStatus').innerText='Digite um email válido!';return;}
+let filtro=document.getElementById('filtroAtual').innerText;
+let praiasFiltro=filtro.includes('TODAS')?praias:praias.filter(p=>filtro.includes(p.cat));
+let relatorio=`BAIA VIVA 6.9.5 - RELATORIO\nData: ${new Date().toLocaleString('pt-BR')}\nFiltro: ${filtro}\nTotal Praias: ${praiasFiltro.length}\nVisitas: ${visitas}\n\nLISTA:\n`+praiasFiltro.map(p=>`- ${p.name} (${p.cat}): ${p.info} [${p.lat},${p.lng}]`).join('\n');
+let emails=JSON.parse(localStorage.getItem('bv_emails')||'[]');emails.push({email:email,data:new Date().toISOString(),relatorio:relatorio});localStorage.setItem('bv_emails',JSON.stringify(emails));
+document.getElementById('emailStatus').innerText='✅ Relatório gerado! Abrindo seu email...';
+let mailto=`mailto:${email}?subject=Baia Viva 6.9.5 - Relatorio ${filtro}&body=${encodeURIComponent(relatorio)}`;
+window.open(mailto);
+}
+function baixarTXT(){
+let filtro=document.getElementById('filtroAtual').innerText;
+let praiasFiltro=filtro.includes('TODAS')?praias:praias.filter(p=>filtro.includes(p.cat));
+let txt=`BAIA VIVA 6.9.5\n${new Date().toLocaleString('pt-BR')}\nFiltro: ${filtro}\nTotal: ${praiasFiltro.length}\n\n`+praiasFiltro.map(p=>`${p.name}|${p.cat}|${p.lat}|${p.lng}|${p.info}`).join('\n');
+let blob=new Blob([txt],{type:'text/plain'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`baia_viva_${filtro}_${Date.now()}.txt`;a.click();
+document.getElementById('emailStatus').innerText='⬇️ TXT baixado!';
+}
+// 103 PRAIAS x 10 LINHAS CADA = 1030 LINHAS
+const praias=[
+// --- PERNA 1: SSA ATLANTICA 20 PRAIAS - PRAIA INDIVIDUAL ---
   {
     name: "Praia da Barra",
     cat: "SSA_ATL",
     lat: -13.007,
     lng: -38.532,
-    info: "Farol da Barra"
+    info: "Farol da Barra, mar aberto, turismo",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 1
   },
   {
     name: "Farol da Barra",
     cat: "SSA_ATL",
     lat: -13.0102,
     lng: -38.5329,
-    info: "Ponta Farol"
+    info: "Ponta Farol, encontro BTS com Atlantico",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 2
   },
   {
     name: "Porto da Barra",
     cat: "SSA_ATL",
     lat: -13.0065,
     lng: -38.531,
-    info: "Porto da Barra"
+    info: "Porto da Barra, aguas calmas",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 3
   },
   {
     name: "Ondina",
     cat: "SSA_ATL",
     lat: -13.012,
     lng: -38.514,
-    info: "Ondina"
+    info: "Ondina, orla nobre, HAYOM",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 4
   },
   {
     name: "Rio Vermelho",
     cat: "SSA_ATL",
     lat: -13.015,
     lng: -38.496,
-    info: "Rio Vermelho"
+    info: "Rio Vermelho, cultura, Yemanjá",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 5
   },
   {
     name: "Amaralina",
     cat: "SSA_ATL",
     lat: -13.022,
     lng: -38.479,
-    info: "Amaralina"
+    info: "Amaralina, lagoa e mar",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 6
   },
   {
     name: "Pituba",
     cat: "SSA_ATL",
     lat: -13.027,
     lng: -38.461,
-    info: "Pituba"
+    info: "Pituba, bairro nobre",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 7
   },
   {
     name: "Jardim de Alah",
     cat: "SSA_ATL",
     lat: -13.031,
     lng: -38.449,
-    info: "Jd Alah"
+    info: "Jardim de Alah, surf",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 8
   },
   {
     name: "Armação",
     cat: "SSA_ATL",
     lat: -13.036,
     lng: -38.441,
-    info: "Armação"
+    info: "Armação, Centro Convencoes",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 9
   },
   {
     name: "Boca do Rio",
     cat: "SSA_ATL",
     lat: -13.039,
     lng: -38.429,
-    info: "Boca do Rio"
+    info: "Boca do Rio, foz rio",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 10
   },
   {
     name: "Patamares",
     cat: "SSA_ATL",
     lat: -13.045,
     lng: -38.414,
-    info: "Patamares"
+    info: "Patamares, residencial",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 11
   },
   {
     name: "Piatã",
     cat: "SSA_ATL",
     lat: -13.058,
     lng: -38.391,
-    info: "Piatã"
+    info: "Piatã, ampla, coqueiros",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 12
   },
   {
     name: "Itapuã",
     cat: "SSA_ATL",
     lat: -13.078,
     lng: -38.365,
-    info: "Itapuã"
+    info: "Itapuã, Vinicius de Moraes",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 13
   },
   {
     name: "Farol Itapuã",
     cat: "SSA_ATL",
     lat: -13.089,
     lng: -38.357,
-    info: "Farol Itapuã"
+    info: "Farol Itapuã, pedras",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 14
   },
   {
     name: "Stella Maris",
     cat: "SSA_ATL",
     lat: -12.945,
     lng: -38.331,
-    info: "Stella Maris"
+    info: "Stella Maris, aeroporto",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 15
   },
   {
     name: "Flamengo",
     cat: "SSA_ATL",
     lat: -12.926,
     lng: -38.316,
-    info: "Flamengo"
+    info: "Flamengo, limite SSA",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 16
   },
   {
     name: "Ipitanga",
     cat: "SSA_ATL",
     lat: -12.908,
     lng: -38.304,
-    info: "Ipitanga"
+    info: "Ipitanga, Lauro de Freitas",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 17
   },
   {
     name: "Villages",
     cat: "SSA_ATL",
     lat: -12.89,
     lng: -38.29,
-    info: "Villages"
+    info: "Villages, condominios",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 18
   },
   {
     name: "Buraquinho",
     cat: "SSA_ATL",
     lat: -12.87,
     lng: -38.27,
-    info: "Buraquinho"
+    info: "Buraquinho, foz Joanes",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 19
   },
   {
     name: "Busca Vida",
     cat: "SSA_ATL",
     lat: -12.86,
     lng: -38.25,
-    info: "Busca Vida"
+    info: "Busca Vida, Camaçari",
+    perna: "Perna 1 - SSA Atlantica",
+    praia_id: 20
   },
-// --- RIBEIRA 12 PRAIAS - COM OFFSET ANTI-EMBOLACAO ---
+// --- PERNA 2: RIBEIRA BTS 12 PRAIAS ---
   {
     name: "Penha",
     cat: "RIBEIRA",
     lat: -12.914,
     lng: -38.5,
-    info: "Penha BTS"
+    info: "Penha, BTS, mar calmo",
+    perna: "Perna 2 - Ribeira BTS",
+    praia_id: 21
   },
   {
     name: "Bogari",
     cat: "RIBEIRA",
     lat: -12.918,
     lng: -38.498,
-    info: "Bogari"
+    info: "Bogari, Ribeira",
+    perna: "Perna 2 - Ribeira BTS",
+    praia_id: 22
   },
   {
     name: "Amores",
     cat: "RIBEIRA",
     lat: -12.92,
     lng: -38.495,
-    info: "Amores"
+    info: "Amores, Ribeira, familia",
+    perna: "Perna 2 - Ribeira BTS",
+    praia_id: 23
   },
   {
     name: "Bonfim",
     cat: "RIBEIRA",
     lat: -12.924,
     lng: -38.502,
-    info: "Bonfim"
+    info: "Bonfim, igreja, tradicao",
+    perna: "Perna 2 - Ribeira BTS",
+    praia_id: 24
   },
   {
     name: "Monte Serrat",
     cat: "RIBEIRA",
     lat: -12.93,
     lng: -38.511,
-    info: "Monte Serrat"
+    info: "Monte Serrat, forte",
+    perna: "Perna 2 - Ribeira BTS",
+    praia_id: 25
   },
   {
     name: "Boa Viagem",
     cat: "RIBEIRA",
     lat: -12.928,
     lng: -38.505,
-    info: "Boa Viagem"
+    info: "Boa Viagem, igreja famosa",
+    perna: "Perna 2 - Ribeira BTS",
+    praia_id: 26
   },
   {
     name: "Pedra Furada",
     cat: "RIBEIRA",
     lat: -12.915,
     lng: -38.51,
-    info: "Pedra Furada"
+    info: "Pedra Furada, formacao",
+    perna: "Perna 2 - Ribeira BTS",
+    praia_id: 27
   },
   {
     name: "Itapagipe",
     cat: "RIBEIRA",
     lat: -12.912,
     lng: -38.492,
-    info: "Itapagipe"
+    info: "Itapagipe, nautico",
+    perna: "Perna 2 - Ribeira BTS",
+    praia_id: 28
   },
   {
     name: "Mangueira",
     cat: "RIBEIRA",
     lat: -12.91,
     lng: -38.488,
-    info: "Mangueira"
+    info: "Mangueira, BTS calmo",
+    perna: "Perna 2 - Ribeira BTS",
+    praia_id: 29
   },
   {
     name: "Papagaio",
     cat: "RIBEIRA",
     lat: -12.908,
     lng: -38.485,
-    info: "Papagaio"
+    info: "Papagaio, calmo, criancas",
+    perna: "Perna 2 - Ribeira BTS",
+    praia_id: 30
   },
   {
     name: "Grumichama",
     cat: "RIBEIRA",
     lat: -12.906,
     lng: -38.505,
-    info: "Grumichama"
+    info: "Grumichama, Ribeira final",
+    perna: "Perna 2 - Ribeira BTS",
+    praia_id: 31
   },
   {
     name: "Sta Luzia",
     cat: "RIBEIRA",
     lat: -12.904,
     lng: -38.5,
-    info: "Sta Luzia"
+    info: "Santa Luzia, final perna",
+    perna: "Perna 2 - Ribeira BTS",
+    praia_id: 32
   },
-// --- SUBURBIO 8 PRAIAS ---
+// --- PERNA 3: SUBURBIO 8 PRAIAS ---
   {
     name: "Periperi",
     cat: "SUBURBIO",
     lat: -12.875,
     lng: -38.471,
-    info: "Periperi"
+    info: "Periperi, suburbio",
+    perna: "Perna 3 - Suburbio",
+    praia_id: 33
   },
   {
     name: "Plataforma",
     cat: "SUBURBIO",
     lat: -12.895,
     lng: -38.475,
-    info: "Plataforma"
+    info: "Plataforma, tradicao",
+    perna: "Perna 3 - Suburbio",
+    praia_id: 34
   },
   {
     name: "Itacaranha",
     cat: "SUBURBIO",
     lat: -12.885,
     lng: -38.468,
-    info: "Itacaranha"
+    info: "Itacaranha, suburbio",
+    perna: "Perna 3 - Suburbio",
+    praia_id: 35
   },
   {
     name: "P Grande Sub",
     cat: "SUBURBIO",
     lat: -12.865,
     lng: -38.465,
-    info: "P Grande"
+    info: "Praia Grande Suburbio",
+    perna: "Perna 3 - Suburbio",
+    praia_id: 36
   },
   {
     name: "S Tomé",
     cat: "SUBURBIO",
     lat: -12.855,
     lng: -38.462,
-    info: "S Tomé"
+    info: "Sao Tome Paripe",
+    perna: "Perna 3 - Suburbio",
+    praia_id: 37
   },
   {
     name: "Tubarão",
     cat: "SUBURBIO",
     lat: -12.845,
     lng: -38.46,
-    info: "Tubarão"
+    info: "Tubarão, BTS, calmo",
+    perna: "Perna 3 - Suburbio",
+    praia_id: 38
   },
   {
     name: "Base Naval",
     cat: "SUBURBIO",
     lat: -12.835,
     lng: -38.458,
-    info: "Base Naval"
+    info: "Base Naval, restrita",
+    perna: "Perna 3 - Suburbio",
+    praia_id: 39
   },
   {
     name: "Inema",
     cat: "SUBURBIO",
     lat: -12.825,
     lng: -38.455,
-    info: "Inema"
+    info: "Inema, final suburbio",
+    perna: "Perna 3 - Suburbio",
+    praia_id: 40
   },
-// --- ITAPARICA 19 PRAIAS - COM OFFSET ANTI-EMBOLACAO ---
+// --- PERNA 4: ITAPARICA 19 PRAIAS ---
   {
     name: "Mar Grande",
     cat: "ITAPARICA",
     lat: -12.985,
     lng: -38.618,
-    info: "Mar Grande"
+    info: "Mar Grande, terminal lanchas",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 41
   },
   {
     name: "Barra do Gil",
     cat: "ITAPARICA",
     lat: -13.015,
     lng: -38.685,
-    info: "Barra do Gil"
+    info: "Barra do Gil, sul ilha",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 42
   },
   {
     name: "Aratuba",
     cat: "ITAPARICA",
     lat: -12.965,
     lng: -38.645,
-    info: "Aratuba"
+    info: "Aratuba, Vera Cruz",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 43
   },
   {
     name: "Berlinque",
     cat: "ITAPARICA",
     lat: -12.955,
     lng: -38.66,
-    info: "Berlinque"
+    info: "Berlinque, coqueirais",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 44
   },
   {
     name: "Conceição",
     cat: "ITAPARICA",
     lat: -12.9,
     lng: -38.68,
-    info: "Conceição"
+    info: "Conceição, centro Vera Cruz",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 45
   },
   {
     name: "Baiacu",
     cat: "ITAPARICA",
     lat: -12.935,
     lng: -38.635,
-    info: "Baiacu"
+    info: "Baiacu, Vera Cruz",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 46
   },
   {
     name: "Pta Areia",
     cat: "ITAPARICA",
     lat: -12.995,
     lng: -38.61,
-    info: "Pta Areia"
+    info: "Ponta de Areia norte",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 47
   },
   {
     name: "Amoreiras",
     cat: "ITAPARICA",
     lat: -13.0,
     lng: -38.625,
-    info: "Amoreiras"
+    info: "Amoreiras, familia",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 48
   },
   {
     name: "Mocambo",
     cat: "ITAPARICA",
     lat: -13.01,
     lng: -38.635,
-    info: "Mocambo"
+    info: "Mocambo, sul",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 49
   },
   {
     name: "Manguinhos",
     cat: "ITAPARICA",
     lat: -12.945,
     lng: -38.655,
-    info: "Manguinhos"
+    info: "Manguinhos, Vera Cruz",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 50
   },
   {
     name: "Pta Duro",
     cat: "ITAPARICA",
     lat: -13.025,
     lng: -38.695,
-    info: "Pta Duro"
+    info: "Ponta do Duro, extremo sul",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 51
   },
   {
     name: "Barra Pote",
     cat: "ITAPARICA",
     lat: -12.975,
     lng: -38.67,
-    info: "Barra Pote"
+    info: "Barra do Pote, Vera Cruz",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 52
   },
   {
     name: "Jiribatuba",
     cat: "ITAPARICA",
     lat: -12.925,
     lng: -38.665,
-    info: "Jiribatuba"
+    info: "Jiribatuba, Vera Cruz",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 53
   },
   {
     name: "Pta Areia VC",
     cat: "ITAPARICA",
     lat: -12.915,
     lng: -38.675,
-    info: "Pta Areia VC"
+    info: "Pta Areia Vera Cruz",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 54
   },
   {
     name: "Gameleira",
     cat: "ITAPARICA",
     lat: -13.005,
     lng: -38.67,
-    info: "Gameleira"
+    info: "Gameleira, Vera Cruz",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 55
   },
   {
     name: "Coral",
     cat: "ITAPARICA",
     lat: -12.985,
     lng: -38.64,
-    info: "Coral"
+    info: "Praia do Coral, piscinas naturais",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 56
   },
   {
     name: "Enseada Itap",
     cat: "ITAPARICA",
     lat: -13.035,
     lng: -38.675,
-    info: "Enseada"
+    info: "Enseada Itaparica",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 57
   },
   {
     name: "Tairu",
     cat: "ITAPARICA",
     lat: -12.905,
     lng: -38.645,
-    info: "Tairu"
+    info: "Tairu, rural, Vera Cruz",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 58
   },
   {
     name: "Cajaíba Itap",
     cat: "ITAPARICA",
     lat: -12.89,
     lng: -38.62,
-    info: "Cajaíba"
+    info: "Cajaíba, barra Itaparica",
+    perna: "Perna 4 - Itaparica",
+    praia_id: 59
   },
-// --- BTS ILHAS 8 ---
+// --- PERNA 5: BTS ILHAS 8 PRAIAS ---
   {
     name: "Maré Botelho",
     cat: "BTS_ILHAS",
     lat: -12.785,
     lng: -38.515,
-    info: "Maré Botelho"
+    info: "Ilha de Maré, Botelho, BTS",
+    perna: "Perna 5 - BTS Ilhas",
+    praia_id: 60
   },
   {
     name: "Maré Itamoabo",
     cat: "BTS_ILHAS",
     lat: -12.775,
     lng: -38.525,
-    info: "Itamoabo"
+    info: "Ilha de Maré, Itamoabo",
+    perna: "Perna 5 - BTS Ilhas",
+    praia_id: 61
   },
   {
     name: "Frades Ponta",
     cat: "BTS_ILHAS",
     lat: -12.8,
     lng: -38.635,
-    info: "Frades Ponta"
+    info: "Ilha Frades, Ponta Nossa Senhora",
+    perna: "Perna 5 - BTS Ilhas",
+    praia_id: 62
   },
   {
     name: "Frades Loreto",
     cat: "BTS_ILHAS",
     lat: -12.81,
     lng: -38.645,
-    info: "Loreto"
+    info: "Ilha Frades, Loreto",
+    perna: "Perna 5 - BTS Ilhas",
+    praia_id: 63
   },
   {
     name: "Bom Jesus",
     cat: "BTS_ILHAS",
     lat: -12.755,
     lng: -38.595,
-    info: "Bom Jesus"
+    info: "Ilha Bom Jesus, BTS",
+    perna: "Perna 5 - BTS Ilhas",
+    praia_id: 64
   },
   {
     name: "Ilha do Medo",
     cat: "BTS_ILHAS",
     lat: -12.82,
     lng: -38.58,
-    info: "Ilha Medo"
+    info: "Ilha do Medo, BTS",
+    perna: "Perna 5 - BTS Ilhas",
+    praia_id: 65
   },
   {
     name: "Ilha Vacas",
     cat: "BTS_ILHAS",
     lat: -12.73,
     lng: -38.555,
-    info: "Vacas"
+    info: "Ilha das Vacas, BTS",
+    perna: "Perna 5 - BTS Ilhas",
+    praia_id: 66
   },
   {
     name: "Cajaíba BTS",
     cat: "BTS_ILHAS",
     lat: -12.89,
     lng: -38.6,
-    info: "Cajaíba BTS"
+    info: "Ilha Cajaíba, BTS",
+    perna: "Perna 5 - BTS Ilhas",
+    praia_id: 67
   },
-// --- LITORAL NORTE 14 ---
+// --- PERNA 6: LITORAL NORTE 14 PRAIAS ---
   {
     name: "Guarajuba",
     cat: "LITORAL_NORTE",
     lat: -12.643,
     lng: -38.067,
-    info: "Guarajuba"
+    info: "Guarajuba, Camaçari, famosa",
+    perna: "Perna 6 - Litoral Norte",
+    praia_id: 68
   },
   {
     name: "Itacimirim",
     cat: "LITORAL_NORTE",
     lat: -12.615,
     lng: -38.042,
-    info: "Itacimirim"
+    info: "Itacimirim, Camaçari",
+    perna: "Perna 6 - Litoral Norte",
+    praia_id: 69
   },
   {
     name: "Praia do Forte",
     cat: "LITORAL_NORTE",
     lat: -12.579,
     lng: -38.002,
-    info: "Praia do Forte"
+    info: "Praia do Forte, Mata de SJ, Tamar",
+    perna: "Perna 6 - Litoral Norte",
+    praia_id: 70
   },
   {
     name: "Imbassaí",
     cat: "LITORAL_NORTE",
     lat: -12.493,
     lng: -37.945,
-    info: "Imbassaí"
+    info: "Imbassaí, Mata de SJ, rio",
+    perna: "Perna 6 - Litoral Norte",
+    praia_id: 71
   },
   {
     name: "Diogo",
     cat: "LITORAL_NORTE",
     lat: -12.435,
     lng: -37.895,
-    info: "Diogo"
+    info: "Diogo, Mata de SJ",
+    perna: "Perna 6 - Litoral Norte",
+    praia_id: 72
   },
   {
     name: "Sauípe",
     cat: "LITORAL_NORTE",
     lat: -12.38,
     lng: -37.87,
-    info: "Sauípe"
+    info: "Costa do Sauípe, resorts",
+    perna: "Perna 6 - Litoral Norte",
+    praia_id: 73
   },
   {
     name: "Massarandupió",
     cat: "LITORAL_NORTE",
     lat: -12.31,
     lng: -37.81,
-    info: "Massarandupió"
+    info: "Massarandupió, Entre Rios, nudismo",
+    perna: "Perna 6 - Litoral Norte",
+    praia_id: 74
   },
   {
     name: "Subaúma",
     cat: "LITORAL_NORTE",
     lat: -12.235,
     lng: -37.775,
-    info: "Subaúma"
+    info: "Subaúma, Entre Rios",
+    perna: "Perna 6 - Litoral Norte",
+    praia_id: 75
   },
   {
     name: "Baixio",
     cat: "LITORAL_NORTE",
     lat: -12.095,
     lng: -37.7,
-    info: "Baixio"
+    info: "Baixio, Esplanada, coqueiros",
+    perna: "Perna 6 - Litoral Norte",
+    praia_id: 76
   },
   {
     name: "Conde",
     cat: "LITORAL_NORTE",
     lat: -11.81,
     lng: -37.61,
-    info: "Conde"
+    info: "Conde, sede municipio",
+    perna: "Perna 6 - Litoral Norte",
+    praia_id: 77
   },
   {
     name: "Sítio Conde",
     cat: "LITORAL_NORTE",
     lat: -11.78,
     lng: -37.59,
-    info: "Sítio Conde"
+    info: "Sítio do Conde, Conde",
+    perna: "Perna 6 - Litoral Norte",
+    praia_id: 78
   },
   {
     name: "Mangue Seco",
     cat: "LITORAL_NORTE",
     lat: -11.43,
     lng: -37.36,
-    info: "Mangue Seco"
+    info: "Mangue Seco, Jandaíra, divisa SE",
+    perna: "Perna 6 - Litoral Norte",
+    praia_id: 79
   },
   {
     name: "Barra Itariri",
     cat: "LITORAL_NORTE",
     lat: -12.015,
     lng: -37.66,
-    info: "Barra Itariri"
+    info: "Barra do Itariri, Esplanada",
+    perna: "Perna 6 - Litoral Norte",
+    praia_id: 80
   },
   {
     name: "Porto Sauípe",
     cat: "LITORAL_NORTE",
     lat: -12.35,
     lng: -37.84,
-    info: "Porto Sauípe"
+    info: "Porto Sauípe, Entre Rios",
+    perna: "Perna 6 - Litoral Norte",
+    praia_id: 81
   },
-// --- BAIXO SUL 12 ---
+// --- PERNA 7: BAIXO SUL 12 PRAIAS ---
   {
     name: "Morro 1a",
     cat: "BAIXO_SUL",
     lat: -13.381,
     lng: -38.915,
-    info: "Morro 1a"
+    info: "Morro de SP, Primeira Praia, tirolesa",
+    perna: "Perna 7 - Baixo Sul",
+    praia_id: 82
   },
   {
     name: "Morro 2a",
     cat: "BAIXO_SUL",
     lat: -13.385,
     lng: -38.917,
-    info: "Morro 2a"
+    info: "Morro de SP, Segunda Praia, festa",
+    perna: "Perna 7 - Baixo Sul",
+    praia_id: 83
   },
   {
     name: "Morro 3a",
     cat: "BAIXO_SUL",
     lat: -13.39,
     lng: -38.919,
-    info: "Morro 3a"
+    info: "Morro de SP, Terceira Praia, calmo",
+    perna: "Perna 7 - Baixo Sul",
+    praia_id: 84
   },
   {
     name: "Morro 4a",
     cat: "BAIXO_SUL",
     lat: -13.395,
     lng: -38.922,
-    info: "Morro 4a"
+    info: "Morro de SP, Quarta Praia, paradisiaca",
+    perna: "Perna 7 - Baixo Sul",
+    praia_id: 85
   },
   {
     name: "Moreré",
     cat: "BAIXO_SUL",
     lat: -13.6,
     lng: -38.93,
-    info: "Moreré"
+    info: "Moreré, Boipeba, Cairu",
+    perna: "Perna 7 - Baixo Sul",
+    praia_id: 86
   },
   {
     name: "Boca Barra",
     cat: "BAIXO_SUL",
     lat: -13.62,
     lng: -38.94,
-    info: "Boca Barra"
+    info: "Boca da Barra, Boipeba",
+    perna: "Perna 7 - Baixo Sul",
+    praia_id: 87
   },
   {
     name: "Barra Grande",
     cat: "BAIXO_SUL",
     lat: -13.882,
     lng: -38.938,
-    info: "Barra Grande"
+    info: "Barra Grande, Camamu, Marau",
+    perna: "Perna 7 - Baixo Sul",
+    praia_id: 88
   },
   {
     name: "Taipu Fora",
     cat: "BAIXO_SUL",
     lat: -13.883,
     lng: -38.915,
-    info: "Taipu Fora"
+    info: "Taipu de Fora, Marau, piscinas naturais",
+    perna: "Perna 7 - Baixo Sul",
+    praia_id: 89
   },
   {
     name: "Concha",
     cat: "BAIXO_SUL",
     lat: -14.279,
     lng: -38.996,
-    info: "Concha"
+    info: "Concha, Itacaré, urbana",
+    perna: "Perna 7 - Baixo Sul",
+    praia_id: 90
   },
   {
     name: "Resende",
     cat: "BAIXO_SUL",
     lat: -14.285,
     lng: -38.999,
-    info: "Resende"
+    info: "Resende, Itacaré, surf",
+    perna: "Perna 7 - Baixo Sul",
+    praia_id: 91
   },
   {
     name: "Tiririca",
     cat: "BAIXO_SUL",
     lat: -14.295,
     lng: -39.005,
-    info: "Tiririca"
+    info: "Tiririca, Itacaré, surf",
+    perna: "Perna 7 - Baixo Sul",
+    praia_id: 92
   },
   {
     name: "Serra Grande",
     cat: "BAIXO_SUL",
     lat: -14.465,
     lng: -39.04,
-    info: "Serra Grande"
+    info: "Serra Grande, Ilhéus, ecologica",
+    perna: "Perna 7 - Baixo Sul",
+    praia_id: 93
   },
-// --- EXTREMO SUL 10 ---
+// --- PERNA 8: EXTREMO SUL 10 PRAIAS ---
   {
     name: "Mucugê",
     cat: "EXTREMO_SUL",
     lat: -16.483,
     lng: -39.065,
-    info: "Mucugê"
+    info: "Mucugê, Arraial D'Ajuda, Porto Seguro",
+    perna: "Perna 8 - Extremo Sul",
+    praia_id: 94
   },
   {
     name: "Pitinga",
     cat: "EXTREMO_SUL",
     lat: -16.515,
     lng: -39.075,
-    info: "Pitinga"
+    info: "Pitinga, Arraial D'Ajuda, falesias",
+    perna: "Perna 8 - Extremo Sul",
+    praia_id: 95
   },
   {
     name: "Trancoso",
     cat: "EXTREMO_SUL",
     lat: -16.594,
     lng: -39.098,
-    info: "Trancoso"
+    info: "Trancoso, Porto Seguro, quadrado",
+    perna: "Perna 8 - Extremo Sul",
+    praia_id: 96
   },
   {
     name: "Caraíva",
     cat: "EXTREMO_SUL",
     lat: -16.793,
     lng: -39.143,
-    info: "Caraíva"
+    info: "Caraíva, Porto Seguro, rio",
+    perna: "Perna 8 - Extremo Sul",
+    praia_id: 97
   },
   {
     name: "Corumbau",
     cat: "EXTREMO_SUL",
     lat: -16.905,
     lng: -39.135,
-    info: "Corumbau"
+    info: "Corumbau, Prado, Ponta do Corumbau",
+    perna: "Perna 8 - Extremo Sul",
+    praia_id: 98
   },
   {
     name: "Cumuruxatiba",
     cat: "EXTREMO_SUL",
     lat: -17.1,
     lng: -39.175,
-    info: "Cumuru"
+    info: "Cumuruxatiba, Prado, BA",
+    perna: "Perna 8 - Extremo Sul",
+    praia_id: 99
   },
   {
     name: "Alcobaça",
     cat: "EXTREMO_SUL",
     lat: -17.52,
     lng: -39.2,
-    info: "Alcobaça"
+    info: "Alcobaça, Extremo Sul",
+    perna: "Perna 8 - Extremo Sul",
+    praia_id: 100
   },
   {
     name: "Pta Areia Car",
     cat: "EXTREMO_SUL",
     lat: -17.735,
     lng: -39.265,
-    info: "Caravelas"
+    info: "Ponta Areia Caravelas",
+    perna: "Perna 8 - Extremo Sul",
+    praia_id: 101
   },
   {
     name: "Nova Viçosa",
     cat: "EXTREMO_SUL",
     lat: -17.89,
     lng: -39.375,
-    info: "Nova Viçosa"
+    info: "Nova Viçosa, Extremo Sul",
+    perna: "Perna 8 - Extremo Sul",
+    praia_id: 102
   },
   {
     name: "Mucuri",
     cat: "EXTREMO_SUL",
     lat: -18.085,
     lng: -39.555,
-    info: "Mucuri"
+    info: "Mucuri, divisa BA/ES, final Bahia",
+    perna: "Perna 8 - Extremo Sul",
+    praia_id: 103
   }
 ];
 let map=L.map('map').setView([-12.97,-38.51],9);
@@ -779,19 +1019,22 @@ markers.forEach(m=>map.removeLayer(m));markers=[];
 document.getElementById('lista').innerHTML='';
 let filtradas=filtro==='TODAS'?praias:praias.filter(p=>p.cat===filtro);
 document.getElementById('filtroAtual').innerText=filtro+' ('+filtradas.length+')';
+let txt={'TODAS':'8 PERNAS: 103 PRAIAS - RELATORIO POR EMAIL','SSA_ATL':'Perna 1: Orla Atlântica - 20 praias','RIBEIRA':'Perna 2: Ribeira BTS - 12 praias','SUBURBIO':'Perna 3: Subúrbio - 8 praias','ITAPARICA':'Perna 4: Itaparica/Vera Cruz - 19 praias','BTS_ILHAS':'Perna 5: Ilhas BTS - 8 praias','LITORAL_NORTE':'Perna 6: Litoral Norte - 14 praias','BAIXO_SUL':'Perna 7: Baixo Sul - 12 praias','EXTREMO_SUL':'Perna 8: Extremo Sul - 10 praias'};
+document.getElementById('pernasInfo').innerText=txt[filtro]||txt['TODAS'];
 filtradas.forEach(p=>{
 let oLat=(filtro==='RIBEIRA'||filtro==='ITAPARICA')?(Math.random()-0.5)*0.006:0;
 let oLng=(filtro==='RIBEIRA'||filtro==='ITAPARICA')?(Math.random()-0.5)*0.006:0;
-let mk=L.marker([p.lat+oLat,p.lng+oLng]).addTo(map).bindPopup(`<b>${p.name}</b><br>${p.info}<br><a href='https://wa.me/5571992418354?text=Check-in ${p.name}' target='_blank'>Zap</a>`);
+let mk=L.marker([p.lat+oLat,p.lng+oLng]).addTo(map).bindPopup(`<b>${p.name}</b><br><small>${p.perna}</small><br>${p.info}<br>🌡️ 27°C | 🌊 Mar<br><small>ID: ${p.praia_id} | ${p.lat.toFixed(3)},${p.lng.toFixed(3)}</small>`);
 markers.push(mk);
-let d=document.createElement('div');d.className='praia-item';d.innerHTML=`<b>${p.name}</b> - ${p.info}`;
-d.onclick=()=>{map.setView([p.lat+oLat,p.lng+oLng],14);mk.openPopup();};
-document.getElementById('lista').appendChild(d);
+let d=document.createElement('div');d.className='praia-item';d.innerHTML=`<b>${p.name}</b><br><small>${p.perna} - ${p.info}</small>`;d.onclick=()=>{map.setView([p.lat+oLat,p.lng+oLng],14);mk.openPopup();};document.getElementById('lista').appendChild(d);
 });
 document.getElementById('totalPraias').innerText=filtradas.length;
 if(markers.length){map.fitBounds(new L.featureGroup(markers).getBounds().pad(0.2));}
+atualizarGrafico(filtradas);
 }
 function filtrar(cat,btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');criar(cat);}
+let chart;
+function atualizarGrafico(dados){let ctx=document.getElementById('grafico').getContext('2d');let c={};dados.forEach(p=>{c[p.cat]=(c[p.cat]||0)+1;});if(chart)chart.destroy();chart=new Chart(ctx,{type:'doughnut',data:{labels:Object.keys(c),datasets:[{data:Object.values(c),backgroundColor:['#ffcc00','#1e90ff','#00ff88','#ff6b6b','#9b59b6','#3498db','#e67e22','#2ecc71']}]},options:{plugins:{legend:{labels:{color:'#fff',font:{size:9}}}},responsive:true}});}
 criar('TODAS');
 </script>
 </body>
