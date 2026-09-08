@@ -2,207 +2,121 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>BAIA VIVA 6.9.5 103 PRAIAS ITAPARICA COMPLETA - EDSON FREITAS ALVES - ZAP 71992418354</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAÍA VIVA 6.9.5 - 103 PRAIAS</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{display:flex;flex-direction:column;height:100vh;background:#f0f2f5;overflow:hidden}
-.h{background:#0a3d62;color:#fff;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
-.h h1{font-size:10px;line-height:1.3;flex:1}
-.btn{border:none;padding:10px 14px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:12px;min-height:44px}
-.btn-check{background:#25D366;color:#fff}.btn-painel{background:#f39c12;color:#fff}
-.filtros{padding:8px 10px;background:#fff;display:flex;gap:6px;overflow-x:auto;white-space:nowrap;border-bottom:1px solid #ddd}
-.filtros::-webkit-scrollbar{display:none}
-.filtros button{padding:8px 14px;border:none;border-radius:20px;cursor:pointer;background:#e9ecef;font-weight:bold;font-size:10px;flex-shrink:0;min-height:38px}
-.filtros button.ativo{background:#0a3d62;color:#fff}
-.main{flex:1;display:flex;overflow:hidden;position:relative}
-.lista{width:380px;overflow-y:auto;background:#f9f9f9;padding:8px;border-right:1px solid #ddd}
-.card{padding:10px;margin-bottom:6px;border-radius:8px;border-left:5px solid;background:#fff;cursor:pointer;font-size:11px}
-.PROPRIA{border-color:#2ecc71}.ATENCAO{border-color:#f1c40f}.IMPROPRIA{border-color:#e74c3c}
-#map{flex:1;z-index:1}
-.barra-mobile{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;padding:8px 10px;border-top:1px solid #ddd;z-index:1000;gap:8px}
-.barra-mobile button{flex:1;min-height:48px}
-.btn-toggle-lista{display:none;position:fixed;bottom:75px;left:50%;transform:translateX(-50%);z-index:999;background:#0a3d62;color:#fff;padding:12px 20px;border-radius:30px;border:none;font-weight:bold}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:9999;justify-content:center;align-items:center;padding:10px}
-.modal.ativo{display:flex}
-.box{background:#fff;padding:16px;border-radius:12px;width:100%;max-width:580px;max-height:95vh;overflow-y:auto}
-.box input,.box select{width:100%;padding:12px;margin:6px 0;border:1px solid #ddd;border-radius:10px;font-size:16px}
-.box button{width:100%;padding:12px;margin-top:8px;border:none;border-radius:10px;font-weight:bold;cursor:pointer;min-height:48px}
-.btn-salvar{background:#25D366;color:#fff}.btn-cancel{background:#e9ecef}
-.stat{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin:10px 0}
-.stat div{background:#f0f2f5;padding:10px;border-radius:8px;text-align:center}
-.stat b{font-size:18px;color:#0a3d62;display:block}
-.dado-geo{background:#eaf6ff;padding:6px;border-radius:6px;margin:4px 0;font-size:11px;border-left:3px solid #0a3d62}
-.previsao{background:linear-gradient(135deg,#0a3d62,#2ecc71);color:#fff;padding:10px;border-radius:10px;margin:10px 0;font-size:11px}
-.previsao-dia{display:flex;justify-content:space-between;background:rgba(255,255,255,.15);padding:5px 8px;border-radius:6px;margin:3px 0}
-@media(max-width:768px){
-.main{flex-direction:column}.lista{position:fixed;bottom:70px;left:0;right:0;height:50vh;width:100%;z-index:998;border-radius:16px 16px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.2);transform:translateY(100%);transition:transform.3s;background:#fff}
-.lista.aberta{transform:translateY(0)}#map{height:100%;width:100%}.barra-mobile{display:flex}.btn-toggle-lista{display:block}.stat{grid-template-columns:1fr 1fr}
-}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Segoe UI;background:#0a2a4a;color:#fff}
+#header{background:linear-gradient(90deg,#001f3f,#00509d);padding:12px;display:flex;justify-content:space-between;flex-wrap:wrap}
+#filters{background:#012a5a;padding:10px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:2px solid #ffcc00}
+.filter-btn{background:#0a4a8a;border:1px solid #1e90ff;color:#fff;padding:7px 14px;border-radius:20px;cursor:pointer;font-size:11px;font-weight:bold}
+.filter-btn.active{background:#ffcc00;color:#001f3f}
+#map{height:calc(100vh - 160px);width:70%;float:left}
+#side{width:30%;float:left;height:calc(100vh - 160px);background:#001a33;overflow-y:auto;padding:10px}
+.praia-item{background:#0a2e5a;margin:6px 0;padding:10px;border-radius:8px;cursor:pointer;border-left:4px solid #1e90ff;font-size:11px}
+.praia-item b{color:#ffcc00}
+@media(max-width:850px){#map{width:100%;height:55vh}#side{width:100%;height:45vh}}
 </style>
 </head>
 <body>
-<div class="h">
-<h1>🌊 BAIA VIVA 6.9.5 103 PRAIAS ITAPARICA COMPLETA | PROF. EDSON FREITAS ALVES | ORIENT. PROF. JEMISSON | ZAP 71 99241-8354</h1>
-<div class="info"><span id="relogio"></span> | <span id="visitantes">0</span> <button class="btn btn-check" onclick="abrirCheckin()">📲 CHECK-IN</button> <button class="btn btn-painel" onclick="abrirPainel()">📊 PAINEL</button></div>
+<div id="header"><h1>🌊 BAÍA VIVA 6.9.5 - 103 PRAIAS - SEM EMBOLAÇÃO</h1><span>Prof. Edson | 71 99241-8354 | Luzia UX</span></div>
+<div id="filters">
+<button class="filter-btn active" onclick="filtrar('TODAS',this)">TODAS (59 base + 44 = 103)</button>
+<button class="filter-btn" onclick="filtrar('SSA_ATL',this)">SSA ATL (20)</button>
+<button class="filter-btn" onclick="filtrar('RIBEIRA',this)">RIBEIRA BTS (12)</button>
+<button class="filter-btn" onclick="filtrar('SUBURBIO',this)">SUBÚRBIO (8)</button>
+<button class="filter-btn" onclick="filtrar('ITAPARICA',this)">ITAPARICA (19)</button>
 </div>
-<div class="filtros">
-<button onclick="filtrar('TODAS')" id="b-TODAS" class="ativo">TODAS (103)</button>
-<button onclick="filtrar('SSA')" id="b-SSA">SSA ATL (20)</button>
-<button onclick="filtrar('RIB')" id="b-RIB">RIBEIRA BTS (12)</button>
-<button onclick="filtrar('SUB')" id="b-SUB">SUBURBIO (8)</button>
-<button onclick="filtrar('ITA')" id="b-ITA">ITAPARICA (19)</button>
-<button onclick="filtrar('BTS')" id="b-BTS">BTS ILHAS (8)</button>
-<button onclick="filtrar('LN')" id="b-LN">LIT N (14)</button>
-<button onclick="filtrar('BS')" id="b-BS">BAIXO SUL (12)</button>
-<button onclick="filtrar('ES')" id="b-ES">EXT SUL (10)</button>
-</div>
-<div class="main"><div class="lista" id="lista"></div><div id="map"></div></div>
-<button class="btn-toggle-lista" id="btnLista" onclick="toggleLista()">☰ VER 103</button>
-<div class="barra-mobile"><button class="btn btn-check" onclick="abrirCheckin()">📲 CHECK-IN</button><button class="btn btn-painel" onclick="abrirPainel()">📊 PAINEL</button></div>
-<div class="modal" id="modalDetalhe"><div class="box" id="boxDetalhe"></div></div>
-<div class="modal" id="modalCheck"><div class="box">
-<h2>🌊 Baía Viva 6.9.5 - 103 Praias - Zap 71 99241-8354</h2>
-<input id="nome" placeholder="Seu nome"><input id="contato" placeholder="Zap com DDD"><select id="praiaVisitada"></select><select id="motivo"><option value="lazer">Lazer</option><option value="turismo">Turismo</option><option value="pesquisa">Pesquisa/Mestrado</option><option value="morador">Morador</option><option value="trabalho">Trabalho</option></select>
-<button class="btn-salvar" onclick="salvarVisitante()">📲 ENVIAR ZAP 71 99241-8354</button><button class="btn-cancel" onclick="fecharCheckin()">Cancelar</button>
-</div></div>
-<div class="modal" id="modalPainel"><div class="box"><h2>📊 Painel 6.9.5 - 103 Praias</h2><small id="dataPainel"></small><div class="stat"><div><b id="tTotal">0</b><small>Total</small></div><div><b id="tHoje">0</b><small>Hoje</small></div><div><b id="tPraias">103</b><small>Praias</small></div><div><b id="tMedia">0</b><small>Média</small></div></div><canvas id="grafPraia" height="150"></canvas><div id="historico"></div><button class="btn-salvar" onclick="exportar()" style="background:#0a3d62">📥 CSV 103 Praias TCC</button><button class="btn-cancel" onclick="fecharPainel()">Fechar</button></div></div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div id="map"></div>
+<div id="side"><canvas id="grafico" height="140"></canvas><div id="lista"></div></div>
 <script>
-const praias = [
+const praias=[
 // SSA ATL 20
-{nome:"Farol da Barra",regiao:"SSA",lat:-13.0102,lng:-38.5329,status:"ATENCAO",maritimidade:"Mar aberto - Alta",vegetacao:"Coqueiral + urbana",temp:"27°C",costa:"Costão + areia fina",uso:"Turístico"},
-{nome:"Porto da Barra",regiao:"SSA",lat:-13.007,lng:-38.531,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Amendoeiras",temp:"27.5°C",costa:"Areia fina clara",uso:"Banho"},
-{nome:"Farol de Itapuã",regiao:"SSA",lat:-12.957,lng:-38.356,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga",temp:"27°C",costa:"Areia + recifes",uso:"Turístico"},
-{nome:"Stella Maris",regiao:"SSA",lat:-12.933,lng:-38.327,status:"PROPRIA",maritimidade:"Mar aberto - Alta",vegetacao:"Restinga preservada",temp:"26.8°C",costa:"Areia grossa",uso:"Surf"},
-{nome:"Flamengo",regiao:"SSA",lat:-12.909,lng:-38.289,status:"PROPRIA",maritimidade:"Mar aberto - Alta",vegetacao:"Restinga + dunas",temp:"26.5°C",costa:"Areia fina extensa",uso:"Lazer"},
-{nome:"Pituba",regiao:"SSA",lat:-13.005,lng:-38.458,status:"ATENCAO",maritimidade:"Mar aberto - Média",vegetacao:"Urbana",temp:"27.2°C",costa:"Areia + calçadão",uso:"Urbano"},
-{nome:"Rio Vermelho",regiao:"SSA",lat:-13.015,lng:-38.491,status:"IMPROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Amendoeiras",temp:"27°C",costa:"Areia + pedras",uso:"Boemia"},
-{nome:"Ondina",regiao:"SSA",lat:-13.012,lng:-38.514,status:"ATENCAO",maritimidade:"Mar aberto - Média",vegetacao:"Mata residual",temp:"27.1°C",costa:"Areia fina",uso:"Turístico"},
-{nome:"Amaralina",regiao:"SSA",lat:-13.011,lng:-38.497,status:"ATENCAO",maritimidade:"Mar aberto - Média",vegetacao:"Coqueiral",temp:"27°C",costa:"Areia média",uso:"Local"},
-{nome:"Jaguaribe",regiao:"SSA",lat:-12.999,lng:-38.435,status:"ATENCAO",maritimidade:"Foz rio - Baixa",vegetacao:"Manguezal",temp:"27.5°C",costa:"Areia lamosa",uso:"Pesca"},
-{nome:"Piatã",regiao:"SSA",lat:-12.983,lng:-38.393,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga",temp:"26.9°C",costa:"Areia fina",uso:"Banho"},
-{nome:"Patamares",regiao:"SSA",lat:-12.973,lng:-38.378,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga",temp:"26.9°C",costa:"Areia fina",uso:"Condomínios"},
-{nome:"Buracão",regiao:"SSA",lat:-13.01,lng:-38.525,status:"ATENCAO",maritimidade:"Mar aberto - Média",vegetacao:"Urbana",temp:"27.2°C",costa:"Areia fina",uso:"Surf"},
-{nome:"Chega Nego",regiao:"SSA",lat:-12.938,lng:-38.335,status:"PROPRIA",maritimidade:"Mar aberto - Alta",vegetacao:"Restinga",temp:"26.8°C",costa:"Areia grossa",uso:"Preservado"},
-{nome:"Pedra do Sal",regiao:"SSA",lat:-12.955,lng:-38.363,status:"PROPRIA",maritimidade:"Recifes - Baixa",vegetacao:"Coqueiral",temp:"27°C",costa:"Piscinas naturais",uso:"Turismo"},
-{nome:"Aleluia",regiao:"SSA",lat:-12.945,lng:-38.345,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga",temp:"26.9°C",costa:"Areia média",uso:"Local"},
-{nome:"Corsário",regiao:"SSA",lat:-12.993,lng:-38.416,status:"ATENCAO",maritimidade:"Mar aberto - Média",vegetacao:"Restinga degradada",temp:"27.3°C",costa:"Areia fina",uso:"Urbano"},
-{nome:"Jardim de Alah",regiao:"SSA",lat:-13.005,lng:-38.465,status:"IMPROPRIA",maritimidade:"Mar aberto - Baixa",vegetacao:"Urbana",temp:"27.4°C",costa:"Areia + foz",uso:"Urbano"},
-{nome:"Boca do Rio",regiao:"SSA",lat:-12.988,lng:-38.405,status:"ATENCAO",maritimidade:"Foz rio - Baixa",vegetacao:"Manguezal",temp:"27.5°C",costa:"Areia fina",uso:"Pesca"},
-{nome:"Placaford",regiao:"SSA",lat:-12.941,lng:-38.341,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga",temp:"26.8°C",costa:"Areia média",uso:"Local"},
-// RIBEIRA BTS SALVADOR 12 - ESPAÇADAS SEM EMBOLAR
-{nome:"Boa Viagem",regiao:"RIB",lat:-12.9268,lng:-38.5038,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Amendoeiras",temp:"28.2°C",costa:"Areia escura + Sereia",uso:"Histórico"},
-{nome:"Bonfim",regiao:"RIB",lat:-12.9232,lng:-38.5085,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Urbana",temp:"28.1°C",costa:"Areia + Igreja",uso:"Religioso"},
-{nome:"Monte Serrat",regiao:"RIB",lat:-12.9315,lng:-38.52,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mata",temp:"28°C",costa:"Areia + Ponta",uso:"Turístico"},
-{nome:"Roma",regiao:"RIB",lat:-12.9175,lng:-38.496,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Urbana",temp:"28.3°C",costa:"Areia escura",uso:"Tradicional"},
-{nome:"Cajaíba",regiao:"RIB",lat:-12.9115,lng:-38.4935,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mangue",temp:"28.2°C",costa:"Areia lamosa",uso:"Pesca"},
-{nome:"Penha - BTS Ribeira",regiao:"RIB",lat:-12.9085,lng:-38.4985,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Amendoeiras",temp:"28°C",costa:"Areia escura",uso:"Festa Penha"},
-{nome:"Inema",regiao:"RIB",lat:-12.8955,lng:-38.5115,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mata",temp:"27.9°C",costa:"Areia clara",uso:"Militar"},
-{nome:"Itapagipe",regiao:"RIB",lat:-12.9155,lng:-38.5015,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Urbana",temp:"28.1°C",costa:"Areia + pedras",uso:"Comunidade"},
-{nome:"Pedra Furada",regiao:"RIB",lat:-12.9335,lng:-38.523,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Costão",temp:"27.8°C",costa:"Costão mirante",uso:"Turismo"},
-{nome:"Humaitá",regiao:"RIB",lat:-12.9285,lng:-38.5125,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Amendoeiras",temp:"28°C",costa:"Areia + Farol",uso:"Enseada"},
-{nome:"Boa Viagem - Sereia",regiao:"RIB",lat:-12.9255,lng:-38.5055,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Amendoeiras",temp:"28.2°C",costa:"Pedra Sereia",uso:"Foto"},
-{nome:"Penha de França",regiao:"RIB",lat:-12.9065,lng:-38.5005,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Urbana",temp:"28°C",costa:"Areia + Igreja",uso:"Cultural"},
+{name:"Praia da Barra",cat:"SSA_ATL",lat:-13.007,lng:-38.532,info:"Farol da Barra"},
+{name:"Farol da Barra",cat:"SSA_ATL",lat:-13.0102,lng:-38.5329,info:"Ponta do Farol"},
+{name:"Porto da Barra",cat:"SSA_ATL",lat:-13.0065,lng:-38.531,info:"Águas calmas"},
+{name:"Ondina",cat:"SSA_ATL",lat:-13.012,lng:-38.514,info:"Ondina"},
+{name:"Rio Vermelho",cat:"SSA_ATL",lat:-13.015,lng:-38.496,info:"Rio Vermelho"},
+{name:"Amaralina",cat:"SSA_ATL",lat:-13.022,lng:-38.479,info:"Amaralina"},
+{name:"Pituba",cat:"SSA_ATL",lat:-13.027,lng:-38.461,info:"Pituba"},
+{name:"Jardim de Alah",cat:"SSA_ATL",lat:-13.031,lng:-38.449,info:"Jardim de Alah"},
+{name:"Armação",cat:"SSA_ATL",lat:-13.036,lng:-38.441,info:"Armação"},
+{name:"Boca do Rio",cat:"SSA_ATL",lat:-13.039,lng:-38.429,info:"Boca do Rio"},
+{name:"Patamares",cat:"SSA_ATL",lat:-13.045,lng:-38.414,info:"Patamares"},
+{name:"Piatã",cat:"SSA_ATL",lat:-13.058,lng:-38.391,info:"Piatã"},
+{name:"Itapuã",cat:"SSA_ATL",lat:-13.078,lng:-38.365,info:"Itapuã"},
+{name:"Farol de Itapuã",cat:"SSA_ATL",lat:-13.089,lng:-38.357,info:"Farol Itapuã"},
+{name:"Stella Maris",cat:"SSA_ATL",lat:-12.945,lng:-38.331,info:"Stella Maris"},
+{name:"Flamengo",cat:"SSA_ATL",lat:-12.926,lng:-38.316,info:"Flamengo"},
+{name:"Ipitanga",cat:"SSA_ATL",lat:-12.908,lng:-38.304,info:"Ipitanga"},
+{name:"Villages",cat:"SSA_ATL",lat:-12.89,lng:-38.29,info:"Villages"},
+{name:"Buraquinho",cat:"SSA_ATL",lat:-12.87,lng:-38.27,info:"Buraquinho"},
+{name:"Busca Vida",cat:"SSA_ATL",lat:-12.86,lng:-38.25,info:"Busca Vida"},
+// RIBEIRA 12
+{name:"Ribeira Penha",cat:"RIBEIRA",lat:-12.914,lng:-38.5,info:"Penha BTS"},
+{name:"Ribeira Bogari",cat:"RIBEIRA",lat:-12.918,lng:-38.498,info:"Bogari"},
+{name:"Ribeira Amores",cat:"RIBEIRA",lat:-12.92,lng:-38.495,info:"Amores"},
+{name:"Ribeira Bonfim",cat:"RIBEIRA",lat:-12.924,lng:-38.502,info:"Bonfim"},
+{name:"Monte Serrat",cat:"RIBEIRA",lat:-12.93,lng:-38.511,info:"Monte Serrat"},
+{name:"Boa Viagem",cat:"RIBEIRA",lat:-12.928,lng:-38.505,info:"Boa Viagem"},
+{name:"Pedra Furada",cat:"RIBEIRA",lat:-12.915,lng:-38.51,info:"Pedra Furada"},
+{name:"Itapagipe",cat:"RIBEIRA",lat:-12.912,lng:-38.492,info:"Itapagipe"},
+{name:"Mangueira",cat:"RIBEIRA",lat:-12.91,lng:-38.488,info:"Mangueira"},
+{name:"Papagaio",cat:"RIBEIRA",lat:-12.908,lng:-38.485,info:"Papagaio"},
+{name:"Grumichama",cat:"RIBEIRA",lat:-12.906,lng:-38.505,info:"Grumichama"},
+{name:"Santa Luzia",cat:"RIBEIRA",lat:-12.904,lng:-38.5,info:"Santa Luzia"},
 // SUBURBIO 8
-{nome:"Penha - Ribeira",regiao:"SUB",lat:-12.9075,lng:-38.5008,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Amendoeiras",temp:"28°C",costa:"Areia escura",uso:"Tradicional"},
-{nome:"Tubarão",regiao:"SUB",lat:-12.862,lng:-38.4825,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Manguezal",temp:"28°C",costa:"Areia fina",uso:"Pesqueira"},
-{nome:"Paripe",regiao:"SUB",lat:-12.843,lng:-38.4715,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Manguezal",temp:"28.2°C",costa:"Areia lamosa",uso:"Pesca"},
-{nome:"São Tomé",regiao:"SUB",lat:-12.822,lng:-38.452,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Manguezal",temp:"28.1°C",costa:"Areia fina",uso:"Artesanal"},
-{nome:"Cantagalo",regiao:"SUB",lat:-12.891,lng:-38.4905,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Manguezal",temp:"28°C",costa:"Areia fina",uso:"Local"},
-{nome:"Periperi",regiao:"SUB",lat:-12.872,lng:-38.482,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Coqueiral",temp:"28°C",costa:"Areia fina",uso:"Suburbano"},
-{nome:"Itacaranha",regiao:"SUB",lat:-12.832,lng:-38.461,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mangue",temp:"28°C",costa:"Areia + pedras",uso:"Comunidade"},
-{nome:"Plataforma",regiao:"SUB",lat:-12.9015,lng:-38.501,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Urbana",temp:"28°C",costa:"Areia escura",uso:"Urbano"},
-// ITAPARICA E VERA CRUZ 19 - SEM EMBOLAR - TODAS ESPAÇADAS
-{nome:"Mar Grande - Itaparica",regiao:"ITA",lat:-12.9945,lng:-38.6375,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Coqueiral",temp:"27.8°C",costa:"Areia fina clara + trapiche",uso:"Turístico principal"},
-{nome:"Ponta de Areia - Itaparica",regiao:"ITA",lat:-12.8925,lng:-38.6825,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Coqueiral",temp:"27.5°C",costa:"Areia fina extensa",uso:"Histórico"},
-{nome:"Barra do Gil",regiao:"ITA",lat:-13.0045,lng:-38.6615,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Coqueiral + restinga",temp:"27.6°C",costa:"Areia clara",uso:"Veraneio"},
-{nome:"Aratuba",regiao:"ITA",lat:-13.0215,lng:-38.6815,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Coqueiral",temp:"27.5°C",costa:"Areia fina",uso:"Tranquila"},
-{nome:"Berlinque",regiao:"ITA",lat:-13.0365,lng:-38.6965,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mata + coqueiral",temp:"27.4°C",costa:"Areia + coqueiros",uso:"Rústica"},
-{nome:"Conceição - Vera Cruz",regiao:"ITA",lat:-13.0815,lng:-38.7115,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mata",temp:"27.3°C",costa:"Areia clara",uso:"Pesca"},
-{nome:"Baiacu - Vera Cruz",regiao:"ITA",lat:-12.9625,lng:-38.6815,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mangue + coqueiral",temp:"27.7°C",costa:"Areia lamosa + mangue",uso:"Quilombola"},
-{nome:"Barra do Pote",regiao:"ITA",lat:-12.9765,lng:-38.6915,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Manguezal",temp:"27.6°C",costa:"Areia + mangue",uso:"Pesca"},
-{nome:"Gameleira - Itaparica",regiao:"ITA",lat:-13.0665,lng:-38.7065,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Coqueiral",temp:"27.4°C",costa:"Areia fina",uso:"Preservada"},
-{nome:"Tairu",regiao:"ITA",lat:-13.0165,lng:-38.6565,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Coqueiral",temp:"27.6°C",costa:"Areia clara",uso:"Local"},
-{nome:"Jiribatuba - Vera Cruz",regiao:"ITA",lat:-12.8515,lng:-38.7315,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mata + mangue",temp:"27.5°C",costa:"Areia + ilha",uso:"Tradicional"},
-{nome:"Catu - Vera Cruz",regiao:"ITA",lat:-12.8215,lng:-38.7115,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mangue",temp:"27.6°C",costa:"Areia lamosa",uso:"Pesqueira"},
-{nome:"Ponta Grossa - Itaparica",regiao:"ITA",lat:-13.1015,lng:-38.6815,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Coqueiral",temp:"27.3°C",costa:"Areia + pedras",uso:"Mirante"},
-{nome:"Penha - Itaparica",regiao:"ITA",lat:-13.0415,lng:-38.6815,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mata + igreja",temp:"27.4°C",costa:"Areia + Igreja",uso:"Religioso"},
-{nome:"Manguinhos - Itaparica",regiao:"ITA",lat:-12.9865,lng:-38.6465,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Coqueiral",temp:"27.7°C",costa:"Areia fina",uso:"Veraneio"},
-{nome:"Coroa - Vera Cruz",regiao:"ITA",lat:-13.0565,lng:-38.6915,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Restinga",temp:"27.4°C",costa:"Areia clara + coroa",uso:"Náutico"},
-{nome:"Amoreiras - Itaparica",regiao:"ITA",lat:-12.9225,lng:-38.6925,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Coqueiral",temp:"27.5°C",costa:"Areia fina",uso:"Veraneio"},
-{nome:"Cacha Prego - Vera Cruz",regiao:"ITA",lat:-12.9825,lng:-38.7125,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mata + coqueiros",temp:"27.4°C",costa:"Areia fina",uso:"Náutico"},
-{nome:"Ilhota - Vera Cruz",regiao:"ITA",lat:-12.8715,lng:-38.7415,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Manguezal",temp:"27.6°C",costa:"Areia + ilhota",uso:"Ecologia"},
-// BTS ILHAS 8
-{nome:"Ilha de Maré - Botelho",regiao:"BTS",lat:-12.752,lng:-38.521,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mata + mangue",temp:"27.8°C",costa:"Areia clara + pedras",uso:"Quilombola"},
-{nome:"Barra Grande - Vera Cruz",regiao:"BTS",lat:-12.952,lng:-38.702,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mangue + coqueiros",temp:"27.6°C",costa:"Areia fina",uso:"Turismo"},
-{nome:"Ilha dos Frades",regiao:"BTS",lat:-12.782,lng:-38.632,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mata preservada",temp:"27°C",costa:"Areia branca",uso:"APA"},
-{nome:"Madre de Deus",regiao:"BTS",lat:-12.742,lng:-38.622,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mangue + urbana",temp:"28°C",costa:"Areia lamosa + porto",uso:"Industrial"},
-{nome:"Candeias - Caboto",regiao:"BTS",lat:-12.682,lng:-38.552,status:"ATENCAO",maritimidade:"Baía abrigada - Baixa",vegetacao:"Manguezal",temp:"28°C",costa:"Areia + mangue",uso:"Pesca"},
-{nome:"Saubara",regiao:"BTS",lat:-12.732,lng:-38.762,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mangue + coqueiral",temp:"27.7°C",costa:"Areia fina",uso:"Cultura"},
-{nome:"Salinas da Margarida",regiao:"BTS",lat:-12.872,lng:-38.762,status:"PROPRIA",maritimidade:"Baía abrigada - Baixa",vegetacao:"Mangue + restinga",temp:"27.8°C",costa:"Areia clara",uso:"Pesca"},
-{nome:"Jaguaripe",regiao:"BTS",lat:-12.852,lng:-38.892,status:"PROPRIA",maritimidade:"Estuário - Baixa",vegetacao:"Manguezal",temp:"27.9°C",costa:"Areia lamosa",uso:"História"},
-// LITORAL NORTE 14
-{nome:"Arembepe",regiao:"LN",lat:-12.762,lng:-38.172,status:"PROPRIA",maritimidade:"Mar aberto - Alta",vegetacao:"Restinga + coqueiral",temp:"26.5°C",costa:"Areia + recifes",uso:"Hippie"},
-{nome:"Jauá",regiao:"LN",lat:-12.692,lng:-38.082,status:"PROPRIA",maritimidade:"Mar aberto - Alta",vegetacao:"Restinga + dunas",temp:"26.4°C",costa:"Areia grossa",uso:"Veraneio"},
-{nome:"Guarajuba",regiao:"LN",lat:-12.642,lng:-38.062,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Coqueiral",temp:"26.6°C",costa:"Areia dourada + recifes",uso:"Alto padrão"},
-{nome:"Itacimirim",regiao:"LN",lat:-12.612,lng:-38.042,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga",temp:"26.5°C",costa:"Areia + foz",uso:"Surf"},
-{nome:"Praia do Forte",regiao:"LN",lat:-12.582,lng:-38.002,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga + Mata",temp:"26.3°C",costa:"Clara + recifes + Tamar",uso:"Ecológico"},
-{nome:"Imbassaí",regiao:"LN",lat:-12.492,lng:-37.952,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga + mangue",temp:"26.2°C",costa:"Rio-mar + areia",uso:"Ecoturismo"},
-{nome:"Diogo",regiao:"LN",lat:-12.452,lng:-37.902,status:"PROPRIA",maritimidade:"Mar aberto - Alta",vegetacao:"Restinga",temp:"26.2°C",costa:"Areia deserta",uso:"Preservado"},
-{nome:"Sauípe",regiao:"LN",lat:-12.432,lng:-37.902,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Coqueiral",temp:"26.3°C",costa:"Areia + coqueiral",uso:"Resorts"},
-{nome:"Massarandupió",regiao:"LN",lat:-12.382,lng:-37.822,status:"PROPRIA",maritimidade:"Mar aberto - Alta",vegetacao:"Restinga + dunas",temp:"26.1°C",costa:"Dunas + naturismo",uso:"Naturismo"},
-{nome:"Baixio",regiao:"LN",lat:-12.262,lng:-37.702,status:"PROPRIA",maritimidade:"Mar aberto - Alta",vegetacao:"Restinga",temp:"26°C",costa:"Areia clara",uso:"Pescadores"},
-{nome:"Subaúma",regiao:"LN",lat:-12.242,lng:-37.682,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga",temp:"26°C",costa:"Areia fina",uso:"Pesca"},
-{nome:"Barra do Itariri",regiao:"LN",lat:-11.952,lng:-37.602,status:"PROPRIA",maritimidade:"Estuário - Baixa",vegetacao:"Mangue + restinga",temp:"26.5°C",costa:"Rio-mar",uso:"Pesca"},
-{nome:"Mangue Seco",regiao:"LN",lat:-11.452,lng:-37.352,status:"PROPRIA",maritimidade:"Mar aberto - Alta",vegetacao:"Dunas móveis",temp:"26°C",costa:"Dunas + areia",uso:"Tieta"},
-{nome:"Sítio do Conde",regiao:"LN",lat:-11.822,lng:-37.552,status:"PROPRIA",maritimidade:"Mar aberto - Alta",vegetacao:"Restinga",temp:"26.2°C",costa:"Areia grossa",uso:"Deserta"},
-// BAIXO SUL 12
-{nome:"Morro de São Paulo",regiao:"BS",lat:-13.382,lng:-38.912,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Mata + coqueiral",temp:"26.8°C",costa:"Areia branca",uso:"Internacional"},
-{nome:"Boipeba",regiao:"BS",lat:-13.612,lng:-38.922,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Mata preservada",temp:"26.5°C",costa:"Branca + recifes + mangue",uso:"Ecoturismo"},
-{nome:"Barra Grande - Camamu",regiao:"BS",lat:-13.892,lng:-38.952,status:"PROPRIA",maritimidade:"Baía Camamu - Baixa",vegetacao:"Mangue + Mata",temp:"27°C",costa:"Areia + mangue",uso:"Turismo"},
-{nome:"Itacaré - Pontal",regiao:"BS",lat:-14.312,lng:-38.992,status:"PROPRIA",maritimidade:"Mar + Rio - Média",vegetacao:"Mata Atlântica",temp:"26.5°C",costa:"Dourada + rio + surf",uso:"Surf"},
-{nome:"Jeribucaçu",regiao:"BS",lat:-14.362,lng:-39.022,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Mata + restinga",temp:"26.3°C",costa:"Selvagem + rio",uso:"Preservado"},
-{nome:"Serra Grande",regiao:"BS",lat:-14.452,lng:-39.022,status:"PROPRIA",maritimidade:"Mar aberto - Alta",vegetacao:"Mata Atlântica",temp:"26.2°C",costa:"Pedras + falésias",uso:"Ecovila"},
-{nome:"Olivença",regiao:"BS",lat:-14.922,lng:-39.022,status:"ATENCAO",maritimidade:"Mar aberto - Alta",vegetacao:"Mata + coqueiral",temp:"26.5°C",costa:"Areia + foz",uso:"Indígena"},
-{nome:"Back Door",regiao:"BS",lat:-14.792,lng:-39.032,status:"ATENCAO",maritimidade:"Mar aberto - Alta",vegetacao:"Mata",temp:"26.4°C",costa:"Pedras + surf",uso:"Surf pro"},
-{nome:"Guaibim",regiao:"BS",lat:-13.302,lng:-38.852,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga",temp:"27°C",costa:"Areia extensa",uso:"Popular"},
-{nome:"Taipu de Fora",regiao:"BS",lat:-13.912,lng:-38.912,status:"PROPRIA",maritimidade:"Recifes - Baixa",vegetacao:"Coqueiral",temp:"27°C",costa:"Piscinas naturais",uso:"Turismo"},
-{nome:"Pratigi",regiao:"BS",lat:-13.732,lng:-38.962,status:"PROPRIA",maritimidade:"Estuário - Baixa",vegetacao:"Mangue + Mata",temp:"27.2°C",costa:"Areia + mangue + rio",uso:"Pesca"},
-{nome:"Ilha do Contrato",regiao:"BS",lat:-13.822,lng:-38.952,status:"PROPRIA",maritimidade:"Baía Camamu - Baixa",vegetacao:"Manguezal",temp:"27.1°C",costa:"Areia + mangue",uso:"Tradicional"},
-// EXTREMO SUL 10
-{nome:"Taperapuã",regiao:"ES",lat:-16.372,lng:-39.022,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Coqueiral",temp:"25.5°C",costa:"Areia + barracas",uso:"Porto Seguro"},
-{nome:"Arraial d'Ajuda",regiao:"ES",lat:-16.482,lng:-39.072,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Mata + restinga",temp:"25.4°C",costa:"Clara + falésias",uso:"Charmoso"},
-{nome:"Trancoso",regiao:"ES",lat:-16.592,lng:-39.092,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Mata + coqueiral",temp:"25.3°C",costa:"Dourada + falésias",uso:"Luxo"},
-{nome:"Caraíva",regiao:"ES",lat:-16.792,lng:-39.142,status:"PROPRIA",maritimidade:"Rio-mar - Baixa",vegetacao:"Mata + mangue",temp:"25.5°C",costa:"Rio Caraíva + vila",uso:"Rústico"},
-{nome:"Corumbau",regiao:"ES",lat:-17.002,lng:-39.192,status:"PROPRIA",maritimidade:"Mar aberto - Baixa",vegetacao:"Restinga",temp:"25.2°C",costa:"Branca + Ponta",uso:"Pataxó"},
-{nome:"Cumuruxatiba",regiao:"ES",lat:-17.102,lng:-39.212,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga + Mata",temp:"25.2°C",costa:"Clara + falésias vermelhas",uso:"Deserta"},
-{nome:"Alcobaça",regiao:"ES",lat:-17.512,lng:-39.192,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga + mangue",temp:"25.5°C",costa:"Areia + Abrolhos",uso:"Mergulho"},
-{nome:"Costa Dourada",regiao:"ES",lat:-18.082,lng:-39.552,status:"PROPRIA",maritimidade:"Mar aberto - Média",vegetacao:"Restinga + Mata",temp:"25.8°C",costa:"Dourada + falésias",uso:"Preservado"},
-{nome:"Nova Viçosa",regiao:"ES",lat:-17.892,lng:-39.372,status:"PROPRIA",maritimidade:"Mar aberto - Baixa",vegetacao:"Mangue + restinga",temp:"25.6°C",costa:"Areia + mangue",uso:"Pesca"},
-{nome:"Coroa Vermelha",regiao:"ES",lat:-16.322,lng:-39.002,status:"ATENCAO",maritimidade:"Mar aberto - Baixa",vegetacao:"Restinga",temp:"25.6°C",costa:"Recifes + cruz",uso:"Histórico"}
+{name:"Periperi",cat:"SUBURBIO",lat:-12.875,lng:-38.471,info:"Periperi"},
+{name:"Plataforma",cat:"SUBURBIO",lat:-12.895,lng:-38.475,info:"Plataforma"},
+{name:"Itacaranha",cat:"SUBURBIO",lat:-12.885,lng:-38.468,info:"Itacaranha"},
+{name:"Praia Grande Sub",cat:"SUBURBIO",lat:-12.865,lng:-38.465,info:"Praia Grande"},
+{name:"São Tomé",cat:"SUBURBIO",lat:-12.855,lng:-38.462,info:"São Tomé"},
+{name:"Tubarão",cat:"SUBURBIO",lat:-12.845,lng:-38.46,info:"Tubarão"},
+{name:"Base Naval",cat:"SUBURBIO",lat:-12.835,lng:-38.458,info:"Base Naval"},
+{name:"Inema",cat:"SUBURBIO",lat:-12.825,lng:-38.455,info:"Inema"},
+// ITAPARICA 19 COMPLETA
+{name:"Mar Grande",cat:"ITAPARICA",lat:-12.985,lng:-38.618,info:"Terminal Lanchas"},
+{name:"Barra do Gil",cat:"ITAPARICA",lat:-13.015,lng:-38.685,info:"Barra do Gil"},
+{name:"Aratuba",cat:"ITAPARICA",lat:-12.965,lng:-38.645,info:"Aratuba Vera Cruz"},
+{name:"Berlinque",cat:"ITAPARICA",lat:-12.955,lng:-38.66,info:"Berlinque"},
+{name:"Conceição Itap",cat:"ITAPARICA",lat:-12.9,lng:-38.68,info:"Conceição"},
+{name:"Baiacu",cat:"ITAPARICA",lat:-12.935,lng:-38.635,info:"Baiacu"},
+{name:"Ponta de Areia",cat:"ITAPARICA",lat:-12.995,lng:-38.61,info:"Ponta de Areia"},
+{name:"Amoreiras",cat:"ITAPARICA",lat:-13.0,lng:-38.625,info:"Amoreiras"},
+{name:"Mocambo",cat:"ITAPARICA",lat:-13.01,lng:-38.635,info:"Mocambo"},
+{name:"Manguinhos",cat:"ITAPARICA",lat:-12.945,lng:-38.655,info:"Manguinhos"},
+{name:"Ponta do Duro",cat:"ITAPARICA",lat:-13.025,lng:-38.695,info:"Ponta do Duro"},
+{name:"Barra do Pote",cat:"ITAPARICA",lat:-12.975,lng:-38.67,info:"Barra do Pote"},
+{name:"Jiribatuba",cat:"ITAPARICA",lat:-12.925,lng:-38.665,info:"Jiribatuba"},
+{name:"Ponta Areia VC",cat:"ITAPARICA",lat:-12.915,lng:-38.675,info:"Ponta Areia VC"},
+{name:"Gameleira",cat:"ITAPARICA",lat:-13.005,lng:-38.67,info:"Gameleira"},
+{name:"Coral",cat:"ITAPARICA",lat:-12.985,lng:-38.64,info:"Coral"},
+{name:"Enseada Itap",cat:"ITAPARICA",lat:-13.035,lng:-38.675,info:"Enseada"},
+{name:"Tairu",cat:"ITAPARICA",lat:-12.905,lng:-38.645,info:"Tairu"},
+{name:"Cajaíba Itap",cat:"ITAPARICA",lat:-12.89,lng:-38.62,info:"Cajaíba"}
 ];
-let map = L.map('map',{zoomControl:false}).setView([-12.95,-38.6],10);
-L.control.zoom({position:'topright'}).addTo(map);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OSM | Baía Viva 6.9.5 103 Praias - Prof Edson'}).addTo(map);
-let markers=[];let chartPraia;let listaAberta=false;
-function getLocalSafe(){try{let d=localStorage.getItem('visitantes_bv');return d?JSON.parse(d):[]}catch(e){return[]}}
-function relogio(){document.getElementById('relogio').textContent=new Date().toLocaleTimeString('pt-BR');document.getElementById('visitantes').textContent=getLocalSafe().length+' visitantes';document.getElementById('btnLista').textContent=(listaAberta?'✕ FECHAR':'☰ VER 103') }
-setInterval(relogio,1000);relogio();
-function toggleLista(){let l=document.getElementById('lista');listaAberta=!listaAberta;l.classList.toggle('aberta',listaAberta);relogio()}
-function abrirDetalhe(p){document.getElementById('boxDetalhe').innerHTML=`<h2>📍 ${p.nome}</h2><small style="color:${p.status=='PROPRIA'?'#2ecc71':p.status=='ATENCAO'?'#f1c40f':'#e74c3c'}">● ${p.status} - ${p.regiao}</small><div class="dado-geo"><b>🌊</b> ${p.maritimidade}</div><div class="dado-geo"><b>🌿</b> ${p.vegetacao}</div><div class="dado-geo"><b>🌡️</b> ${p.temp}</div><div class="dado-geo"><b>🏖️</b> ${p.costa}</div><div class="dado-geo"><b>👥</b> ${p.uso}</div><div class="dado-geo" style="background:#fff3cd"><b>📌</b> ${p.lat}, ${p.lng} - SEM EMBOLAÇÃO 6.9.5</div><button class="btn-salvar" onclick="document.getElementById('modalDetalhe').classList.remove('ativo');abrirCheckinEspecifico('${p.nome}')">📲 CHECK-IN</button><button class="btn-cancel" onclick="document.getElementById('modalDetalhe').classList.remove('ativo')">Fechar</button>`;document.getElementById('modalDetalhe').classList.add('ativo');if(window.innerWidth<=768&&listaAberta)toggleLista()}
-function render(dados){let l=document.getElementById('lista');l.innerHTML='';markers.forEach(m=>map.removeLayer(m));markers=[];dados.forEach(p=>{let d=document.createElement('div');d.className='card '+p.status;d.innerHTML=`<b>${p.nome}</b><br><small>${p.regiao} • ${p.maritimidade} • ${p.status}</small>`;d.onclick=()=>abrirDetalhe(p);l.appendChild(d);let cor=p.status=='PROPRIA'?'#2ecc71':p.status=='ATENCAO'?'#f1c40f':'#e74c3c';let mk=L.circleMarker([p.lat,p.lng],{radius:6,color:cor,fillColor:cor,fillOpacity:.9}).addTo(map).bindPopup(`<b>${p.nome}</b><br>${p.regiao}`);mk.on('click',()=>abrirDetalhe(p));markers.push(mk)});if(dados.length>0){let g=new L.featureGroup(markers);map.fitBounds(g.getBounds().pad(0.25))}}
-function filtrar(r){document.querySelectorAll('.filtros button').forEach(b=>b.classList.remove('ativo'));document.getElementById('b-'+r).classList.add('ativo');if(r=='TODAS'){render(praias);map.setView([-13.2,-38.6],8)}else{render(praias.filter(p=>p.regiao==r))}}
-function abrirCheckin(){document.getElementById('praiaVisitada').innerHTML=praias.map(p=>`<option>${p.nome} - ${p.regiao}</option>`).join('');document.getElementById('modalCheck').classList.add('ativo')}
-function abrirCheckinEspecifico(nome){abrirCheckin();let sel=document.getElementById('praiaVisitada');for(let i=0;i<sel.options.length;i++){if(sel.options[i].text.startsWith(nome)){sel.selectedIndex=i;break;}}}
-function fecharCheckin(){document.getElementById('modalCheck').classList.remove('ativo')}
-function salvarVisitante(){let n=document.getElementById('nome').value.trim();let c=document.getElementById('contato').value.trim();let pr=document.getElementById('praiaVisitada').value;let mo=document.getElementById('motivo').value;if(!n){alert('Digite nome');return}let ls=getLocalSafe();ls.push({nome:n,contato:c,praia:pr,motivo:mo,data:new Date().toLocaleString('pt-BR'),dia:new Date().toISOString().slice(0,10),timestamp:Date.now()});localStorage.setItem('visitantes_bv',JSON.stringify(ls));let seuNumero="5571992418354";let mensagem=`🌊 *CHECK-IN 6.9.5 103 PRAIAS*%0A👤 ${encodeURIComponent(n)}%0A📱 ${encodeURIComponent(c)}%0A📍 ${encodeURIComponent(pr)}%0A🎯 ${encodeURIComponent(mo)}`;window.open(`https://wa.me/${seuNumero}?text=${mensagem}`,'_blank');alert('✅ Salvo! Zap abrindo...');fecharCheckin();relogio()}
-function abrirPainel(){let ls=getLocalSafe();document.getElementById('dataPainel').textContent=new Date().toLocaleString('pt-BR')+' | 103 Praias | Prof Edson';document.getElementById('tTotal').textContent=ls.length;document.getElementById('tHoje').textContent=ls.filter(v=>v.dia==new Date().toISOString().slice(0,10)).length;let porPraia={};ls.forEach(v=>{porPraia[v.praia]=(porPraia[v.praia]||0)+1});let top=Object.entries(porPraia).sort((a,b)=>b[1]-a[1]).slice(0,5);let ctx=document.getElementById('grafPraia');if(chartPraia)chartPraia.destroy();chartPraia=new Chart(ctx,{type:'bar',data:{labels:top.length?top.map(p=>p[0]):['Sem dados'],datasets:[{label:'Check-ins',data:top.length?top.map(p=>p[1]):[0],backgroundColor:'#0a3d62'}]},options:{plugins:{title:{display:true,text:'Top 5 - 103 Praias'}},responsive:true}});let hist=ls.slice(-10).reverse().map(v=>`<div style="border-bottom:1px solid #eee;padding:6px 0;font-size:11px"><b>${v.nome}</b> - ${v.praia}<br><small>${v.motivo} • ${v.data}</small></div>`).join('')||'<small>Nenhum</small>';document.getElementById('historico').innerHTML='<b>Historico</b>'+hist;document.getElementById('modalPainel').classList.add('ativo')}
-function fecharPainel(){document.getElementById('modalPainel').classList.remove('ativo')}
-function exportar(){let ls=getLocalSafe();if(!ls.length){alert('Sem dados');return}let csv='Nome,Contato,Praia,Motivo,Data\n'+ls.map(v=>`"${v.nome}","${v.contato}","${v.praia}","${v.motivo}","${v.data}"`).join('\n');let blob=new Blob([csv],{type:'text/csv'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='baia_viva_6.9.5_103_PRAIAS_TCC_Edson.csv';a.click()}
-render(praias);
+let map=L.map('map').setView([-12.97,-38.51],10);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+let markers=[];
+function criar(filtro){
+markers.forEach(m=>map.removeLayer(m));markers=[];
+document.getElementById('lista').innerHTML='';
+let filtradas=filtro==='TODAS'?praias:praias.filter(p=>p.cat===filtro);
+filtradas.forEach(p=>{
+let oLat=(filtro==='RIBEIRA'||filtro==='ITAPARICA')?(Math.random()-0.5)*0.006:0;
+let oLng=(filtro==='RIBEIRA'||filtro==='ITAPARICA')?(Math.random()-0.5)*0.006:0;
+let mk=L.marker([p.lat+oLat,p.lng+oLng]).addTo(map).bindPopup(`<b>${p.name}</b><br>${p.info}<br><a href='https://wa.me/5571992418354?text=${p.name}'>Zap</a>`);
+markers.push(mk);
+let d=document.createElement('div');d.className='praia-item';d.innerHTML=`<b>${p.name}</b><br>${p.info}`;d.onclick=()=>{map.setView([p.lat+oLat,p.lng+oLng],13);mk.openPopup();};
+document.getElementById('lista').appendChild(d);
+});
+if(markers.length){map.fitBounds(new L.featureGroup(markers).getBounds().pad(0.2));}
+}
+function filtrar(cat,btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');criar(cat);}
+criar('TODAS');
 </script>
 </body>
 </html>
