@@ -1,111 +1,171 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BAIA VIVA 17.3 - COMPLETO AO VIVO</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<style>
-*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#061a2a;color:#fff;display:flex;flex-direction:column;height:100vh}
-header{padding:10px 16px;background:#082a44;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-#clock{font-family:monospace;font-size:16px;color:#7ff0ff}#tempSalvador{background:#0b3a5c;padding:5px 12px;border-radius:20px;font-weight:700;font-size:13px}
-main{display:flex;flex:1;overflow:hidden}
-#sidebar{width:260px;background:#0a2e4e;padding:12px;overflow-y:auto}
-#mapWrap{flex:1;display:flex;flex-direction:column}
-#map{flex:1;min-height:400px}
-#infoPanel{background:#082a44;padding:12px;border-top:2px solid #0b5cff;max-height:38vh;overflow-y:auto}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.card{background:#0d3a61;padding:8px;border-radius:8px;font-size:12px}
-.badge{background:#0b5cff;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px}
-</style>
-</head>
-<body>
-<header>
-<div><b>BAIA VIVA 17.3</b> - AO VIVO</div>
-<div id="clock">--:--:--</div>
-<div id="tempSalvador">Carregando Salvador...</div>
-</header>
-<main>
-<div id="sidebar">
-<h3>🗺️ Camadas Ativas</h3>
-<p style="font-size:12px">🌡️ Temp Ar AO VIVO<br>🌊 Temp Agua<br>💨 Vento AO VIVO<br>🧂 Salinidade<br>🌊 Corrente<br>🌳 Vegetacao<br>🌱 Mangue</p>
-<p style="font-size:11px;color:#9cc">76 pontos - Clique no mapa</p>
-</div>
-<div id="mapWrap">
-<div id="map"></div>
-<div id="infoPanel"><b>👈 Clique em um ponto azul</b><br><small>Vai abrir: Temp AO VIVO + Agua + Vento + Sal + Vegetacao + Mangue</small></div>
-</div>
-</main>
-<script>
-const pontos=[
-{n:"Mangue Seco",lat:-11.44,lng:-37.36,reg:"Coqueiros",veg:82,mangue:75,sal:35.2,corr:"NE 0.8kt",agua:27.1},
-{n:"Praia do Saco",lat:-11.40,lng:-37.34,reg:"Coqueiros",veg:78,mangue:60,sal:35.0,corr:"NE 0.6kt",agua:27.3},
-{n:"Jandaira",lat:-11.56,lng:-37.35,reg:"Coqueiros",veg:80,mangue:65,sal:35.1,corr:"E 0.7kt",agua:27.2},
-{n:"Sitio do Conde",lat:-11.72,lng:-37.42,reg:"Coqueiros",veg:75,mangue:55,sal:35.0,corr:"E 0.5kt",agua:27.4},
-{n:"Baixio",lat:-11.95,lng:-37.61,reg:"Coqueiros",veg:70,mangue:50,sal:34.9,corr:"SE 0.6kt",agua:27.5},
-{n:"Subauma",lat:-12.08,lng:-37.74,reg:"Coqueiros",veg:72,mangue:48,sal:34.9,corr:"SE 0.7kt",agua:27.4},
-{n:"Massarandupio",lat:-12.20,lng:-37.82,reg:"Coqueiros",veg:65,mangue:40,sal:34.8,corr:"E 0.6kt",agua:27.8},
-{n:"Praia do Forte",lat:-12.57,lng:-38.00,reg:"Coqueiros",veg:60,mangue:35,sal:35.0,corr:"E 0.9kt",agua:27.9},
-{n:"Itacimirim",lat:-12.62,lng:-38.06,reg:"Coqueiros",veg:55,mangue:28,sal:35.0,corr:"SE 0.6kt",agua:27.9},
-{n:"Guarajuba",lat:-12.64,lng:-38.07,reg:"Coqueiros",veg:52,mangue:25,sal:35.2,corr:"SE 0.8kt",agua:28.1},
-{n:"Busca Vida",lat:-12.86,lng:-38.26,reg:"Coqueiros",veg:45,mangue:20,sal:35.3,corr:"E 0.7kt",agua:28.2},
-{n:"Arembepe",lat:-12.74,lng:-38.17,reg:"Coqueiros",veg:48,mangue:24,sal:35.1,corr:"SE 0.5kt",agua:27.9},
-{n:"Stella Maris",lat:-12.94,lng:-38.32,reg:"Salvador",veg:40,mangue:15,sal:35.4,corr:"SE 0.8kt",agua:28.0},
-{n:"Farol da Barra",lat:-13.01,lng:-38.532,reg:"Salvador",veg:20,mangue:5,sal:35.6,corr:"S 1.0kt",agua:27.8},
-{n:"Mar Grande",lat:-12.99,lng:-38.68,reg:"Salvador",veg:55,mangue:70,sal:33.5,corr:"N 0.4kt",agua:28.5},
-{n:"Ilha de Mare",lat:-12.78,lng:-38.52,reg:"Salvador",veg:70,mangue:80,sal:32.5,corr:"N 0.2kt",agua:28.8},
-{n:"Ilha dos Frades",lat:-12.81,lng:-38.64,reg:"Salvador",veg:75,mangue:78,sal:32.8,corr:"N 0.3kt",agua:28.7},
-{n:"Salinas",lat:-12.88,lng:-38.77,reg:"Salvador",veg:60,mangue:85,sal:32.0,corr:"N 0.2kt",agua:29.0},
-{n:"Morro de SP",lat:-13.37,lng:-38.91,reg:"Dende",veg:68,mangue:40,sal:35.0,corr:"SE 0.9kt",agua:27.9},
-{n:"Boipeba",lat:-13.61,lng:-38.93,reg:"Dende",veg:78,mangue:50,sal:34.8,corr:"SE 0.7kt",agua:27.8},
-{n:"Barra Grande",lat:-13.88,lng:-38.94,reg:"Dende",veg:75,mangue:60,sal:34.6,corr:"E 0.8kt",agua:27.6},
-{n:"Camamu",lat:-13.94,lng:-39.10,reg:"Dende",veg:78,mangue:84,sal:32.0,corr:"E 0.4kt",agua:28.5},
-{n:"Itacare",lat:-14.31,lng:-38.99,reg:"Cacau",veg:75,mangue:45,sal:34.5,corr:"SE 0.9kt",agua:27.5},
-{n:"Ilheus",lat:-14.93,lng:-39.01,reg:"Cacau",veg:60,mangue:30,sal:35.0,corr:"E 0.8kt",agua:27.7},
-{n:"Canavieiras",lat:-15.67,lng:-38.94,reg:"Cacau",veg:70,mangue:75,sal:33.0,corr:"NE 0.6kt",agua:28.2},
-{n:"Porto Seguro",lat:-16.44,lng:-39.06,reg:"Descobrimento",veg:50,mangue:35,sal:34.8,corr:"E 0.8kt",agua:27.3},
-{n:"Trancoso",lat:-16.59,lng:-39.09,reg:"Descobrimento",veg:65,mangue:25,sal:35.0,corr:"E 0.7kt",agua:27.2},
-{n:"Caraiva",lat:-16.79,lng:-39.14,reg:"Descobrimento",veg:80,mangue:40,sal:34.7,corr:"NE 0.6kt",agua:27.0},
-{n:"Prado",lat:-17.33,lng:-39.22,reg:"Baleias",veg:60,mangue:50,sal:34.5,corr:"E 0.7kt",agua:26.8},
-{n:"Caravelas",lat:-17.73,lng:-39.25,reg:"Baleias",veg:64,mangue:75,sal:33.5,corr:"NE 0.4kt",agua:27.1},
-{n:"Mucuri",lat:-18.08,lng:-39.55,reg:"Baleias",veg:55,mangue:60,sal:34.0,corr:"NE 0.6kt",agua:26.8}
-];
-const map=L.map('map').setView([-13.0,-38.9],7);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
-function relogio(){document.getElementById('clock').innerText=new Date().toLocaleTimeString('pt-BR');}
-setInterval(relogio,1000);relogio();
-async function fetchTempo(lat,lng){
- try{
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,wind_speed_10m,relative_humidity_2m&timezone=America%2FSao_Paulo`;
-  const r=await fetch(url); const j=await r.json(); return j.current;
- }catch(e){return null}
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+void main() {
+  runApp(const AppMonitoramento());
 }
-async function atualizaSalvador(){
- const cur=await fetchTempo(-13.01,-38.532);
- if(cur){document.getElementById('tempSalvador').innerHTML=`Salvador ${cur.temperature_2m}°C AO VIVO | ${new Date().toLocaleTimeString('pt-BR')}`;}
+
+class AppMonitoramento extends StatelessWidget {
+  const AppMonitoramento({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Monitoramento 18.0',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      home: const TelaColeta(),
+    );
+  }
 }
-atualizaSalvador(); setInterval(atualizaSalvador,3600000);
-pontos.forEach(p=>{
- const m=L.marker([p.lat,p.lng]).addTo(map);
- m.on('click', async()=>{
-  const panel=document.getElementById('infoPanel');
-  panel.innerHTML='⏳ Buscando AO VIVO...';
-  const cur=await fetchTempo(p.lat,p.lng);
-  const tAr=cur?`${cur.temperature_2m}°C`:'---';
-  const vento=cur?`${cur.wind_speed_10m} km/h`:'---';
-  const umid=cur?`${cur.relative_humidity_2m}%`:'---';
-  panel.innerHTML=`<div style="display:flex;justify-content:space-between"><b>${p.n}</b><span class=badge>${p.reg}</span></div>
-  <div class=grid style="margin-top:8px">
-  <div class=card><b>🌡️ Temp Ar AO VIVO</b><br><span style="font-size:18px">${tAr}</span><br><small>${new Date().toLocaleTimeString('pt-BR')}</small></div>
-  <div class=card><b>🌊 Temp Agua</b><br>${p.agua}°C</div>
-  <div class=card><b>💨 Vento AO VIVO</b><br>${vento}<br>Umidade ${umid}</div>
-  <div class=card><b>🧂 Salinidade</b><br>${p.sal} PSU<br>${p.corr}</div>
-  <div class=card><b>🌳 Vegetacao</b><br>${p.veg}% Mata Atlantica</div>
-  <div class=card><b>🌱 Mangue</b><br>${p.mangue}% cobertura</div>
-  </div>`;
- });
-});
-</script>
-</body>
-</html>
+
+// MODELO PROFISSIONAL
+class Ponto {
+  final String id;
+  final String nome;
+  final String regiao;
+  final double lat;
+  final double lng;
+  Ponto({required this.id, required this.nome, required this.regiao, required this.lat, required this.lng});
+  factory Ponto.fromJson(Map<String, dynamic> json) {
+    return Ponto(
+      id: json['id'],
+      nome: json['nome'],
+      regiao: json['regiao'],
+      lat: (json['lat'] as num).toDouble(),
+      lng: (json['lng'] as num).toDouble(),
+    );
+  }
+}
+
+class TelaColeta extends StatefulWidget {
+  const TelaColeta({super.key});
+  @override
+  State<TelaColeta> createState() => _TelaColetaState();
+}
+
+class _TelaColetaState extends State<TelaColeta> {
+  List<Ponto> pontos = [];
+  Ponto? pontoSelecionado;
+  bool carregando = true;
+
+  // MAP DE CONTROLADORES - Código Limpo
+  final Map<String, TextEditingController> controllers = {
+    'ph': TextEditingController(),
+    'tempAgua': TextEditingController(),
+    'tempAr': TextEditingController(),
+    'vento': TextEditingController(),
+    'salinidade': TextEditingController(),
+    'od': TextEditingController(),
+    'turbidez': TextEditingController(),
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    carregarPontos();
+  }
+
+  Future<void> carregarPontos() async {
+    try {
+      final String response = await rootBundle.loadString('assets/pontos.json');
+      final List data = json.decode(response);
+      setState(() {
+        pontos = data.map((e) => Ponto.fromJson(e)).toList();
+        carregando = false;
+      });
+    } catch (e) {
+      setState(() => carregando = false);
+      debugPrint("Erro ao carregar pontos: $e");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Coleta 18.0 - 76 Pontos'),
+        centerTitle: true,
+      ),
+      body: carregando
+         ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ListView(
+                children: [
+                  // DROPDOWN COM OS 76 PONTOS
+                  DropdownButtonFormField<Ponto>(
+                    value: pontoSelecionado,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Selecione o Ponto (76 pontos)',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.location_on),
+                    ),
+                    items: pontos.map((Ponto ponto) {
+                      return DropdownMenuItem<Ponto>(
+                        value: ponto,
+                        child: Text(ponto.nome, overflow: TextOverflow.ellipsis),
+                      );
+                    }).toList(),
+                    onChanged: (Ponto? novo) {
+                      setState(() => pontoSelecionado = novo);
+                    },
+                  ),
+                  const SizedBox(height: 20),
+
+                  if (pontoSelecionado!= null)
+                    Card(
+                      color: Colors.blue.shade50,
+                      child: ListTile(
+                        title: Text(pontoSelecionado!.nome, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text('Região: ${pontoSelecionado!.regiao} | Lat: ${pontoSelecionado!.lat} | Lng: ${pontoSelecionado!.lng}'),
+                      ),
+                    ),
+
+                  const SizedBox(height: 20),
+                  const Text('Dados da Coleta:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
+
+                  _campo('pH', 'ph', Icons.science),
+                  _campo('Temperatura Água (°C)', 'tempAgua', Icons.thermostat),
+                  _campo('Temperatura Ar (°C)', 'tempAr', Icons.air),
+                  _campo('Vento (nós)', 'vento', Icons.wind_power),
+                  _campo('Salinidade (ppt)', 'salinidade', Icons.water_drop),
+                  _campo('OD (mg/L)', 'od', Icons.bubble_chart),
+                  _campo('Turbidez (NTU)', 'turbidez', Icons.blur_on),
+
+                  const SizedBox(height: 30),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      if (pontoSelecionado == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Selecione um ponto!')));
+                        return;
+                      }
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Salvo: ${pontoSelecionado!.id}')));
+                    },
+                    icon: const Icon(Icons.save),
+                    label: const Text('SALVAR COLETA', style: TextStyle(fontSize: 18)),
+                    style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 55)),
+                  ),
+                ],
+              ),
+            ),
+    );
+  }
+
+  Widget _campo(String label, String key, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextFormField(
+        controller: controllers[key],
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+          prefixIcon: Icon(icon),
+        ),
+      ),
+    );
+  }
+}
