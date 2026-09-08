@@ -32,7 +32,6 @@ body{display:flex;flex-direction:column;height:100vh;background:#f0f2f5}
 <span id="relogio">--:--:--</span> | <span id="data">--/--/----</span> | <span id="temp">🌡️ 28°C Salvador</span> | <span id="update">Atualiza a cada hora</span>
 </div>
 </div>
-
 <div class="filtros">
 <button onclick="filtrar('TODAS')" id="b-TODAS" class="ativo">TODAS (76)</button>
 <button onclick="filtrar('SSA')" id="b-SSA">SALVADOR</button>
@@ -42,75 +41,120 @@ body{display:flex;flex-direction:column;height:100vh;background:#f0f2f5}
 <button onclick="filtrar('BS')" id="b-BS">BAIXO SUL</button>
 <button onclick="filtrar('ES')" id="b-ES">EXTREMO SUL</button>
 </div>
-
 <div class="main">
 <div class="lista" id="lista"></div>
 <div id="map"></div>
 </div>
-
 <script>
 const praias = [
-  {nome:"Farol da Barra", regiao:"SSA", lat:-13.0102, lng:-38.5329, status:"ATENCAO", obs:"Salvador"},
-  {nome:"Porto da Barra", regiao:"SSA", lat:-13.007, lng:-38.531, status:"PROPRIA", obs:"Salvador"},
-  {nome:"Farol de Itapuã", regiao:"SSA", lat:-12.957, lng:-38.356, status:"PROPRIA", obs:"Salvador"},
-  {nome:"Stella Maris", regiao:"SSA", lat:-12.933, lng:-38.327, status:"PROPRIA", obs:"Salvador"},
-  {nome:"Flamengo", regiao:"SSA", lat:-12.909, lng:-38.289, status:"PROPRIA", obs:"Salvador"},
-  {nome:"Pituba", regiao:"SSA", lat:-13.005, lng:-38.458, status:"ATENCAO", obs:"Salvador"},
-  {nome:"Rio Vermelho", regiao:"SSA", lat:-13.015, lng:-38.491, status:"IMPROPRIA", obs:"Salvador"},
-  {nome:"Ondina", regiao:"SSA", lat:-13.012, lng:-38.514, status:"ATENCAO", obs:"Salvador"},
-  {nome:"Amaralina", regiao:"SSA", lat:-13.011, lng:-38.497, status:"ATENCAO", obs:"Salvador"},
-  {nome:"Jaguaribe", regiao:"SSA", lat:-12.999, lng:-38.435, status:"ATENCAO", obs:"Salvador"},
-  {nome:"Piatã", regiao:"SSA", lat:-12.983, lng:-38.393, status:"PROPRIA", obs:"Salvador"},
-  {nome:"Patamares", regiao:"SSA", lat:-12.973, lng:-38.378, status:"PROPRIA", obs:"Salvador"},
-  {nome:"Arembepe", regiao:"LN", lat:-12.76, lng:-38.17, status:"PROPRIA", obs:"Litoral Norte"},
-  {nome:"Guarajuba", regiao:"LN", lat:-12.64, lng:-38.06, status:"PROPRIA", obs:"Litoral Norte"},
-  {nome:"Praia do Forte", regiao:"LN", lat:-12.58, lng:-38.00, status:"PROPRIA", obs:"Litoral Norte"},
-  {nome:"Itacimirim", regiao:"LN", lat:-12.61, lng:-38.04, status:"PROPRIA", obs:"Litoral Norte"},
-  {nome:"Imbassaí", regiao:"LN", lat:-12.49, lng:-37.95, status:"PROPRIA", obs:"Litoral Norte"},
-  {nome:"Morro de São Paulo", regiao:"BS", lat:-13.38, lng:-38.91, status:"PROPRIA", obs:"Baixo Sul"},
-  {nome:"Boipeba", regiao:"BS", lat:-13.61, lng:-38.92, status:"PROPRIA", obs:"Baixo Sul"},
-  {nome:"Porto Seguro - Taperapuã", regiao:"ES", lat:-16.37, lng:-39.02, status:"PROPRIA", obs:"Extremo Sul"},
-  {nome:"Arraial d'Ajuda", regiao:"ES", lat:-16.48, lng:-39.07, status:"PROPRIA", obs:"Extremo Sul"},
-  {nome:"Trancoso", regiao:"ES", lat:-16.59, lng:-39.09, status:"PROPRIA", obs:"Extremo Sul"},
-  {nome:"Ilha de Maré", regiao:"BTS", lat:-12.75, lng:-38.52, status:"PROPRIA", obs:"BTS"},
-  {nome:"Madre de Deus", regiao:"BTS", lat:-12.74, lng:-38.62, status:"ATENCAO", obs:"BTS"}
+{nome:"Farol da Barra",regiao:"SSA",lat:-13.0102,lng:-38.5329,status:"ATENCAO",obs:"Salvador"},
+{nome:"Porto da Barra",regiao:"SSA",lat:-13.007,lng:-38.531,status:"PROPRIA",obs:"Salvador"},
+{nome:"Farol de Itapuã",regiao:"SSA",lat:-12.957,lng:-38.356,status:"PROPRIA",obs:"Salvador"},
+{nome:"Stella Maris",regiao:"SSA",lat:-12.933,lng:-38.327,status:"PROPRIA",obs:"Salvador"},
+{nome:"Flamengo",regiao:"SSA",lat:-12.909,lng:-38.289,status:"PROPRIA",obs:"Salvador"},
+{nome:"Pituba",regiao:"SSA",lat:-13.005,lng:-38.458,status:"ATENCAO",obs:"Salvador"},
+{nome:"Rio Vermelho",regiao:"SSA",lat:-13.015,lng:-38.491,status:"IMPROPRIA",obs:"Salvador"},
+{nome:"Ondina",regiao:"SSA",lat:-13.012,lng:-38.514,status:"ATENCAO",obs:"Salvador"},
+{nome:"Amaralina",regiao:"SSA",lat:-13.011,lng:-38.497,status:"ATENCAO",obs:"Salvador"},
+{nome:"Jaguaribe",regiao:"SSA",lat:-12.999,lng:-38.435,status:"ATENCAO",obs:"Salvador"},
+{nome:"Piatã",regiao:"SSA",lat:-12.983,lng:-38.393,status:"PROPRIA",obs:"Salvador"},
+{nome:"Patamares",regiao:"SSA",lat:-12.973,lng:-38.378,status:"PROPRIA",obs:"Salvador"},
+{nome:"Buracão",regiao:"SSA",lat:-13.01,lng:-38.525,status:"ATENCAO",obs:"Salvador"},
+{nome:"Chega Nego",regiao:"SSA",lat:-12.938,lng:-38.335,status:"PROPRIA",obs:"Salvador"},
+{nome:"Pedra do Sal",regiao:"SSA",lat:-12.955,lng:-38.363,status:"PROPRIA",obs:"Salvador"},
+{nome:"Aleluia",regiao:"SSA",lat:-12.945,lng:-38.345,status:"PROPRIA",obs:"Salvador"},
+{nome:"Corsário",regiao:"SSA",lat:-12.993,lng:-38.416,status:"ATENCAO",obs:"Salvador"},
+{nome:"Jardim de Alah",regiao:"SSA",lat:-13.005,lng:-38.465,status:"IMPROPRIA",obs:"Salvador"},
+{nome:"Boca do Rio",regiao:"SSA",lat:-12.988,lng:-38.405,status:"ATENCAO",obs:"Salvador"},
+{nome:"Placaford",regiao:"SSA",lat:-12.941,lng:-38.341,status:"PROPRIA",obs:"Salvador"},
+{nome:"Penha - Ribeira",regiao:"SUB",lat:-12.907,lng:-38.5,status:"ATENCAO",obs:"Subúrbio"},
+{nome:"Tubarão",regiao:"SUB",lat:-12.86,lng:-38.48,status:"PROPRIA",obs:"Subúrbio"},
+{nome:"Paripe",regiao:"SUB",lat:-12.84,lng:-38.47,status:"PROPRIA",obs:"Subúrbio"},
+{nome:"São Tomé",regiao:"SUB",lat:-12.82,lng:-38.45,status:"PROPRIA",obs:"Subúrbio"},
+{nome:"Cantagalo",regiao:"SUB",lat:-12.89,lng:-38.49,status:"ATENCAO",obs:"Subúrbio"},
+{nome:"Periperi",regiao:"SUB",lat:-12.87,lng:-38.48,status:"PROPRIA",obs:"Subúrbio"},
+{nome:"Itacaranha",regiao:"SUB",lat:-12.83,lng:-38.46,status:"PROPRIA",obs:"Subúrbio"},
+{nome:"Plataforma",regiao:"SUB",lat:-12.9,lng:-38.5,status:"ATENCAO",obs:"Subúrbio"},
+{nome:"Ilha de Maré - Botelho",regiao:"BTS",lat:-12.75,lng:-38.52,status:"PROPRIA",obs:"BTS"},
+{nome:"Itaparica - Ponta de Areia",regiao:"BTS",lat:-12.89,lng:-38.68,status:"PROPRIA",obs:"BTS"},
+{nome:"Barra Grande",regiao:"BTS",lat:-12.95,lng:-38.7,status:"PROPRIA",obs:"BTS"},
+{nome:"Ilha dos Frades",regiao:"BTS",lat:-12.78,lng:-38.63,status:"PROPRIA",obs:"BTS"},
+{nome:"Madre de Deus",regiao:"BTS",lat:-12.74,lng:-38.62,status:"ATENCAO",obs:"BTS"},
+{nome:"Candeias - Caboto",regiao:"BTS",lat:-12.68,lng:-38.55,status:"ATENCAO",obs:"BTS"},
+{nome:"Saubara",regiao:"BTS",lat:-12.73,lng:-38.76,status:"PROPRIA",obs:"BTS"},
+{nome:"Amoreiras",regiao:"BTS",lat:-12.92,lng:-38.69,status:"PROPRIA",obs:"BTS"},
+{nome:"Salinas da Margarida",regiao:"BTS",lat:-12.87,lng:-38.76,status:"PROPRIA",obs:"BTS"},
+{nome:"Cacha Prego",regiao:"BTS",lat:-12.98,lng:-38.71,status:"PROPRIA",obs:"BTS"},
+{nome:"Ilha de Bom Jesus",regiao:"BTS",lat:-12.79,lng:-38.64,status:"PROPRIA",obs:"BTS"},
+{nome:"Jaguaripe",regiao:"BTS",lat:-12.85,lng:-38.89,status:"PROPRIA",obs:"BTS"},
+{nome:"Arembepe",regiao:"LN",lat:-12.76,lng:-38.17,status:"PROPRIA",obs:"Litoral Norte"},
+{nome:"Jauá",regiao:"LN",lat:-12.69,lng:-38.08,status:"PROPRIA",obs:"Litoral Norte"},
+{nome:"Guarajuba",regiao:"LN",lat:-12.64,lng:-38.06,status:"PROPRIA",obs:"Litoral Norte"},
+{nome:"Itacimirim",regiao:"LN",lat:-12.61,lng:-38.04,status:"PROPRIA",obs:"Litoral Norte"},
+{nome:"Praia do Forte",regiao:"LN",lat:-12.58,lng:-38,status:"PROPRIA",obs:"Litoral Norte"},
+{nome:"Imbassaí",regiao:"LN",lat:-12.49,lng:-37.95,status:"PROPRIA",obs:"Litoral Norte"},
+{nome:"Diogo",regiao:"LN",lat:-12.45,lng:-37.9,status:"PROPRIA",obs:"Litoral Norte"},
+{nome:"Sauípe",regiao:"LN",lat:-12.43,lng:-37.9,status:"PROPRIA",obs:"Litoral Norte"},
+{nome:"Massarandupió",regiao:"LN",lat:-12.38,lng:-37.82,status:"PROPRIA",obs:"Litoral Norte"},
+{nome:"Baixio",regiao:"LN",lat:-12.26,lng:-37.7,status:"PROPRIA",obs:"Litoral Norte"},
+{nome:"Subaúma",regiao:"LN",lat:-12.24,lng:-37.68,status:"PROPRIA",obs:"Litoral Norte"},
+{nome:"Barra do Itariri",regiao:"LN",lat:-11.95,lng:-37.6,status:"PROPRIA",obs:"Litoral Norte"},
+{nome:"Mangue Seco",regiao:"LN",lat:-11.45,lng:-37.35,status:"PROPRIA",obs:"Litoral Norte"},
+{nome:"Sítio do Conde",regiao:"LN",lat:-11.82,lng:-37.55,status:"PROPRIA",obs:"Litoral Norte"},
+{nome:"Morro de São Paulo",regiao:"BS",lat:-13.38,lng:-38.91,status:"PROPRIA",obs:"Baixo Sul"},
+{nome:"Boipeba",regiao:"BS",lat:-13.61,lng:-38.92,status:"PROPRIA",obs:"Baixo Sul"},
+{nome:"Barra Grande - Camamu",regiao:"BS",lat:-13.89,lng:-38.95,status:"PROPRIA",obs:"Baixo Sul"},
+{nome:"Itacaré - Pontal",regiao:"BS",lat:-14.31,lng:-38.99,status:"PROPRIA",obs:"Baixo Sul"},
+{nome:"Jeribucaçu",regiao:"BS",lat:-14.36,lng:-39.02,status:"PROPRIA",obs:"Baixo Sul"},
+{nome:"Serra Grande",regiao:"BS",lat:-14.45,lng:-39.02,status:"PROPRIA",obs:"Baixo Sul"},
+{nome:"Olivença",regiao:"BS",lat:-14.92,lng:-39.02,status:"ATENCAO",obs:"Baixo Sul"},
+{nome:"Back Door",regiao:"BS",lat:-14.79,lng:-39.03,status:"ATENCAO",obs:"Baixo Sul"},
+{nome:"Guaibim",regiao:"BS",lat:-13.3,lng:-38.85,status:"PROPRIA",obs:"Baixo Sul"},
+{nome:"Taipu de Fora",regiao:"BS",lat:-13.91,lng:-38.91,status:"PROPRIA",obs:"Baixo Sul"},
+{nome:"Pratigi",regiao:"BS",lat:-13.73,lng:-38.96,status:"PROPRIA",obs:"Baixo Sul"},
+{nome:"Ilha do Contrato",regiao:"BS",lat:-13.82,lng:-38.95,status:"PROPRIA",obs:"Baixo Sul"},
+{nome:"Taperapuã",regiao:"ES",lat:-16.37,lng:-39.02,status:"PROPRIA",obs:"Extremo Sul"},
+{nome:"Arraial d'Ajuda",regiao:"ES",lat:-16.48,lng:-39.07,status:"PROPRIA",obs:"Extremo Sul"},
+{nome:"Trancoso",regiao:"ES",lat:-16.59,lng:-39.09,status:"PROPRIA",obs:"Extremo Sul"},
+{nome:"Caraíva",regiao:"ES",lat:-16.79,lng:-39.14,status:"PROPRIA",obs:"Extremo Sul"},
+{nome:"Corumbau",regiao:"ES",lat:-17,lng:-39.19,status:"PROPRIA",obs:"Extremo Sul"},
+{nome:"Cumuruxatiba",regiao:"ES",lat:-17.1,lng:-39.21,status:"PROPRIA",obs:"Extremo Sul"},
+{nome:"Alcobaça",regiao:"ES",lat:-17.51,lng:-39.19,status:"PROPRIA",obs:"Extremo Sul"},
+{nome:"Costa Dourada",regiao:"ES",lat:-18.08,lng:-39.55,status:"PROPRIA",obs:"Extremo Sul"},
+{nome:"Nova Viçosa",regiao:"ES",lat:-17.89,lng:-39.37,status:"PROPRIA",obs:"Extremo Sul"},
+{nome:"Coroa Vermelha",regiao:"ES",lat:-16.32,lng:-39,status:"ATENCAO",obs:"Extremo Sul"}
 ];
-
-let map = L.map('map').setView([-13.0, -38.8], 7);
+let map=L.map('map').setView([-13,-38.8],7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
 let markers=[];
-
 function atualizarRelogio(){
-  const agora = new Date();
-  document.getElementById('relogio').textContent = agora.toLocaleTimeString('pt-BR');
-  document.getElementById('data').textContent = agora.toLocaleDateString('pt-BR');
+const agora=new Date();
+document.getElementById('relogio').textContent=agora.toLocaleTimeString('pt-BR');
+document.getElementById('data').textContent=agora.toLocaleDateString('pt-BR');
 }
-setInterval(atualizarRelogio,1000); atualizarRelogio();
-
+setInterval(atualizarRelogio,1000);atualizarRelogio();
 function render(dados){
-  const lista = document.getElementById('lista');
-  lista.innerHTML='';
-  markers.forEach(m=>map.removeLayer(m)); markers=[];
-  document.getElementById('update').textContent = dados.length + ' pontos | AO VIVO';
-  dados.forEach(p=>{
-    const div = document.createElement('div');
-    div.className='card '+p.status;
-    div.innerHTML='<b>'+p.nome+'</b><small>'+p.regiao+' • '+p.obs+' • '+p.status+'</small>';
-    div.onclick=()=>map.setView([p.lat,p.lng],13);
-    lista.appendChild(div);
-    const cor = p.status=='PROPRIA'?'#2ecc71':p.status=='ATENCAO'?'#f1c40f':'#e74c3c';
-    const m = L.circleMarker([p.lat,p.lng],{radius:7,color:cor,fillColor:cor,fillOpacity:.9}).addTo(map).bindPopup('<b>'+p.nome+'</b><br>'+p.regiao+'<br>'+p.status);
-    markers.push(m);
-  });
+const lista=document.getElementById('lista');
+lista.innerHTML='';
+markers.forEach(m=>map.removeLayer(m));markers=[];
+document.getElementById('update').textContent=dados.length+' pontos | AO VIVO';
+dados.forEach(p=>{
+const div=document.createElement('div');
+div.className='card '+p.status;
+div.innerHTML='<b>'+p.nome+'</b><small>'+p.regiao+' • '+p.obs+' • '+p.status+'</small>';
+div.onclick=()=>map.setView([p.lat,p.lng],13);
+lista.appendChild(div);
+const cor=p.status=='PROPRIA'?'#2ecc71':p.status=='ATENCAO'?'#f1c40f':'#e74c3c';
+const m=L.circleMarker([p.lat,p.lng],{radius:7,color:cor,fillColor:cor,fillOpacity:.9}).addTo(map).bindPopup('<b>'+p.nome+'</b><br>'+p.regiao+'<br>'+p.status);
+markers.push(m);
+});
 }
-
 function filtrar(reg){
-  document.querySelectorAll('.filtros button').forEach(b=>b.classList.remove('ativo'));
-  document.getElementById('b-'+reg).classList.add('ativo');
-  if(reg=='TODAS') render(praias);
-  else render(praias.filter(p=>p.regiao==reg));
+document.querySelectorAll('.filtros button').forEach(b=>b.classList.remove('ativo'));
+document.getElementById('b-'+reg).classList.add('ativo');
+if(reg=='TODAS')render(praias);
+else render(praias.filter(p=>p.regiao==reg));
 }
-
 render(praias);
 </script>
 </body>
