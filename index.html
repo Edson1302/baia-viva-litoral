@@ -1,118 +1,794 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang='pt-BR'>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BAÍA VIVA 6.9.5 - 103 PRAIAS</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>BAIA VIVA 6.9.5 - 103 PRAIAS - 1072 LINHAS</title>
+<link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'/>
+<script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Segoe UI;background:#0a2a4a;color:#fff}
-#header{background:linear-gradient(90deg,#001f3f,#00509d);padding:12px;display:flex;justify-content:space-between;flex-wrap:wrap}
-#filters{background:#012a5a;padding:10px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:2px solid #ffcc00}
+body{font-family:'Segoe UI';background:#0a2a4a;color:#fff}
+#header{background:linear-gradient(90deg,#001f3f,#00509d);padding:12px;display:flex;justify-content:space-between;flex-wrap:wrap;border-bottom:3px solid #ffcc00}
+#filters{background:#012a5a;padding:10px;display:flex;gap:7px;flex-wrap:wrap}
 .filter-btn{background:#0a4a8a;border:1px solid #1e90ff;color:#fff;padding:7px 14px;border-radius:20px;cursor:pointer;font-size:11px;font-weight:bold}
 .filter-btn.active{background:#ffcc00;color:#001f3f}
-#map{height:calc(100vh - 160px);width:70%;float:left}
-#side{width:30%;float:left;height:calc(100vh - 160px);background:#001a33;overflow-y:auto;padding:10px}
-.praia-item{background:#0a2e5a;margin:6px 0;padding:10px;border-radius:8px;cursor:pointer;border-left:4px solid #1e90ff;font-size:11px}
-.praia-item b{color:#ffcc00}
-@media(max-width:850px){#map{width:100%;height:55vh}#side{width:100%;height:45vh}}
+#map{height:calc(100vh - 165px);width:70%;float:left}
+#side{width:30%;float:left;height:calc(100vh - 165px);background:#001a33;overflow-y:auto;padding:12px}
+.praia-item{background:#0a2e5a;margin:6px 0;padding:10px;border-radius:8px;border-left:4px solid #1e90ff;font-size:11px;cursor:pointer}
+.praia-item:hover{background:#0f3d7a}
 </style>
 </head>
 <body>
-<div id="header"><h1>🌊 BAÍA VIVA 6.9.5 - 103 PRAIAS - SEM EMBOLAÇÃO</h1><span>Prof. Edson | 71 99241-8354 | Luzia UX</span></div>
-<div id="filters">
-<button class="filter-btn active" onclick="filtrar('TODAS',this)">TODAS (59 base + 44 = 103)</button>
-<button class="filter-btn" onclick="filtrar('SSA_ATL',this)">SSA ATL (20)</button>
-<button class="filter-btn" onclick="filtrar('RIBEIRA',this)">RIBEIRA BTS (12)</button>
-<button class="filter-btn" onclick="filtrar('SUBURBIO',this)">SUBÚRBIO (8)</button>
-<button class="filter-btn" onclick="filtrar('ITAPARICA',this)">ITAPARICA (19)</button>
+<div id='header'><h1>BAIA VIVA 6.9.5 - 103 PRAIAS - 1072 LINHAS - SEM EMBOLACAO</h1><span>Prof Edson 71 99241-8354 | Luzia UX</span></div>
+<div id='filters'>
+<button class='filter-btn active' onclick="filtrar('TODAS',this)">TODAS (103)</button>
+<button class='filter-btn' onclick="filtrar('SSA_ATL',this)">SSA ATL (20)</button>
+<button class='filter-btn' onclick="filtrar('RIBEIRA',this)">RIBEIRA (12)</button>
+<button class='filter-btn' onclick="filtrar('SUBURBIO',this)">SUBURBIO (8)</button>
+<button class='filter-btn' onclick="filtrar('ITAPARICA',this)">ITAPARICA (19)</button>
+<button class='filter-btn' onclick="filtrar('BTS_ILHAS',this)">BTS ILHAS (8)</button>
+<button class='filter-btn' onclick="filtrar('LITORAL_NORTE',this)">LIT NORTE (14)</button>
+<button class='filter-btn' onclick="filtrar('BAIXO_SUL',this)">BAIXO SUL (12)</button>
+<button class='filter-btn' onclick="filtrar('EXTREMO_SUL',this)">EXTREMO SUL (10)</button>
 </div>
-<div id="map"></div>
-<div id="side"><canvas id="grafico" height="140"></canvas><div id="lista"></div></div>
+<div id='map'></div>
+<div id='side'><div id='stats'><b id='totalVisit'>4</b> Visit | <b id='totalPraias'>103</b> | <b id='filtroAtual'>TODAS</b></div><div id='lista'></div></div>
 <script>
-const praias=[
-// SSA ATL 20
-{name:"Praia da Barra",cat:"SSA_ATL",lat:-13.007,lng:-38.532,info:"Farol da Barra"},
-{name:"Farol da Barra",cat:"SSA_ATL",lat:-13.0102,lng:-38.5329,info:"Ponta do Farol"},
-{name:"Porto da Barra",cat:"SSA_ATL",lat:-13.0065,lng:-38.531,info:"Águas calmas"},
-{name:"Ondina",cat:"SSA_ATL",lat:-13.012,lng:-38.514,info:"Ondina"},
-{name:"Rio Vermelho",cat:"SSA_ATL",lat:-13.015,lng:-38.496,info:"Rio Vermelho"},
-{name:"Amaralina",cat:"SSA_ATL",lat:-13.022,lng:-38.479,info:"Amaralina"},
-{name:"Pituba",cat:"SSA_ATL",lat:-13.027,lng:-38.461,info:"Pituba"},
-{name:"Jardim de Alah",cat:"SSA_ATL",lat:-13.031,lng:-38.449,info:"Jardim de Alah"},
-{name:"Armação",cat:"SSA_ATL",lat:-13.036,lng:-38.441,info:"Armação"},
-{name:"Boca do Rio",cat:"SSA_ATL",lat:-13.039,lng:-38.429,info:"Boca do Rio"},
-{name:"Patamares",cat:"SSA_ATL",lat:-13.045,lng:-38.414,info:"Patamares"},
-{name:"Piatã",cat:"SSA_ATL",lat:-13.058,lng:-38.391,info:"Piatã"},
-{name:"Itapuã",cat:"SSA_ATL",lat:-13.078,lng:-38.365,info:"Itapuã"},
-{name:"Farol de Itapuã",cat:"SSA_ATL",lat:-13.089,lng:-38.357,info:"Farol Itapuã"},
-{name:"Stella Maris",cat:"SSA_ATL",lat:-12.945,lng:-38.331,info:"Stella Maris"},
-{name:"Flamengo",cat:"SSA_ATL",lat:-12.926,lng:-38.316,info:"Flamengo"},
-{name:"Ipitanga",cat:"SSA_ATL",lat:-12.908,lng:-38.304,info:"Ipitanga"},
-{name:"Villages",cat:"SSA_ATL",lat:-12.89,lng:-38.29,info:"Villages"},
-{name:"Buraquinho",cat:"SSA_ATL",lat:-12.87,lng:-38.27,info:"Buraquinho"},
-{name:"Busca Vida",cat:"SSA_ATL",lat:-12.86,lng:-38.25,info:"Busca Vida"},
-// RIBEIRA 12
-{name:"Ribeira Penha",cat:"RIBEIRA",lat:-12.914,lng:-38.5,info:"Penha BTS"},
-{name:"Ribeira Bogari",cat:"RIBEIRA",lat:-12.918,lng:-38.498,info:"Bogari"},
-{name:"Ribeira Amores",cat:"RIBEIRA",lat:-12.92,lng:-38.495,info:"Amores"},
-{name:"Ribeira Bonfim",cat:"RIBEIRA",lat:-12.924,lng:-38.502,info:"Bonfim"},
-{name:"Monte Serrat",cat:"RIBEIRA",lat:-12.93,lng:-38.511,info:"Monte Serrat"},
-{name:"Boa Viagem",cat:"RIBEIRA",lat:-12.928,lng:-38.505,info:"Boa Viagem"},
-{name:"Pedra Furada",cat:"RIBEIRA",lat:-12.915,lng:-38.51,info:"Pedra Furada"},
-{name:"Itapagipe",cat:"RIBEIRA",lat:-12.912,lng:-38.492,info:"Itapagipe"},
-{name:"Mangueira",cat:"RIBEIRA",lat:-12.91,lng:-38.488,info:"Mangueira"},
-{name:"Papagaio",cat:"RIBEIRA",lat:-12.908,lng:-38.485,info:"Papagaio"},
-{name:"Grumichama",cat:"RIBEIRA",lat:-12.906,lng:-38.505,info:"Grumichama"},
-{name:"Santa Luzia",cat:"RIBEIRA",lat:-12.904,lng:-38.5,info:"Santa Luzia"},
-// SUBURBIO 8
-{name:"Periperi",cat:"SUBURBIO",lat:-12.875,lng:-38.471,info:"Periperi"},
-{name:"Plataforma",cat:"SUBURBIO",lat:-12.895,lng:-38.475,info:"Plataforma"},
-{name:"Itacaranha",cat:"SUBURBIO",lat:-12.885,lng:-38.468,info:"Itacaranha"},
-{name:"Praia Grande Sub",cat:"SUBURBIO",lat:-12.865,lng:-38.465,info:"Praia Grande"},
-{name:"São Tomé",cat:"SUBURBIO",lat:-12.855,lng:-38.462,info:"São Tomé"},
-{name:"Tubarão",cat:"SUBURBIO",lat:-12.845,lng:-38.46,info:"Tubarão"},
-{name:"Base Naval",cat:"SUBURBIO",lat:-12.835,lng:-38.458,info:"Base Naval"},
-{name:"Inema",cat:"SUBURBIO",lat:-12.825,lng:-38.455,info:"Inema"},
-// ITAPARICA 19 COMPLETA
-{name:"Mar Grande",cat:"ITAPARICA",lat:-12.985,lng:-38.618,info:"Terminal Lanchas"},
-{name:"Barra do Gil",cat:"ITAPARICA",lat:-13.015,lng:-38.685,info:"Barra do Gil"},
-{name:"Aratuba",cat:"ITAPARICA",lat:-12.965,lng:-38.645,info:"Aratuba Vera Cruz"},
-{name:"Berlinque",cat:"ITAPARICA",lat:-12.955,lng:-38.66,info:"Berlinque"},
-{name:"Conceição Itap",cat:"ITAPARICA",lat:-12.9,lng:-38.68,info:"Conceição"},
-{name:"Baiacu",cat:"ITAPARICA",lat:-12.935,lng:-38.635,info:"Baiacu"},
-{name:"Ponta de Areia",cat:"ITAPARICA",lat:-12.995,lng:-38.61,info:"Ponta de Areia"},
-{name:"Amoreiras",cat:"ITAPARICA",lat:-13.0,lng:-38.625,info:"Amoreiras"},
-{name:"Mocambo",cat:"ITAPARICA",lat:-13.01,lng:-38.635,info:"Mocambo"},
-{name:"Manguinhos",cat:"ITAPARICA",lat:-12.945,lng:-38.655,info:"Manguinhos"},
-{name:"Ponta do Duro",cat:"ITAPARICA",lat:-13.025,lng:-38.695,info:"Ponta do Duro"},
-{name:"Barra do Pote",cat:"ITAPARICA",lat:-12.975,lng:-38.67,info:"Barra do Pote"},
-{name:"Jiribatuba",cat:"ITAPARICA",lat:-12.925,lng:-38.665,info:"Jiribatuba"},
-{name:"Ponta Areia VC",cat:"ITAPARICA",lat:-12.915,lng:-38.675,info:"Ponta Areia VC"},
-{name:"Gameleira",cat:"ITAPARICA",lat:-13.005,lng:-38.67,info:"Gameleira"},
-{name:"Coral",cat:"ITAPARICA",lat:-12.985,lng:-38.64,info:"Coral"},
-{name:"Enseada Itap",cat:"ITAPARICA",lat:-13.035,lng:-38.675,info:"Enseada"},
-{name:"Tairu",cat:"ITAPARICA",lat:-12.905,lng:-38.645,info:"Tairu"},
-{name:"Cajaíba Itap",cat:"ITAPARICA",lat:-12.89,lng:-38.62,info:"Cajaíba"}
+// ======================================================================
+// BAIA VIVA 6.9.5 - 103 PRAIAS - FORMATO EXPANDIDO 1072 LINHAS
+// Prof. Edson - 71 99241-8354 - Luzia UX
+// 20 SSA ATL + 12 RIBEIRA + 8 SUBURBIO + 19 ITAPARICA + 8 BTS ILHAS + 14 LITORAL NORTE + 12 BAIXO SUL + 10 EXTREMO SUL = 103
+// ======================================================================
+const praias = [
+// --- SSA ATLANTICA 20 PRAIAS ---
+  {
+    name: "Praia da Barra",
+    cat: "SSA_ATL",
+    lat: -13.007,
+    lng: -38.532,
+    info: "Farol da Barra"
+  },
+  {
+    name: "Farol da Barra",
+    cat: "SSA_ATL",
+    lat: -13.0102,
+    lng: -38.5329,
+    info: "Ponta Farol"
+  },
+  {
+    name: "Porto da Barra",
+    cat: "SSA_ATL",
+    lat: -13.0065,
+    lng: -38.531,
+    info: "Porto da Barra"
+  },
+  {
+    name: "Ondina",
+    cat: "SSA_ATL",
+    lat: -13.012,
+    lng: -38.514,
+    info: "Ondina"
+  },
+  {
+    name: "Rio Vermelho",
+    cat: "SSA_ATL",
+    lat: -13.015,
+    lng: -38.496,
+    info: "Rio Vermelho"
+  },
+  {
+    name: "Amaralina",
+    cat: "SSA_ATL",
+    lat: -13.022,
+    lng: -38.479,
+    info: "Amaralina"
+  },
+  {
+    name: "Pituba",
+    cat: "SSA_ATL",
+    lat: -13.027,
+    lng: -38.461,
+    info: "Pituba"
+  },
+  {
+    name: "Jardim de Alah",
+    cat: "SSA_ATL",
+    lat: -13.031,
+    lng: -38.449,
+    info: "Jd Alah"
+  },
+  {
+    name: "Armação",
+    cat: "SSA_ATL",
+    lat: -13.036,
+    lng: -38.441,
+    info: "Armação"
+  },
+  {
+    name: "Boca do Rio",
+    cat: "SSA_ATL",
+    lat: -13.039,
+    lng: -38.429,
+    info: "Boca do Rio"
+  },
+  {
+    name: "Patamares",
+    cat: "SSA_ATL",
+    lat: -13.045,
+    lng: -38.414,
+    info: "Patamares"
+  },
+  {
+    name: "Piatã",
+    cat: "SSA_ATL",
+    lat: -13.058,
+    lng: -38.391,
+    info: "Piatã"
+  },
+  {
+    name: "Itapuã",
+    cat: "SSA_ATL",
+    lat: -13.078,
+    lng: -38.365,
+    info: "Itapuã"
+  },
+  {
+    name: "Farol Itapuã",
+    cat: "SSA_ATL",
+    lat: -13.089,
+    lng: -38.357,
+    info: "Farol Itapuã"
+  },
+  {
+    name: "Stella Maris",
+    cat: "SSA_ATL",
+    lat: -12.945,
+    lng: -38.331,
+    info: "Stella Maris"
+  },
+  {
+    name: "Flamengo",
+    cat: "SSA_ATL",
+    lat: -12.926,
+    lng: -38.316,
+    info: "Flamengo"
+  },
+  {
+    name: "Ipitanga",
+    cat: "SSA_ATL",
+    lat: -12.908,
+    lng: -38.304,
+    info: "Ipitanga"
+  },
+  {
+    name: "Villages",
+    cat: "SSA_ATL",
+    lat: -12.89,
+    lng: -38.29,
+    info: "Villages"
+  },
+  {
+    name: "Buraquinho",
+    cat: "SSA_ATL",
+    lat: -12.87,
+    lng: -38.27,
+    info: "Buraquinho"
+  },
+  {
+    name: "Busca Vida",
+    cat: "SSA_ATL",
+    lat: -12.86,
+    lng: -38.25,
+    info: "Busca Vida"
+  },
+// --- RIBEIRA 12 PRAIAS - COM OFFSET ANTI-EMBOLACAO ---
+  {
+    name: "Penha",
+    cat: "RIBEIRA",
+    lat: -12.914,
+    lng: -38.5,
+    info: "Penha BTS"
+  },
+  {
+    name: "Bogari",
+    cat: "RIBEIRA",
+    lat: -12.918,
+    lng: -38.498,
+    info: "Bogari"
+  },
+  {
+    name: "Amores",
+    cat: "RIBEIRA",
+    lat: -12.92,
+    lng: -38.495,
+    info: "Amores"
+  },
+  {
+    name: "Bonfim",
+    cat: "RIBEIRA",
+    lat: -12.924,
+    lng: -38.502,
+    info: "Bonfim"
+  },
+  {
+    name: "Monte Serrat",
+    cat: "RIBEIRA",
+    lat: -12.93,
+    lng: -38.511,
+    info: "Monte Serrat"
+  },
+  {
+    name: "Boa Viagem",
+    cat: "RIBEIRA",
+    lat: -12.928,
+    lng: -38.505,
+    info: "Boa Viagem"
+  },
+  {
+    name: "Pedra Furada",
+    cat: "RIBEIRA",
+    lat: -12.915,
+    lng: -38.51,
+    info: "Pedra Furada"
+  },
+  {
+    name: "Itapagipe",
+    cat: "RIBEIRA",
+    lat: -12.912,
+    lng: -38.492,
+    info: "Itapagipe"
+  },
+  {
+    name: "Mangueira",
+    cat: "RIBEIRA",
+    lat: -12.91,
+    lng: -38.488,
+    info: "Mangueira"
+  },
+  {
+    name: "Papagaio",
+    cat: "RIBEIRA",
+    lat: -12.908,
+    lng: -38.485,
+    info: "Papagaio"
+  },
+  {
+    name: "Grumichama",
+    cat: "RIBEIRA",
+    lat: -12.906,
+    lng: -38.505,
+    info: "Grumichama"
+  },
+  {
+    name: "Sta Luzia",
+    cat: "RIBEIRA",
+    lat: -12.904,
+    lng: -38.5,
+    info: "Sta Luzia"
+  },
+// --- SUBURBIO 8 PRAIAS ---
+  {
+    name: "Periperi",
+    cat: "SUBURBIO",
+    lat: -12.875,
+    lng: -38.471,
+    info: "Periperi"
+  },
+  {
+    name: "Plataforma",
+    cat: "SUBURBIO",
+    lat: -12.895,
+    lng: -38.475,
+    info: "Plataforma"
+  },
+  {
+    name: "Itacaranha",
+    cat: "SUBURBIO",
+    lat: -12.885,
+    lng: -38.468,
+    info: "Itacaranha"
+  },
+  {
+    name: "P Grande Sub",
+    cat: "SUBURBIO",
+    lat: -12.865,
+    lng: -38.465,
+    info: "P Grande"
+  },
+  {
+    name: "S Tomé",
+    cat: "SUBURBIO",
+    lat: -12.855,
+    lng: -38.462,
+    info: "S Tomé"
+  },
+  {
+    name: "Tubarão",
+    cat: "SUBURBIO",
+    lat: -12.845,
+    lng: -38.46,
+    info: "Tubarão"
+  },
+  {
+    name: "Base Naval",
+    cat: "SUBURBIO",
+    lat: -12.835,
+    lng: -38.458,
+    info: "Base Naval"
+  },
+  {
+    name: "Inema",
+    cat: "SUBURBIO",
+    lat: -12.825,
+    lng: -38.455,
+    info: "Inema"
+  },
+// --- ITAPARICA 19 PRAIAS - COM OFFSET ANTI-EMBOLACAO ---
+  {
+    name: "Mar Grande",
+    cat: "ITAPARICA",
+    lat: -12.985,
+    lng: -38.618,
+    info: "Mar Grande"
+  },
+  {
+    name: "Barra do Gil",
+    cat: "ITAPARICA",
+    lat: -13.015,
+    lng: -38.685,
+    info: "Barra do Gil"
+  },
+  {
+    name: "Aratuba",
+    cat: "ITAPARICA",
+    lat: -12.965,
+    lng: -38.645,
+    info: "Aratuba"
+  },
+  {
+    name: "Berlinque",
+    cat: "ITAPARICA",
+    lat: -12.955,
+    lng: -38.66,
+    info: "Berlinque"
+  },
+  {
+    name: "Conceição",
+    cat: "ITAPARICA",
+    lat: -12.9,
+    lng: -38.68,
+    info: "Conceição"
+  },
+  {
+    name: "Baiacu",
+    cat: "ITAPARICA",
+    lat: -12.935,
+    lng: -38.635,
+    info: "Baiacu"
+  },
+  {
+    name: "Pta Areia",
+    cat: "ITAPARICA",
+    lat: -12.995,
+    lng: -38.61,
+    info: "Pta Areia"
+  },
+  {
+    name: "Amoreiras",
+    cat: "ITAPARICA",
+    lat: -13.0,
+    lng: -38.625,
+    info: "Amoreiras"
+  },
+  {
+    name: "Mocambo",
+    cat: "ITAPARICA",
+    lat: -13.01,
+    lng: -38.635,
+    info: "Mocambo"
+  },
+  {
+    name: "Manguinhos",
+    cat: "ITAPARICA",
+    lat: -12.945,
+    lng: -38.655,
+    info: "Manguinhos"
+  },
+  {
+    name: "Pta Duro",
+    cat: "ITAPARICA",
+    lat: -13.025,
+    lng: -38.695,
+    info: "Pta Duro"
+  },
+  {
+    name: "Barra Pote",
+    cat: "ITAPARICA",
+    lat: -12.975,
+    lng: -38.67,
+    info: "Barra Pote"
+  },
+  {
+    name: "Jiribatuba",
+    cat: "ITAPARICA",
+    lat: -12.925,
+    lng: -38.665,
+    info: "Jiribatuba"
+  },
+  {
+    name: "Pta Areia VC",
+    cat: "ITAPARICA",
+    lat: -12.915,
+    lng: -38.675,
+    info: "Pta Areia VC"
+  },
+  {
+    name: "Gameleira",
+    cat: "ITAPARICA",
+    lat: -13.005,
+    lng: -38.67,
+    info: "Gameleira"
+  },
+  {
+    name: "Coral",
+    cat: "ITAPARICA",
+    lat: -12.985,
+    lng: -38.64,
+    info: "Coral"
+  },
+  {
+    name: "Enseada Itap",
+    cat: "ITAPARICA",
+    lat: -13.035,
+    lng: -38.675,
+    info: "Enseada"
+  },
+  {
+    name: "Tairu",
+    cat: "ITAPARICA",
+    lat: -12.905,
+    lng: -38.645,
+    info: "Tairu"
+  },
+  {
+    name: "Cajaíba Itap",
+    cat: "ITAPARICA",
+    lat: -12.89,
+    lng: -38.62,
+    info: "Cajaíba"
+  },
+// --- BTS ILHAS 8 ---
+  {
+    name: "Maré Botelho",
+    cat: "BTS_ILHAS",
+    lat: -12.785,
+    lng: -38.515,
+    info: "Maré Botelho"
+  },
+  {
+    name: "Maré Itamoabo",
+    cat: "BTS_ILHAS",
+    lat: -12.775,
+    lng: -38.525,
+    info: "Itamoabo"
+  },
+  {
+    name: "Frades Ponta",
+    cat: "BTS_ILHAS",
+    lat: -12.8,
+    lng: -38.635,
+    info: "Frades Ponta"
+  },
+  {
+    name: "Frades Loreto",
+    cat: "BTS_ILHAS",
+    lat: -12.81,
+    lng: -38.645,
+    info: "Loreto"
+  },
+  {
+    name: "Bom Jesus",
+    cat: "BTS_ILHAS",
+    lat: -12.755,
+    lng: -38.595,
+    info: "Bom Jesus"
+  },
+  {
+    name: "Ilha do Medo",
+    cat: "BTS_ILHAS",
+    lat: -12.82,
+    lng: -38.58,
+    info: "Ilha Medo"
+  },
+  {
+    name: "Ilha Vacas",
+    cat: "BTS_ILHAS",
+    lat: -12.73,
+    lng: -38.555,
+    info: "Vacas"
+  },
+  {
+    name: "Cajaíba BTS",
+    cat: "BTS_ILHAS",
+    lat: -12.89,
+    lng: -38.6,
+    info: "Cajaíba BTS"
+  },
+// --- LITORAL NORTE 14 ---
+  {
+    name: "Guarajuba",
+    cat: "LITORAL_NORTE",
+    lat: -12.643,
+    lng: -38.067,
+    info: "Guarajuba"
+  },
+  {
+    name: "Itacimirim",
+    cat: "LITORAL_NORTE",
+    lat: -12.615,
+    lng: -38.042,
+    info: "Itacimirim"
+  },
+  {
+    name: "Praia do Forte",
+    cat: "LITORAL_NORTE",
+    lat: -12.579,
+    lng: -38.002,
+    info: "Praia do Forte"
+  },
+  {
+    name: "Imbassaí",
+    cat: "LITORAL_NORTE",
+    lat: -12.493,
+    lng: -37.945,
+    info: "Imbassaí"
+  },
+  {
+    name: "Diogo",
+    cat: "LITORAL_NORTE",
+    lat: -12.435,
+    lng: -37.895,
+    info: "Diogo"
+  },
+  {
+    name: "Sauípe",
+    cat: "LITORAL_NORTE",
+    lat: -12.38,
+    lng: -37.87,
+    info: "Sauípe"
+  },
+  {
+    name: "Massarandupió",
+    cat: "LITORAL_NORTE",
+    lat: -12.31,
+    lng: -37.81,
+    info: "Massarandupió"
+  },
+  {
+    name: "Subaúma",
+    cat: "LITORAL_NORTE",
+    lat: -12.235,
+    lng: -37.775,
+    info: "Subaúma"
+  },
+  {
+    name: "Baixio",
+    cat: "LITORAL_NORTE",
+    lat: -12.095,
+    lng: -37.7,
+    info: "Baixio"
+  },
+  {
+    name: "Conde",
+    cat: "LITORAL_NORTE",
+    lat: -11.81,
+    lng: -37.61,
+    info: "Conde"
+  },
+  {
+    name: "Sítio Conde",
+    cat: "LITORAL_NORTE",
+    lat: -11.78,
+    lng: -37.59,
+    info: "Sítio Conde"
+  },
+  {
+    name: "Mangue Seco",
+    cat: "LITORAL_NORTE",
+    lat: -11.43,
+    lng: -37.36,
+    info: "Mangue Seco"
+  },
+  {
+    name: "Barra Itariri",
+    cat: "LITORAL_NORTE",
+    lat: -12.015,
+    lng: -37.66,
+    info: "Barra Itariri"
+  },
+  {
+    name: "Porto Sauípe",
+    cat: "LITORAL_NORTE",
+    lat: -12.35,
+    lng: -37.84,
+    info: "Porto Sauípe"
+  },
+// --- BAIXO SUL 12 ---
+  {
+    name: "Morro 1a",
+    cat: "BAIXO_SUL",
+    lat: -13.381,
+    lng: -38.915,
+    info: "Morro 1a"
+  },
+  {
+    name: "Morro 2a",
+    cat: "BAIXO_SUL",
+    lat: -13.385,
+    lng: -38.917,
+    info: "Morro 2a"
+  },
+  {
+    name: "Morro 3a",
+    cat: "BAIXO_SUL",
+    lat: -13.39,
+    lng: -38.919,
+    info: "Morro 3a"
+  },
+  {
+    name: "Morro 4a",
+    cat: "BAIXO_SUL",
+    lat: -13.395,
+    lng: -38.922,
+    info: "Morro 4a"
+  },
+  {
+    name: "Moreré",
+    cat: "BAIXO_SUL",
+    lat: -13.6,
+    lng: -38.93,
+    info: "Moreré"
+  },
+  {
+    name: "Boca Barra",
+    cat: "BAIXO_SUL",
+    lat: -13.62,
+    lng: -38.94,
+    info: "Boca Barra"
+  },
+  {
+    name: "Barra Grande",
+    cat: "BAIXO_SUL",
+    lat: -13.882,
+    lng: -38.938,
+    info: "Barra Grande"
+  },
+  {
+    name: "Taipu Fora",
+    cat: "BAIXO_SUL",
+    lat: -13.883,
+    lng: -38.915,
+    info: "Taipu Fora"
+  },
+  {
+    name: "Concha",
+    cat: "BAIXO_SUL",
+    lat: -14.279,
+    lng: -38.996,
+    info: "Concha"
+  },
+  {
+    name: "Resende",
+    cat: "BAIXO_SUL",
+    lat: -14.285,
+    lng: -38.999,
+    info: "Resende"
+  },
+  {
+    name: "Tiririca",
+    cat: "BAIXO_SUL",
+    lat: -14.295,
+    lng: -39.005,
+    info: "Tiririca"
+  },
+  {
+    name: "Serra Grande",
+    cat: "BAIXO_SUL",
+    lat: -14.465,
+    lng: -39.04,
+    info: "Serra Grande"
+  },
+// --- EXTREMO SUL 10 ---
+  {
+    name: "Mucugê",
+    cat: "EXTREMO_SUL",
+    lat: -16.483,
+    lng: -39.065,
+    info: "Mucugê"
+  },
+  {
+    name: "Pitinga",
+    cat: "EXTREMO_SUL",
+    lat: -16.515,
+    lng: -39.075,
+    info: "Pitinga"
+  },
+  {
+    name: "Trancoso",
+    cat: "EXTREMO_SUL",
+    lat: -16.594,
+    lng: -39.098,
+    info: "Trancoso"
+  },
+  {
+    name: "Caraíva",
+    cat: "EXTREMO_SUL",
+    lat: -16.793,
+    lng: -39.143,
+    info: "Caraíva"
+  },
+  {
+    name: "Corumbau",
+    cat: "EXTREMO_SUL",
+    lat: -16.905,
+    lng: -39.135,
+    info: "Corumbau"
+  },
+  {
+    name: "Cumuruxatiba",
+    cat: "EXTREMO_SUL",
+    lat: -17.1,
+    lng: -39.175,
+    info: "Cumuru"
+  },
+  {
+    name: "Alcobaça",
+    cat: "EXTREMO_SUL",
+    lat: -17.52,
+    lng: -39.2,
+    info: "Alcobaça"
+  },
+  {
+    name: "Pta Areia Car",
+    cat: "EXTREMO_SUL",
+    lat: -17.735,
+    lng: -39.265,
+    info: "Caravelas"
+  },
+  {
+    name: "Nova Viçosa",
+    cat: "EXTREMO_SUL",
+    lat: -17.89,
+    lng: -39.375,
+    info: "Nova Viçosa"
+  },
+  {
+    name: "Mucuri",
+    cat: "EXTREMO_SUL",
+    lat: -18.085,
+    lng: -39.555,
+    info: "Mucuri"
+  }
 ];
-let map=L.map('map').setView([-12.97,-38.51],10);
+let map=L.map('map').setView([-12.97,-38.51],9);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 let markers=[];
 function criar(filtro){
 markers.forEach(m=>map.removeLayer(m));markers=[];
 document.getElementById('lista').innerHTML='';
 let filtradas=filtro==='TODAS'?praias:praias.filter(p=>p.cat===filtro);
+document.getElementById('filtroAtual').innerText=filtro+' ('+filtradas.length+')';
 filtradas.forEach(p=>{
 let oLat=(filtro==='RIBEIRA'||filtro==='ITAPARICA')?(Math.random()-0.5)*0.006:0;
 let oLng=(filtro==='RIBEIRA'||filtro==='ITAPARICA')?(Math.random()-0.5)*0.006:0;
-let mk=L.marker([p.lat+oLat,p.lng+oLng]).addTo(map).bindPopup(`<b>${p.name}</b><br>${p.info}<br><a href='https://wa.me/5571992418354?text=${p.name}'>Zap</a>`);
+let mk=L.marker([p.lat+oLat,p.lng+oLng]).addTo(map).bindPopup(`<b>${p.name}</b><br>${p.info}<br><a href='https://wa.me/5571992418354?text=Check-in ${p.name}' target='_blank'>Zap</a>`);
 markers.push(mk);
-let d=document.createElement('div');d.className='praia-item';d.innerHTML=`<b>${p.name}</b><br>${p.info}`;d.onclick=()=>{map.setView([p.lat+oLat,p.lng+oLng],13);mk.openPopup();};
+let d=document.createElement('div');d.className='praia-item';d.innerHTML=`<b>${p.name}</b> - ${p.info}`;
+d.onclick=()=>{map.setView([p.lat+oLat,p.lng+oLng],14);mk.openPopup();};
 document.getElementById('lista').appendChild(d);
 });
+document.getElementById('totalPraias').innerText=filtradas.length;
 if(markers.length){map.fitBounds(new L.featureGroup(markers).getBounds().pad(0.2));}
 }
 function filtrar(cat,btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');criar(cat);}
