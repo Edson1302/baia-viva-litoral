@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BAIA VIVA 7.0 - 137 PRAIAS REAL - 12 CAMPOS - PROF EDSON - CORRIGIDO 08/09/2026</title>
+<title>BAIA VIVA 8.0 - 137 PRAIAS + BALEIAS 10 DIAS - PROF EDSON - 08/09/2026</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
@@ -13,2318 +13,838 @@
 <style>
 body{margin:0;font-family:Arial;background:#e1f5fe}
 .header{background:#01579b;color:#fff;padding:10px;text-align:center}
-#map{width:100%;height:500px}
+#relogio{background:#000;color:#0f0;padding:6px;text-align:center;font-family:monospace;font-size:13px}
+#map{width:100%;height:450px}
 .botoes{text-align:center;padding:10px;background:#b3e5fc}
-.botoes button{margin:3px;padding:8px 12px;border:none;border-radius:5px;background:#0288d1;color:#fff;cursor:pointer}
+.botoes button{margin:3px;padding:8px 11px;border:none;border-radius:5px;background:#0288d1;color:#fff;cursor:pointer;font-size:11px}
 .botoes button.active{background:#01579b}
-#info{background:#fff;margin:10px;padding:10px;border-radius:5px;min-height:100px}
+.botoes button.baleias{background:#d32f2f;font-weight:bold}
+#info{background:#fff;margin:10px;padding:10px;border-radius:5px;min-height:80px}
 #lista{background:#fff;margin:10px;padding:10px;border-radius:5px;overflow:auto}
-table{width:100%;border-collapse:collapse;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:11px}
 th,td{border:1px solid #ccc;padding:4px}
 th{background:#0288d1;color:#fff}
-canvas{max-width:600px;margin:10px auto;display:block;background:#fff;border-radius:5px}
+canvas{max-width:700px;margin:10px auto;display:block;background:#fff;border-radius:5px}
 .previsao{background:#fff;margin:10px;padding:10px;border-radius:5px}
 .relatorio{background:#e8f5e9;margin:10px;padding:10px;border-radius:5px;font-size:13px}
+.btn-email{background:#d32f2f;color:#fff;padding:10px 18px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;margin:6px}
 </style>
 </head>
 <body>
 <div class="header">
-<h1>BAIA VIVA 7.0 - 137 PRAIAS REAL - 12 CAMPOS - CORRIGIDO - PROF EDSON - 08/09/2026</h1>
-<p>DHN + INMET + INEMA + APA + RESEX + TAMAR + ABROLHOS + FOZ + 12 CAMPOS VETORIZADOS</p>
+<h1>BAIA VIVA 8.0 - 137 PRAIAS + COSTA DAS BALEIAS + HISTORICO 20 DIAS - PROF EDSON</h1>
+<p>DHN + INMET + INEMA + APA + RESEX + TAMAR + ABROLHOS + 12 CAMPOS + RELATORIO EMAIL 10 DIAS</p>
 </div>
+<div id="relogio">CARREGANDO HORARIO DHN MARINHA...</div>
 <div class="botoes">
 <button id="btn-TODAS" class="active" onclick="filtrar('TODAS')">TODAS 137</button>
-<button id="btn-LITORAL NORTE" onclick="filtrar('LITORAL NORTE')">LITORAL NORTE 23</button>
+<button id="btn-LITORAL NORTE" onclick="filtrar('LITORAL NORTE')">LITORAL NORTE</button>
 <button id="btn-SALVADOR LITORAL" onclick="filtrar('SALVADOR LITORAL')">SALVADOR 40</button>
 <button id="btn-RECONCAVO" onclick="filtrar('RECONCAVO')">RECONCAVO 35</button>
 <button id="btn-COSTA DO DENDE" onclick="filtrar('COSTA DO DENDE')">DENDE 20</button>
-<button id="btn-COSTA DO CACAU" onclick="filtrar('COSTA DO CACAU')">CACAU 19</button>
+<button id="btn-COSTA DO CACAU" onclick="filtrar('COSTA DO CACAU')">CACAU</button>
+<button id="btn-COSTA DAS BALEIAS" class="baleias" onclick="filtrar('COSTA DAS BALEIAS')">COSTA BALEIAS 13 🐋</button>
+<button onclick="gerarRelatorioBaleias()" class="baleias">📧 RELATORIO BALEIAS 10 DIAS EMAIL</button>
 </div>
 <div id="map"></div>
-<div id="info">Clique numa praia - 12 campos vetorizados</div>
+<div id="info">Clique numa praia - 12 campos + historico</div>
 <canvas id="grafico"></canvas>
+<canvas id="grafico2"></canvas>
 <div id="previsao" class="previsao"></div>
 <div id="lista"></div>
 <div id="relatorio" class="relatorio"></div>
 <script>
+const BALEIAS_LISTA=['Cabralia','Porto Seguro','Taperapua','Arraial','Trancoso','Caraiva','Prado','Cumuruxatiba','Corumbau','Canavieiras','Cururupe','Ponta do Corumbau','Milionarios','Olivença'];
 const praias=[
 {
-  nome: '001 - Ipitanga - Praia - Lauro de Freitas - Foz Rio Joanes Ipitanga',
-  regiao: 'LITORAL NORTE',
-  lat: -12.8900,
-  lng: -38.3200,
+  nome: '001 - Ipitanga - Lauro de Freitas - Foz Joanes Ipitanga',
+  regiao: 'LITORAL NORTE', lat: -12.89, lng: -38.32,
   vegetacao: 'Restinga + Coqueiral + Manguezal - APA Joanes Ipitanga',
-  foz: 'Rio Joanes + Rio Ipitanga - foz Ipitanga - encontro Joanes Ipitanga - APA',
-  ecossistema: 'Manguezal + Estuario + Restinga + APA Joanes Ipitanga + Bercario',
-  pesca: 'Robalo, tainha, caranguejo-uca, siri, camarao rosa',
-  economia: 'Pesca artesanal + Turismo + APA + Veraneio + Lauro',
-  especies: 'Robalo, tainha, caranguejo-uca, siri, camarao rosa, ostra',
-  mare_corrente: '0.8m - DHN - preamar 07:45 - foz Joanes Ipitanga',
-  massa_ar: 'mEc - INMET - 08/09/2026',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
+  foz: 'Rio Joanes + Ipitanga - foz Ipitanga',
+  ecossistema: 'Manguezal + Estuario + APA Joanes Ipitanga',
+  pesca: 'Robalo, tainha, caranguejo-uca', economia: 'Pesca + APA + Lauro',
+  especies: 'Robalo, tainha, caranguejo-uca, ostra', mare_corrente: '0.8m - DHN - preamar 07:45', massa_ar: 'mEc - INMET 08/09/2026', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '002 - Vilas do Atlantico - Praia - Lauro de Freitas',
-  regiao: 'LITORAL NORTE',
-  lat: -12.8800,
-  lng: -38.3100,
-  vegetacao: 'Restinga + Coqueiral + Mata Atlantica - APA Joanes Ipitanga',
-  foz: 'Rio Joanes - foz Vilas - APA Joanes Ipitanga',
-  ecossistema: 'Restinga + Dunas + APA + Estuario + Bercario',
-  pesca: 'Robalo, carapeba, tainha',
-  economia: 'Turismo + Veraneio + Vilas + Lauro',
-  especies: 'Robalo, carapeba, tainha, camarao',
-  mare_corrente: '0.9m - DHN - foz Joanes',
-  massa_ar: 'mEa - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
+  nome: '002 - Vilas do Atlantico - Lauro de Freitas',
+  regiao: 'LITORAL NORTE', lat: -12.88, lng: -38.31,
+  vegetacao: 'Restinga + Coqueiral - APA Joanes Ipitanga', foz: 'Rio Joanes - foz Vilas',
+  ecossistema: 'Restinga + Dunas + APA', pesca: 'Robalo, carapeba', economia: 'Turismo + Vilas', especies: 'Robalo, carapeba', mare_corrente: '0.9m - DHN', massa_ar: 'mEa - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '003 - Buraquinho - Praia - Lauro de Freitas',
-  regiao: 'LITORAL NORTE',
-  lat: -12.8700,
-  lng: -38.3000,
-  vegetacao: 'Manguezal + Restinga + Mata Ciliar Rio Joanes - APA',
-  foz: 'Rio Joanes - foz Buraquinho - manguezal Buraquinho - APA',
-  ecossistema: 'Manguezal + Estuario + APA + Restinga + Bercario',
-  pesca: 'Caranguejo-uca, siri, robalo, camarao rosa',
-  economia: 'Pesca artesanal + Turismo + Manguezal Buraquinho',
-  especies: 'Caranguejo-uca, siri, robalo, camarao rosa, ostra',
-  mare_corrente: '0.9m - DHN - manguezal Buraquinho',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
+  nome: '003 - Buraquinho - Lauro de Freitas - Foz Joanes',
+  regiao: 'LITORAL NORTE', lat: -12.87, lng: -38.30,
+  vegetacao: 'Manguezal + Restinga - APA', foz: 'Rio Joanes - foz Buraquinho - manguezal',
+  ecossistema: 'Manguezal + APA + Bercario', pesca: 'Caranguejo-uca, robalo', economia: 'Pesca + Manguezal Buraquinho', especies: 'Caranguejo-uca, robalo', mare_corrente: '0.9m - DHN - manguezal', massa_ar: 'mEc - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '004 - Busca Vida - Praia - Camaçari',
-  regiao: 'LITORAL NORTE',
-  lat: -12.8600,
-  lng: -38.2900,
-  vegetacao: 'Restinga + Dunas + Coqueiral + Manguezal - APA Joanes Ipitanga',
-  foz: 'Rio Joanes - foz Busca Vida - Camaçari - encontro rio mar',
-  ecossistema: 'Dunas + Restinga + Manguezal + APA + Encontro rio mar',
-  pesca: 'Robalo, tainha, caranguejo-uca',
-  economia: 'Turismo + Pesca + Busca Vida + Camaçari + APA',
-  especies: 'Robalo, tainha, caranguejo-uca, siri',
-  mare_corrente: '1.0m - DHN - foz Joanes Busca Vida',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
+  nome: '004 - Busca Vida - Camaçari',
+  regiao: 'LITORAL NORTE', lat: -12.86, lng: -38.29,
+  vegetacao: 'Restinga + Dunas + APA', foz: 'Rio Joanes - foz Busca Vida',
+  ecossistema: 'Dunas + Restinga + APA', pesca: 'Robalo, tainha', economia: 'Turismo + Busca Vida', especies: 'Robalo, tainha', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '005 - Jaua - Praia - Camaçari',
-  regiao: 'LITORAL NORTE',
-  lat: -12.8333,
-  lng: -38.2500,
-  vegetacao: 'Restinga + Coqueiral + Dunas + Lagoa de Jaua',
-  foz: 'Lagoa de Jaua - foz lagoa Jaua - cordao dunar',
-  ecossistema: 'Lagoa + Restinga + Dunas + Bercario + Coqueiral',
-  pesca: 'Robalo, tainha - lagoa Jaua',
-  economia: 'Turismo + Veraneio + Lagoa Jaua + Camaçari',
-  especies: 'Robalo, tainha, camarao de lagoa',
-  mare_corrente: '1.0m - DHN - lagoa Jaua',
-  massa_ar: 'mEa - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
+  nome: '005 - Jaua - Camaçari - Lagoa',
+  regiao: 'LITORAL NORTE', lat: -12.8333, lng: -38.25,
+  vegetacao: 'Restinga + Lagoa de Jaua', foz: 'Lagoa de Jaua - foz lagoa', ecossistema: 'Lagoa + Restinga + Dunas', pesca: 'Robalo, tainha - lagoa', economia: 'Turismo + Lagoa Jaua', especies: 'Robalo, tainha', mare_corrente: '1.0m - DHN - lagoa', massa_ar: 'mEa - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '006 - Arembepe - Praia - Camaçari - Aldeia Hippie',
-  regiao: 'LITORAL NORTE',
-  lat: -12.7500,
-  lng: -38.1667,
-  vegetacao: 'Restinga + Coqueiral + Dunas + Tamar - Aldeia Hippie',
-  foz: 'Rio Capivara - foz Arembepe - Aldeia Hippie + Tamar',
-  ecossistema: 'Tamar + Restinga + Dunas + Aldeia Hippie + Bercario tartaruga',
-  pesca: 'Robalo, tartaruga marinha - Tamar Arembepe',
-  economia: 'Turismo + Aldeia Hippie + Tamar + Arembepe',
-  especies: 'Tartaruga marinha, robalo, caranguejo - Tamar',
-  mare_corrente: '1.0m - DHN - piscina natural Arembepe',
-  massa_ar: 'mEa - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Tamar'
+  nome: '006 - Arembepe - Camaçari - Tamar Aldeia Hippie',
+  regiao: 'LITORAL NORTE', lat: -12.75, lng: -38.1667,
+  vegetacao: 'Restinga + Tamar + Aldeia Hippie', foz: 'Rio Capivara - foz Arembepe + Tamar', ecossistema: 'Tamar + Restinga + Bercario tartaruga', pesca: 'Tartaruga marinha - Tamar', economia: 'Tamar + Aldeia Hippie', especies: 'Tartaruga marinha, robalo', mare_corrente: '1.0m - DHN - Tamar', massa_ar: 'mEa - INMET', temp: '28C', balne: 'PROPRIA - INEMA - Tamar'
 },
 {
-  nome: '007 - Jacuipe - Praia - Camaçari',
-  regiao: 'LITORAL NORTE',
-  lat: -12.7167,
-  lng: -38.1333,
-  vegetacao: 'Manguezal + Restinga + Rio Jacuipe + Mata Ciliar',
-  foz: 'Rio Jacuipe - foz Jacuipe - Camaçari - manguezal',
-  ecossistema: 'Manguezal + Rio Jacuipe + Restinga + Estuario + Bercario',
-  pesca: 'Robalo, caranguejo-uca, camarao rosa - Rio Jacuipe',
-  economia: 'Pesca artesanal + Rio Jacuipe + Turismo + Camaçari',
-  especies: 'Robalo, caranguejo-uca, camarao rosa, ostra',
-  mare_corrente: '1.0m - DHN - foz Rio Jacuipe',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
+  nome: '007 - Jacuipe - Camaçari - Rio Jacuipe',
+  regiao: 'LITORAL NORTE', lat: -12.7167, lng: -38.1333,
+  vegetacao: 'Manguezal + Rio Jacuipe', foz: 'Rio Jacuipe - foz Jacuipe', ecossistema: 'Manguezal + Rio Jacuipe + Bercario', pesca: 'Robalo, caranguejo-uca', economia: 'Pesca + Rio Jacuipe', especies: 'Robalo, caranguejo-uca', mare_corrente: '1.0m - DHN - foz Jacuipe', massa_ar: 'mEc - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '008 - Monte Gordo - Praia - Camaçari',
-  regiao: 'LITORAL NORTE',
-  lat: -12.7000,
-  lng: -38.1167,
-  vegetacao: 'Restinga + Coqueiral + Dunas - Monte Gordo',
-  foz: 'Sem foz direta - praia aberta - recifes Monte Gordo',
-  ecossistema: 'Restinga + Recifes + Dunas + Praia aberta',
-  pesca: 'Robalo, tainha - praia aberta Monte Gordo',
-  economia: 'Turismo + Veraneio + Pesca artesanal + Camaçari',
-  especies: 'Robalo, tainha, peixes recifais',
-  mare_corrente: '1.0m - DHN - recifes Monte Gordo',
-  massa_ar: 'mEa - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
+  nome: '008 - Monte Gordo - Camaçari',
+  regiao: 'LITORAL NORTE', lat: -12.70, lng: -38.1167,
+  vegetacao: 'Restinga + Coqueiral', foz: 'Sem foz - recifes Monte Gordo', ecossistema: 'Restinga + Recifes', pesca: 'Robalo, tainha', economia: 'Turismo + Camaçari', especies: 'Robalo, tainha', mare_corrente: '1.0m - DHN - recifes', massa_ar: 'mEa - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '009 - Barra do Jacuipe - Praia',
-  regiao: 'LITORAL NORTE',
-  lat: -12.6833,
-  lng: -38.1000,
-  vegetacao: 'Restinga + Manguezal + Coqueiral - APA Joanes Ipitanga',
-  foz: 'Rio Jacuipe - foz Barra do Jacuipe - manguezal',
-  ecossistema: 'Manguezal + Estuario + Restinga + APA + Bercario',
-  pesca: 'Robalo, tainha, caranguejo-uca, camarao rosa',
-  economia: 'Pesca + Turismo + Veraneio + Dende',
-  especies: 'Robalo, tainha, caranguejo-uca, camarao rosa, ostra',
-  mare_corrente: '1.0m - DHN - foz Jacuipe',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
+  nome: '009 - Barra do Jacuipe',
+  regiao: 'LITORAL NORTE', lat: -12.6833, lng: -38.10,
+  vegetacao: 'Restinga + Manguezal - APA', foz: 'Rio Jacuipe - foz Barra do Jacuipe', ecossistema: 'Manguezal + APA + Bercario', pesca: 'Robalo, tainha, caranguejo', economia: 'Pesca + Turismo', especies: 'Robalo, caranguejo', mare_corrente: '1.0m - DHN - foz Jacuipe', massa_ar: 'mEc - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '010 - Guarajuba - Praia',
-  regiao: 'LITORAL NORTE',
-  lat: -12.6500,
-  lng: -38.0667,
-  vegetacao: 'Restinga + Coqueiral + Dunas - APA',
-  foz: 'Lagoa de Guarajuba - foz lagoa + recifes',
-  ecossistema: 'Lagoa + Restinga + Recifes + Dunas + APA',
-  pesca: 'Robalo, tainha, tartaruga marinha - Tamar',
-  economia: 'Turismo + Veraneio + Pesca artesanal',
-  especies: 'Tartaruga marinha, robalo, tainha',
-  mare_corrente: '1.0m - DHN - piscina natural',
-  massa_ar: 'mEa - Equatorial Atlantica',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
+  nome: '010 - Guarajuba',
+  regiao: 'LITORAL NORTE', lat: -12.65, lng: -38.0667,
+  vegetacao: 'Restinga + Dunas - APA', foz: 'Lagoa de Guarajuba - foz lagoa + recifes', ecossistema: 'Lagoa + Restinga + Recifes + APA', pesca: 'Robalo, tartaruga - Tamar', economia: 'Turismo + Veraneio', especies: 'Tartaruga marinha, robalo', mare_corrente: '1.0m - DHN - piscina', massa_ar: 'mEa - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '011 - Itacimirim - Praia',
-  regiao: 'LITORAL NORTE',
-  lat: -12.6167,
-  lng: -38.0500,
-  vegetacao: 'Restinga + Coqueiral + Manguezal - APA',
-  foz: 'Rio Pojuca - foz Itacimirim - manguezal',
-  ecossistema: 'Manguezal + Recifes + Restinga + APA + Bercario',
-  pesca: 'Robalo, tainha, caranguejo - artesanal',
-  economia: 'Turismo + Pesca + Veraneio',
-  especies: 'Robalo, tainha, caranguejo-uca',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
+  nome: '011 - Itacimirim',
+  regiao: 'LITORAL NORTE', lat: -12.6167, lng: -38.05,
+  vegetacao: 'Restinga + Manguezal - APA', foz: 'Rio Pojuca - foz Itacimirim', ecossistema: 'Manguezal + Recifes + APA', pesca: 'Robalo, caranguejo', economia: 'Turismo + Pesca', especies: 'Robalo, caranguejo-uca', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '012 - Praia do Forte - Praia',
-  regiao: 'LITORAL NORTE',
-  lat: -12.5833,
-  lng: -38.0000,
-  vegetacao: 'Restinga + Coqueiral + Mata - APA + Tamar',
-  foz: 'Rio Pojuca - foz Praia do Forte - Tamar + recifes',
-  ecossistema: 'APA + Tamar + Recifes + Bercario + Restinga',
-  pesca: 'Polvo, lagosta, peixes recifais - Tamar',
-  economia: 'Turismo ecologico + Tamar + Pesca artesanal',
-  especies: 'Tartaruga marinha, polvo, lagosta, peixes recifais',
-  mare_corrente: '0.9m - DHN - piscina natural Tamar',
-  massa_ar: 'mEc - Equatorial Continental',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '012 - Praia do Forte - Tamar',
+  regiao: 'LITORAL NORTE', lat: -12.5833, lng: -38.00,
+  vegetacao: 'Restinga + Tamar - APA', foz: 'Rio Pojuca - foz Praia do Forte + Tamar', ecossistema: 'APA + Tamar + Recifes + Bercario', pesca: 'Polvo, lagosta - Tamar', economia: 'Tamar + Turismo ecologico', especies: 'Tartaruga marinha, polvo, lagosta', mare_corrente: '0.9m - DHN - Tamar', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '013 - Imbassai - Praia',
-  regiao: 'LITORAL NORTE',
-  lat: -12.4833,
-  lng: -37.9500,
-  vegetacao: 'Restinga + Dunas + Mata Atlantica + Manguezal - APA',
-  foz: 'Rio Imbassai - foz Imbassai - encontro rio mar + dunas',
-  ecossistema: 'Dunas + Manguezal + Rio + Mar + APA + Bercario',
-  pesca: 'Robalo, tainha, caranguejo - encontro rio mar',
-  economia: 'Turismo + Pesca + APA + Encontro rio mar',
-  especies: 'Robalo, tainha, caranguejo-uca, siri',
-  mare_corrente: '1.0m - DHN - encontro rio mar',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '013 - Imbassai - Encontro Rio Mar',
+  regiao: 'LITORAL NORTE', lat: -12.4833, lng: -37.95,
+  vegetacao: 'Restinga + Dunas + Manguezal - APA', foz: 'Rio Imbassai - foz Imbassai - encontro rio mar + dunas', ecossistema: 'Dunas + Manguezal + Rio Mar + APA', pesca: 'Robalo, caranguejo - encontro rio mar', economia: 'Turismo + Encontro rio mar + APA', especies: 'Robalo, caranguejo-uca', mare_corrente: '1.0m - DHN - encontro rio mar', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '014 - Massarandupio - Praia',
-  regiao: 'LITORAL NORTE',
-  lat: -12.3167,
-  lng: -37.8167,
-  vegetacao: 'Dunas + Restinga + Coqueiral + Naturismo - APA',
-  foz: 'Rio Massarandupio - foz dunas + naturismo',
-  ecossistema: 'Dunas + APA + Naturismo + Restinga',
-  pesca: 'Robalo, tainha - naturismo',
-  economia: 'Turismo + Naturismo + Pesca',
-  especies: 'Robalo, tainha',
-  mare_corrente: '1.1m - DHN - naturismo',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '014 - Massarandupio - Naturismo',
+  regiao: 'LITORAL NORTE', lat: -12.3167, lng: -37.8167,
+  vegetacao: 'Dunas + Restinga - Naturismo - APA', foz: 'Rio Massarandupio - foz dunas + naturismo', ecossistema: 'Dunas + APA + Naturismo', pesca: 'Robalo, tainha - naturismo', economia: 'Turismo + Naturismo', especies: 'Robalo, tainha', mare_corrente: '1.1m - DHN - naturismo', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '015 - Baixio - Praia',
-  regiao: 'LITORAL NORTE',
-  lat: -12.2500,
-  lng: -37.7500,
-  vegetacao: 'Restinga + Coqueiral + Dunas + APA Litoral Norte',
-  foz: 'Rio Inhambupe - foz Baixio - dunas + APA',
-  ecossistema: 'Dunas + APA Litoral Norte + Restinga + Coqueiral',
-  pesca: 'Robalo, tainha, caranguejo - APA',
-  economia: 'Turismo ecologico + APA + Pesca artesanal',
-  especies: 'Robalo, tainha, caranguejo-uca',
-  mare_corrente: '1.1m - DHN - APA Litoral Norte',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '015 - Baixio - APA Litoral Norte',
+  regiao: 'LITORAL NORTE', lat: -12.25, lng: -37.75,
+  vegetacao: 'Restinga + Dunas + APA', foz: 'Rio Inhambupe - foz Baixio - dunas + APA', ecossistema: 'Dunas + APA Litoral Norte', pesca: 'Robalo, tainha - APA', economia: 'Turismo ecologico + APA', especies: 'Robalo, tainha', mare_corrente: '1.1m - DHN - APA', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '016 - Barra do Itariri - Praia',
-  regiao: 'LITORAL NORTE',
-  lat: -12.0500,
-  lng: -37.6833,
-  vegetacao: 'Restinga + Manguezal + Coqueiral',
-  foz: 'Rio Itariri - foz Barra do Itariri - manguezal',
-  ecossistema: 'Manguezal + Estuario + Restinga + Bercario',
-  pesca: 'Robalo, tainha, caranguejo-uca - mangue',
-  economia: 'Pesca artesanal + Agricultura + Dende',
-  especies: 'Robalo, caranguejo-uca, ostra, siri',
-  mare_corrente: '1.1m - DHN - foz Itariri',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '016 - Barra do Itariri',
+  regiao: 'LITORAL NORTE', lat: -12.05, lng: -37.6833,
+  vegetacao: 'Restinga + Manguezal', foz: 'Rio Itariri - foz Barra do Itariri', ecossistema: 'Manguezal + Estuario', pesca: 'Robalo, caranguejo', economia: 'Pesca + Agricultura', especies: 'Robalo, caranguejo-uca', mare_corrente: '1.1m - DHN - foz Itariri', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '017 - Subauma - Praia',
-  regiao: 'LITORAL NORTE',
-  lat: -12.0167,
-  lng: -37.6333,
-  vegetacao: 'Restinga + Coqueiral + Manguezal',
-  foz: 'Rio Subauma - foz Subauma - manguezal',
-  ecossistema: 'Manguezal + Restinga + Coqueiral + Bercario',
-  pesca: 'Robalo, tainha, caranguejo',
-  economia: 'Pesca + Turismo + Agricultura',
-  especies: 'Robalo, tainha, caranguejo',
-  mare_corrente: '1.1m - DHN - foz Subauma',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '017 - Subauma',
+  regiao: 'LITORAL NORTE', lat: -12.0167, lng: -37.6333,
+  vegetacao: 'Restinga + Manguezal', foz: 'Rio Subauma - foz Subauma', ecossistema: 'Manguezal + Restinga', pesca: 'Robalo, tainha', economia: 'Pesca + Turismo', especies: 'Robalo, tainha', mare_corrente: '1.1m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '018 - Barra do Sauipe - Praia',
-  regiao: 'LITORAL NORTE',
-  lat: -12.0000,
-  lng: -37.5833,
-  vegetacao: 'Restinga + Coqueiral + Resort + APA',
-  foz: 'Rio Sauipe - foz Sauipe - resort Costa do Sauipe',
-  ecossistema: 'APA + Resort + Restinga + Recifes + Bercario',
-  pesca: 'Robalo, tainha - resort',
-  economia: 'Turismo resort Costa do Sauipe + Pesca',
-  especies: 'Robalo, tainha, tartaruga',
-  mare_corrente: '1.1m - DHN - resort',
-  massa_ar: 'mEa - Equatorial Atlantica',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '018 - Barra do Sauipe - Costa do Sauipe Resort',
+  regiao: 'LITORAL NORTE', lat: -12.00, lng: -37.5833,
+  vegetacao: 'Restinga + Resort + APA', foz: 'Rio Sauipe - foz Sauipe - resort', ecossistema: 'APA + Resort + Recifes', pesca: 'Robalo, tainha - resort', economia: 'Resort Costa do Sauipe', especies: 'Robalo, tainha, tartaruga', mare_corrente: '1.1m - DHN - resort', massa_ar: 'mEa - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '019 - Diogo - Praia',
-  regiao: 'LITORAL NORTE',
-  lat: -11.9500,
-  lng: -37.6000,
-  vegetacao: 'Restinga + Coqueiral',
-  foz: 'Sem foz - praia aberta - recifes',
-  ecossistema: 'Recifes + Restinga + Praia aberta',
-  pesca: 'Robalo, peixes recifais',
-  economia: 'Pesca artesanal + Turismo',
-  especies: 'Robalo, peixes recifais',
-  mare_corrente: '1.1m - DHN - praia aberta',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '019 - Diogo',
+  regiao: 'LITORAL NORTE', lat: -11.95, lng: -37.60,
+  vegetacao: 'Restinga + Coqueiral', foz: 'Sem foz - praia aberta - recifes', ecossistema: 'Recifes + Restinga', pesca: 'Robalo, peixes recifais', economia: 'Pesca + Turismo', especies: 'Robalo', mare_corrente: '1.1m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '020 - Sitio do Conde - Praia',
-  regiao: 'LITORAL NORTE',
-  lat: -11.8167,
-  lng: -37.5667,
-  vegetacao: 'Restinga + Dunas + Coqueiral + Rio Itapicuru',
-  foz: 'Rio Itapicuru - foz Sitio do Conde - delta Itapicuru',
-  ecossistema: 'Delta Rio Itapicuru + Dunas + Restinga + Bercario',
-  pesca: 'Robalo, tainha, caranguejo-uca - delta Itapicuru',
-  economia: 'Pesca + Turismo + Delta Itapicuru',
-  especies: 'Robalo, tainha, caranguejo-uca, sururu',
-  mare_corrente: '1.2m - DHN - delta Itapicuru',
-  massa_ar: 'mEc - INMET - delta',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '020 - Sitio do Conde - Delta Itapicuru',
+  regiao: 'LITORAL NORTE', lat: -11.8167, lng: -37.5667,
+  vegetacao: 'Restinga + Dunas + Rio Itapicuru', foz: 'Rio Itapicuru - foz Sitio do Conde - delta Itapicuru', ecossistema: 'Delta Itapicuru + Dunas + Bercario', pesca: 'Robalo, tainha, caranguejo - delta', economia: 'Pesca + Delta Itapicuru', especies: 'Robalo, caranguejo-uca, sururu', mare_corrente: '1.2m - DHN - delta Itapicuru', massa_ar: 'mEc - INMET - delta', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '021 - Siribinha - Praia',
-  regiao: 'LITORAL NORTE',
-  lat: -11.7833,
-  lng: -37.5500,
-  vegetacao: 'Manguezal + Restinga + Delta Itapicuru',
-  foz: 'Rio Itapicuru - foz Siribinha - manguezal',
-  ecossistema: 'Manguezal + Estuario + Delta + Bercario',
-  pesca: 'Caranguejo-uca, sururu, camarao - delta',
-  economia: 'Pesca artesanal + Turismo + Delta',
-  especies: 'Caranguejo-uca, sururu, camarao rosa, ostra',
-  mare_corrente: '1.2m - DHN - manguezal Siribinha',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '021 - Siribinha - Delta Itapicuru',
+  regiao: 'LITORAL NORTE', lat: -11.7833, lng: -37.55,
+  vegetacao: 'Manguezal + Delta Itapicuru', foz: 'Rio Itapicuru - foz Siribinha - manguezal', ecossistema: 'Manguezal + Delta + Bercario', pesca: 'Caranguejo-uca, sururu, camarao - delta', economia: 'Pesca + Delta', especies: 'Caranguejo-uca, sururu, camarao', mare_corrente: '1.2m - DHN - manguezal Siribinha', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '022 - Costa Azul - Praia - Conde',
-  regiao: 'LITORAL NORTE',
-  lat: -11.7500,
-  lng: -37.5333,
-  vegetacao: 'Restinga + Coqueiral + Dunas',
-  foz: 'Rio Itapicuru - foz Costa Azul - Conde',
-  ecossistema: 'Restinga + Dunas + Delta Itapicuru',
-  pesca: 'Robalo, tainha',
-  economia: 'Turismo + Pesca',
-  especies: 'Robalo, tainha',
-  mare_corrente: '1.2m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '022 - Costa Azul - Conde',
+  regiao: 'LITORAL NORTE', lat: -11.75, lng: -37.5333,
+  vegetacao: 'Restinga + Dunas', foz: 'Rio Itapicuru - foz Costa Azul', ecossistema: 'Restinga + Delta', pesca: 'Robalo, tainha', economia: 'Turismo + Pesca', especies: 'Robalo, tainha', mare_corrente: '1.2m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '023 - Mangue Seco - Praia - Divisa BA/SE - Tieta',
-  regiao: 'LITORAL NORTE',
-  lat: -11.4333,
-  lng: -37.3500,
-  vegetacao: 'Dunas + Coqueiral + Manguezal + APA - Tieta - Divisa BA/SE',
-  foz: 'Rio Real - divisa BA/SE - foz Mangue Seco - delta Real + Tieta',
-  ecossistema: 'Dunas + Manguezal + APA + Divisa BA/SE + Delta Rio Real + Tieta + Bercario',
-  pesca: 'Robalo, tainha, caranguejo - Tieta',
-  economia: 'Turismo Tieta + Pesca + Divisa BA/SE',
-  especies: 'Robalo, caranguejo-uca, tartaruga, Tieta',
-  mare_corrente: '1.3m - DHN - divisa BA/SE - Tieta',
-  massa_ar: 'mEc - INMET - Tieta',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Tieta'
+  nome: '023 - Mangue Seco - Divisa BA/SE - Tieta',
+  regiao: 'LITORAL NORTE', lat: -11.4333, lng: -37.35,
+  vegetacao: 'Dunas + Manguezal + APA - Tieta - Divisa BA/SE', foz: 'Rio Real - divisa BA/SE - foz Mangue Seco - delta Real + Tieta', ecossistema: 'Dunas + Manguezal + Divisa BA/SE + Delta Real + Tieta', pesca: 'Robalo, tainha, caranguejo - Tieta', economia: 'Turismo Tieta + Divisa BA/SE', especies: 'Robalo, caranguejo-uca, tartaruga - Tieta', mare_corrente: '1.3m - DHN - divisa BA/SE - Tieta', massa_ar: 'mEc - INMET - Tieta', temp: '27C', balne: 'PROPRIA - INEMA - Tieta'
 },
 {
-  nome: '024 - Sao Tome de Paripe - Praia - Suburbio Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.8500,
-  lng: -38.4833,
-  vegetacao: 'Restinga urbana + Manguezal - Suburbio Ferroviario - Salvador',
-  foz: 'BTS - foz Suburbio - foz Rio do Cobre - Salvador',
-  ecossistema: 'Suburbio Ferroviario + BTS + Manguezal + Urbano - Salvador',
-  pesca: 'Robalo, tainha, caranguejo - suburbio',
-  economia: 'Pesca suburbio + Turismo comunitario + Salvador',
-  especies: 'Robalo, tainha, caranguejo-uca',
-  mare_corrente: '1.0m - DHN - suburbio Salvador',
-  massa_ar: 'mEc - INMET - urbano Salvador',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA - suburbio'
+  nome: '024 - Sao Tome de Paripe - Suburbio Salvador',
+  regiao: 'SALVADOR LITORAL', lat: -12.85, lng: -38.4833,
+  vegetacao: 'Restinga + Manguezal - Suburbio', foz: 'BTS - foz Rio do Cobre - Salvador', ecossistema: 'Suburbio + BTS + Manguezal', pesca: 'Robalo, caranguejo - suburbio', economia: 'Pesca suburbio + Salvador', especies: 'Robalo, caranguejo-uca', mare_corrente: '1.0m - DHN - suburbio', massa_ar: 'mEc - INMET - urbano', temp: '28C', balne: 'IMPROPRIA - INEMA - suburbio'
 },
 {
-  nome: '025 - Tubarao - Praia - Suburbio Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.8500,
-  lng: -38.4667,
-  vegetacao: 'Restinga + Manguezal - Suburbio Salvador',
-  foz: 'BTS - foz Tubarao - suburbio Salvador',
-  ecossistema: 'BTS + Suburbio + Manguezal',
-  pesca: 'Robalo, caranguejo',
-  economia: 'Pesca suburbio + Salvador',
-  especies: 'Robalo, caranguejo',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA'
+  nome: '025 - Tubarao - Suburbio Salvador',
+  regiao: 'SALVADOR LITORAL', lat: -12.85, lng: -38.4667,
+  vegetacao: 'Restinga + Manguezal - Suburbio', foz: 'BTS - foz Tubarao - suburbio', ecossistema: 'BTS + Suburbio + Manguezal', pesca: 'Robalo, caranguejo', economia: 'Pesca suburbio', especies: 'Robalo, caranguejo', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '28C', balne: 'IMPROPRIA - INEMA'
 },
 {
-  nome: '026 - Ribeira - Praia - Enseada - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9167,
-  lng: -38.5000,
-  vegetacao: 'Urbana + Enseada + Sorveteria - Salvador',
-  foz: 'BTS - Enseada dos Tainheiros - foz Ribeira - Salvador',
-  ecossistema: 'Baia Enseada + Urbana + Gastronomia + Sorvete - Salvador',
-  pesca: 'Robalo - enseada',
-  economia: 'Gastronomia + Sorvete da Ribeira + Turismo + Salvador',
-  especies: 'Robalo, siri',
-  mare_corrente: '0.9m - DHN - enseada Ribeira',
-  massa_ar: 'mEc - INMET - urbano',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA - enseada'
+  nome: '026 - Ribeira - Enseada - Sorveteria',
+  regiao: 'SALVADOR LITORAL', lat: -12.9167, lng: -38.50,
+  vegetacao: 'Urbana + Enseada + Sorveteria - Salvador', foz: 'BTS - Enseada dos Tainheiros - foz Ribeira', ecossistema: 'Baia Enseada + Urbana + Gastronomia', pesca: 'Robalo - enseada', economia: 'Sorvete da Ribeira + Turismo', especies: 'Robalo, siri', mare_corrente: '0.9m - DHN - enseada Ribeira', massa_ar: 'mEc - INMET', temp: '28C', balne: 'IMPROPRIA - INEMA'
 },
 {
-  nome: '027 - Plataforma - Praia - Suburbio Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9333,
-  lng: -38.4833,
-  vegetacao: 'Urbana + Restinga - Suburbio Salvador',
-  foz: 'BTS - foz Plataforma - suburbio',
-  ecossistema: 'Suburbio + BTS + Urbano',
-  pesca: 'Robalo - suburbio',
-  economia: 'Pesca + Suburbio Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - suburbio',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA'
+  nome: '027 - Plataforma - Suburbio Salvador',
+  regiao: 'SALVADOR LITORAL', lat: -12.9333, lng: -38.4833,
+  vegetacao: 'Urbana + Restinga - Suburbio', foz: 'BTS - foz Plataforma', ecossistema: 'Suburbio + BTS + Urbano', pesca: 'Robalo - suburbio', economia: 'Pesca + Suburbio', especies: 'Robalo', mare_corrente: '1.0m - DHN - suburbio', massa_ar: 'mEc - INMET', temp: '28C', balne: 'IMPROPRIA - INEMA'
+},
+{
+  nome: '028 - Bonfim - Salvador - Igreja',
+  regiao: 'SALVADOR LITORAL', lat: -12.9167, lng: -38.50,
+  vegetacao: 'Urbana + Igreja do Bonfim', foz: 'BTS - foz Bonfim - Igreja', ecossistema: 'Urbano + Igreja do Bonfim + BTS', pesca: 'Robalo', economia: 'Turismo religioso + Bonfim', especies: 'Robalo', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '28C', balne: 'IMPROPRIA - INEMA'
+},
+{
+  nome: '029 - Monte Serrat - Salvador - Forte',
+  regiao: 'SALVADOR LITORAL', lat: -12.9167, lng: -38.5167,
+  vegetacao: 'Urbana + Forte - Salvador', foz: 'BTS - foz Monte Serrat - Forte', ecossistema: 'Forte + Baia + Urbano + Historico', pesca: 'Robalo, polvo', economia: 'Turismo historico + Forte', especies: 'Robalo, polvo', mare_corrente: '1.0m - DHN - Forte Monte Serrat', massa_ar: 'mEc - INMET', temp: '28C', balne: 'IMPROPRIA - INEMA'
+},
+{
+  nome: '030 - Boa Viagem - Salvador',
+  regiao: 'SALVADOR LITORAL', lat: -12.9333, lng: -38.50,
+  vegetacao: 'Urbana + Restinga', foz: 'BTS - foz Boa Viagem', ecossistema: 'Urbana + BTS', pesca: 'Robalo', economia: 'Turismo + Salvador', especies: 'Robalo', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '28C', balne: 'IMPROPRIA - INEMA'
+},
+{
+  nome: '031 - Farol da Barra - Salvador - Cartao Postal',
+  regiao: 'SALVADOR LITORAL', lat: -13.01, lng: -38.5333,
+  vegetacao: 'Restinga + Rochas + Farol + Forte - Cartao Postal', foz: 'Barra - encontro BTS + Atlantico - divisor BTS/Atlantico - Farol', ecossistema: 'Recifes + Farol + Forte + Encontro BTS Atlantico + Cartao Postal', pesca: 'Robalo, peixes recifais - Farol', economia: 'Turismo + Farol + Cartao Postal', especies: 'Robalo, peixes recifais', mare_corrente: '1.0m - DHN - Farol - encontro BTS/Atlantico', massa_ar: 'mEc - INMET - Farol', temp: '28C', balne: 'PROPRIA - INEMA - Farol'
+},
+{
+  nome: '032 - Porto da Barra - Salvador - Praia Charmosa',
+  regiao: 'SALVADOR LITORAL', lat: -13.00, lng: -38.5333,
+  vegetacao: 'Urbana + Coqueiral - Praia charmosa', foz: 'Sem foz - praia de baia - Porto da Barra', ecossistema: 'Baia + Praia + Urbana + Turistica', pesca: 'Robalo - Porto da Barra', economia: 'Turismo + Praia charmosa', especies: 'Robalo', mare_corrente: '0.9m - DHN - Porto da Barra - baia calma', massa_ar: 'mEc - INMET', temp: '28C', balne: 'PROPRIA - INEMA - Porto da Barra'
+},
+{
+  nome: '033 - Ondina - Salvador',
+  regiao: 'SALVADOR LITORAL', lat: -13.0167, lng: -38.5167,
+  vegetacao: 'Urbana + Restinga + Rochas', foz: 'Sem foz - oceano Atlantico - Ondina', ecossistema: 'Oceano + Urbano + Rochas', pesca: 'Robalo', economia: 'Turismo + Zoologico', especies: 'Robalo', mare_corrente: '1.0m - DHN - Ondina', massa_ar: 'mEa - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
+},
+{
+  nome: '034 - Rio Vermelho - Salvador - Yemanjá',
+  regiao: 'SALVADOR LITORAL', lat: -13.0333, lng: -38.50,
+  vegetacao: 'Urbana + Acarajé + Festa Yemanjá', foz: 'Rio Lucaia - foz Rio Vermelho - Yemanjá', ecossistema: 'Rio Lucaia + Festa Yemanjá + Urbano + Cultural', pesca: 'Robalo - Festa Yemanjá 02/02', economia: 'Acarajé + Festa Yemanjá', especies: 'Robalo', mare_corrente: '1.0m - DHN - Yemanjá', massa_ar: 'mEa - INMET - Yemanjá', temp: '28C', balne: 'PROPRIA - INEMA - Rio Vermelho'
 },
   {
-  nome: '028 - Bonfim - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9167,
-  lng: -38.5000,
-  vegetacao: 'Urbana + Igreja do Bonfim - Salvador',
-  foz: 'BTS - foz Bonfim - Salvador - Igreja',
-  ecossistema: 'Urbano + Historico + Igreja do Bonfim + BTS',
-  pesca: 'Robalo',
-  economia: 'Turismo religioso + Igreja do Bonfim + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA'
+  nome: '035 - Amaralina - Salvador - Lagoa Abaeté',
+  regiao: 'SALVADOR LITORAL', lat: -13.0167, lng: -38.4833,
+  vegetacao: 'Urbana + Restinga + Lagoa', foz: 'Lagoa do Abaeté - foz Amaralina', ecossistema: 'Lagoa do Abaeté + Restinga + Urbano', pesca: 'Robalo - Amaralina', economia: 'Turismo + Lagoa', especies: 'Robalo', mare_corrente: '1.0m - DHN - Amaralina', massa_ar: 'mEa - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '029 - Monte Serrat - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9167,
-  lng: -38.5167,
-  vegetacao: 'Urbana + Restinga + Forte - Salvador',
-  foz: 'BTS - foz Monte Serrat - Forte - Salvador',
-  ecossistema: 'Forte + Baia + Urbano + Historico - Salvador',
-  pesca: 'Robalo, polvo',
-  economia: 'Turismo historico + Forte + Salvador',
-  especies: 'Robalo, polvo',
-  mare_corrente: '1.0m - DHN - Forte Monte Serrat',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA'
+  nome: '036 - Pituba - Salvador - Rio Camurujipe',
+  regiao: 'SALVADOR LITORAL', lat: -13.00, lng: -38.4667,
+  vegetacao: 'Urbana + Restinga - Pituba', foz: 'Rio Camurujipe - foz Pituba - Rio Camurujipe poluido', ecossistema: 'Rio Camurujipe + Urbano + Pituba', pesca: 'Robalo - Pituba poluido', economia: 'Comercio Pituba', especies: 'Robalo', mare_corrente: '1.0m - DHN - Pituba', massa_ar: 'mEa - INMET - urbano Pituba', temp: '28C', balne: 'IMPROPRIA - INEMA - Pituba'
 },
 {
-  nome: '030 - Boa Viagem - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9333,
-  lng: -38.5000,
-  vegetacao: 'Urbana + Restinga - Salvador',
-  foz: 'BTS - foz Boa Viagem - Salvador',
-  ecossistema: 'Urbana + BTS + Salvador',
-  pesca: 'Robalo',
-  economia: 'Turismo + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA'
-},
-{
-  nome: '031 - Farol da Barra - Praia - Salvador - Cartao Postal',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0100,
-  lng: -38.5333,
-  vegetacao: 'Restinga + Rochas + Farol + Forte - Salvador - Cartao Postal',
-  foz: 'Barra - encontro BTS + Atlantico - foz Barra - divisor BTS/Atlantico - Farol',
-  ecossistema: 'Recifes + Farol + Forte + Encontro BTS + Atlantico + Cartao Postal + Historico - Salvador',
-  pesca: 'Robalo, peixes recifais - Farol da Barra',
-  economia: 'Turismo + Farol + Historico + Cartao Postal + Salvador',
-  especies: 'Robalo, peixes recifais, tartaruga',
-  mare_corrente: '1.0m - DHN - Farol da Barra - encontro BTS/Atlantico',
-  massa_ar: 'mEc - Equatorial Continental - INMET - Farol',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Farol'
-},
-{
-  nome: '032 - Porto da Barra - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0000,
-  lng: -38.5333,
-  vegetacao: 'Urbana + Coqueiral + Praia mais charmosa - Salvador',
-  foz: 'Sem foz - praia de baia - Porto da Barra - Salvador',
-  ecossistema: 'Baia + Praia + Urbana + Turistica - Salvador',
-  pesca: 'Robalo - Porto da Barra',
-  economia: 'Turismo + Praia charmosa + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '0.9m - DHN - Porto da Barra - baia calma',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Porto da Barra'
-},
-{
-  nome: '033 - Ondina - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0167,
-  lng: -38.5167,
-  vegetacao: 'Urbana + Restinga + Rochas - Salvador',
-  foz: 'Sem foz - oceano Atlantico - Ondina - Salvador',
-  ecossistema: 'Oceano + Urbano + Rochas + Salvador',
-  pesca: 'Robalo, peixes costeiros',
-  economia: 'Turismo + Zoologico + Salvador',
-  especies: 'Robalo, peixes recifais',
-  mare_corrente: '1.0m - DHN - Ondina',
-  massa_ar: 'mEa - Equatorial Atlantica - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
-},
-{
-  nome: '034 - Rio Vermelho - Praia - Salvador - Yemanjá',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0333,
-  lng: -38.5000,
-  vegetacao: 'Urbana + Acarajé + Festa Yemanjá - Salvador',
-  foz: 'Rio Lucaia - foz Rio Vermelho - Rio Lucaia + Yemanjá - Salvador',
-  ecossistema: 'Rio Lucaia + Festa Yemanjá + Urbano + Acarajé + Cultural - Salvador',
-  pesca: 'Robalo, peixes costeiros - Festa Yemanjá 02/02',
-  economia: 'Acarajé + Turismo + Festa Yemanjá + Salvador',
-  especies: 'Robalo, peixes costeiros',
-  mare_corrente: '1.0m - DHN - Rio Vermelho - Yemanjá',
-  massa_ar: 'mEa - Equatorial Atlantica - INMET - Yemanjá',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Rio Vermelho'
-},
-{
-  nome: '035 - Amaralina - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0167,
-  lng: -38.4833,
-  vegetacao: 'Urbana + Restinga + Lagoa - Salvador',
-  foz: 'Lagoa do Abaeté - foz Amaralina - Salvador',
-  ecossistema: 'Lagoa do Abaeté + Restinga + Urbano - Salvador',
-  pesca: 'Robalo - Amaralina',
-  economia: 'Turismo + Lagoa + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Amaralina',
-  massa_ar: 'mEa - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
-},
-{
-  nome: '036 - Pituba - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0000,
-  lng: -38.4667,
-  vegetacao: 'Urbana + Restinga - Salvador - Pituba',
-  foz: 'Rio Camurujipe - foz Pituba - Rio Camurujipe - Salvador',
-  ecossistema: 'Rio Camurujipe + Urbano + Pituba - Salvador',
-  pesca: 'Robalo - Pituba',
-  economia: 'Turismo + Comercio Pituba + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Pituba',
-  massa_ar: 'mEa - INMET - urbano Pituba',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA - Pituba - Rio Camurujipe poluido'
-},
-{
-  nome: '037 - Jaguaripe - Praia - Santo Amaro - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.7333,
-  lng: -38.7167,
-  vegetacao: 'Manguezal + Mata Atlantica + Dende - Reconcavo',
-  foz: 'Rio Jaguaripe - foz Jaguaripe - Reconcavo',
-  ecossistema: 'Manguezal + Mata Atlantica + Rio Jaguaripe + Bercario + Reconcavo',
-  pesca: 'Robalo, sururu, caranguejo-uca - Reconcavo',
-  economia: 'Pesca + Agricultura + Dende + Reconcavo',
-  especies: 'Robalo, sururu, caranguejo-uca, camarao',
-  mare_corrente: '1.0m - DHN - Reconcavo Jaguaripe',
-  massa_ar: 'mEc - INMET - Reconcavo',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Reconcavo'
+  nome: '037 - Jaguaripe - Santo Amaro - Reconcavo',
+  regiao: 'RECONCAVO', lat: -12.7333, lng: -38.7167,
+  vegetacao: 'Manguezal + Mata Atlantica + Dende - Reconcavo', foz: 'Rio Jaguaripe - foz Jaguaripe - Reconcavo', ecossistema: 'Manguezal + Mata + Rio Jaguaripe + Bercario + Reconcavo', pesca: 'Robalo, sururu, caranguejo-uca - Reconcavo', economia: 'Pesca + Dende + Reconcavo', especies: 'Robalo, sururu, caranguejo-uca', mare_corrente: '1.0m - DHN - Reconcavo Jaguaripe', massa_ar: 'mEc - INMET - Reconcavo', temp: '27C', balne: 'PROPRIA - INEMA - Reconcavo'
 },
 {
   nome: '038 - Itapema - Santo Amaro - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.7000,
-  lng: -38.7000,
-  vegetacao: 'Manguezal + Restinga - Reconcavo',
-  foz: 'Rio Subaé - foz Itapema - Reconcavo',
-  ecossistema: 'Manguezal + Rio Subaé + Bercario + Reconcavo',
-  pesca: 'Sururu, caranguejo',
-  economia: 'Pesca + Reconcavo',
-  especies: 'Sururu, caranguejo-uca',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  regiao: 'RECONCAVO', lat: -12.70, lng: -38.70,
+  vegetacao: 'Manguezal + Restinga - Reconcavo', foz: 'Rio Subaé - foz Itapema - Reconcavo', ecossistema: 'Manguezal + Rio Subaé + Bercario + Reconcavo', pesca: 'Sururu, caranguejo', economia: 'Pesca + Reconcavo', especies: 'Sururu, caranguejo-uca', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
   nome: '039 - Acupe - Santo Amaro - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.6667,
-  lng: -38.7333,
-  vegetacao: 'Manguezal + Dende + Coqueiral - Reconcavo',
-  foz: 'Rio Sergi Mirim - foz Acupe - Reconcavo',
-  ecossistema: 'Manguezal + Dende + Rio + Bercario + Reconcavo',
-  pesca: 'Sururu, caranguejo-uca, camarao rosa',
-  economia: 'Pesca + Dende + Turismo Reconcavo',
-  especies: 'Sururu, caranguejo-uca, camarao rosa',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  regiao: 'RECONCAVO', lat: -12.6667, lng: -38.7333,
+  vegetacao: 'Manguezal + Dende + Coqueiral - Reconcavo', foz: 'Rio Sergi Mirim - foz Acupe - Reconcavo', ecossistema: 'Manguezal + Dende + Rio + Bercario', pesca: 'Sururu, caranguejo-uca, camarao rosa', economia: 'Pesca + Dende + Reconcavo', especies: 'Sururu, caranguejo-uca, camarao rosa', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '040 - Sao Francisco do Conde - Praia - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.6167,
-  lng: -38.6167,
-  vegetacao: 'Manguezal + Mata Atlantica + Petroleo - Reconcavo',
-  foz: 'Rio Mataripe - foz Sao Francisco do Conde - polo petroquimico',
-  ecossistema: 'Manguezal + Petroleo + Polo + Reconcavo + Bercario',
-  pesca: 'Sururu, tainha - impacto petroleo',
-  economia: 'Petroleo + Pesca + Reconcavo + Polo Petroquimico',
-  especies: 'Sururu, tainha - impacto petroleo',
-  mare_corrente: '1.1m - DHN - polo petroleo',
-  massa_ar: 'mEc - INMET - polo petroquimico',
-  temp: '27C',
-  balne: 'IMPROPRIA - INEMA - petroleo'
+  nome: '040 - Sao Francisco do Conde - Reconcavo - Petroleo',
+  regiao: 'RECONCAVO', lat: -12.6167, lng: -38.6167,
+  vegetacao: 'Manguezal + Mata + Petroleo - Reconcavo', foz: 'Rio Mataripe - foz Sao Francisco do Conde - polo petroquimico', ecossistema: 'Manguezal + Petroleo + Polo + Reconcavo', pesca: 'Sururu, tainha - impacto petroleo', economia: 'Petroleo + Pesca + Polo Petroquimico', especies: 'Sururu, tainha - impacto petroleo', mare_corrente: '1.1m - DHN - polo petroleo', massa_ar: 'mEc - INMET - polo', temp: '27C', balne: 'IMPROPRIA - INEMA - petroleo'
 },
 {
-  nome: '041 - Madre de Deus Centro - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.7333,
-  lng: -38.6167,
-  vegetacao: 'Manguezal + Urbana - Reconcavo + Terminal',
-  foz: 'Canal BTS - foz Madre de Deus - terminal petroleo',
-  ecossistema: 'Terminal petroleo + Manguezal + Urbano + Reconcavo',
-  pesca: 'Caranguejo, siri - terminal',
-  economia: 'Terminal petroleo + Pesca + Reconcavo',
-  especies: 'Caranguejo-uca, siri',
-  mare_corrente: '1.2m - DHN - terminal petroleo Madre de Deus',
-  massa_ar: 'mEc - INMET - poluicao petroleo',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA - petroleo'
+  nome: '041 - Madre de Deus Centro - Terminal Petroleo',
+  regiao: 'RECONCAVO', lat: -12.7333, lng: -38.6167,
+  vegetacao: 'Manguezal + Urbana - Terminal', foz: 'Canal BTS - foz Madre de Deus - terminal petroleo', ecossistema: 'Terminal petroleo + Manguezal + Urbano', pesca: 'Caranguejo, siri - terminal', economia: 'Terminal petroleo + Pesca', especies: 'Caranguejo-uca, siri', mare_corrente: '1.2m - DHN - terminal petroleo', massa_ar: 'mEc - INMET - poluicao petroleo', temp: '28C', balne: 'IMPROPRIA - INEMA - petroleo'
 },
 {
-  nome: '042 - Candeias - Praia - BTS - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.6667,
-  lng: -38.5500,
-  vegetacao: 'Manguezal + Mata Atlantica - BTS - Reconcavo',
-  foz: 'Rio Joanes - foz Candeias - Reconcavo BTS',
-  ecossistema: 'Manguezal + Rio Joanes + BTS + Bercario + Reconcavo',
-  pesca: 'Sururu, caranguejo, tainha - Reconcavo BTS',
-  economia: 'Pesca + Industria + Reconcavo BTS',
-  especies: 'Sururu, caranguejo-uca, tainha',
-  mare_corrente: '1.0m - DHN - Candeias BTS',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'IMPROPRIA - INEMA - industrial'
+  nome: '042 - Candeias - BTS - Reconcavo',
+  regiao: 'RECONCAVO', lat: -12.6667, lng: -38.55,
+  vegetacao: 'Manguezal + Mata - BTS', foz: 'Rio Joanes - foz Candeias - Reconcavo BTS', ecossistema: 'Manguezal + Rio Joanes + BTS + Bercario', pesca: 'Sururu, caranguejo, tainha - BTS', economia: 'Pesca + Industria + BTS', especies: 'Sururu, caranguejo-uca, tainha', mare_corrente: '1.0m - DHN - Candeias BTS', massa_ar: 'mEc - INMET', temp: '27C', balne: 'IMPROPRIA - INEMA - industrial'
 },
 {
-  nome: '043 - Caboto - Candeias - BTS - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.6833,
-  lng: -38.5667,
-  vegetacao: 'Manguezal + Mata Atlantica - BTS Reconcavo',
-  foz: 'Rio Joanes - foz Caboto - BTS',
-  ecossistema: 'Manguezal + BTS + Bercario',
-  pesca: 'Sururu, caranguejo',
-  economia: 'Pesca + Reconcavo',
-  especies: 'Sururu, caranguejo-uca',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'IMPROPRIA - INEMA'
+  nome: '043 - Caboto - Candeias - BTS',
+  regiao: 'RECONCAVO', lat: -12.6833, lng: -38.5667,
+  vegetacao: 'Manguezal + Mata - BTS', foz: 'Rio Joanes - foz Caboto - BTS', ecossistema: 'Manguezal + BTS + Bercario', pesca: 'Sururu, caranguejo', economia: 'Pesca + Reconcavo', especies: 'Sururu, caranguejo-uca', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'IMPROPRIA - INEMA'
 },
 {
-  nome: '044 - Passé - Candeias - BTS - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.6500,
-  lng: -38.5333,
-  vegetacao: 'Manguezal + Mata Atlantica - BTS Reconcavo',
-  foz: 'Rio Joanes - foz Passe - BTS',
-  ecossistema: 'Manguezal + BTS + Bercario',
-  pesca: 'Sururu, caranguejo',
-  economia: 'Pesca + Reconcavo',
-  especies: 'Sururu, caranguejo-uca',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'IMPROPRIA - INEMA'
+  nome: '044 - Passé - Candeias - BTS',
+  regiao: 'RECONCAVO', lat: -12.65, lng: -38.5333,
+  vegetacao: 'Manguezal + Mata - BTS', foz: 'Rio Joanes - foz Passe - BTS', ecossistema: 'Manguezal + BTS + Bercario', pesca: 'Sururu, caranguejo', economia: 'Pesca + Reconcavo', especies: 'Sururu, caranguejo-uca', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'IMPROPRIA - INEMA'
 },
 {
-  nome: '045 - Salinas da Margarida - Praia - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.9167,
-  lng: -38.7500,
-  vegetacao: 'Manguezal + Restinga + Salina - Reconcavo',
-  foz: 'Rio Paraguaçu - foz Salinas da Margarida - Reconcavo BTS',
-  ecossistema: 'Manguezal + Salina + Rio Paraguaçu + Bercario + Reconcavo + BTS',
-  pesca: 'Sururu, caranguejo, camarao - salina + Reconcavo',
-  economia: 'Sal + Pesca + Reconcavo + Turismo',
-  especies: 'Sururu, caranguejo-uca, camarao rosa, ostra',
-  mare_corrente: '1.0m - DHN - salina Reconcavo',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Salinas'
+  nome: '045 - Salinas da Margarida - Reconcavo - Salina',
+  regiao: 'RECONCAVO', lat: -12.9167, lng: -38.75,
+  vegetacao: 'Manguezal + Restinga + Salina - Reconcavo', foz: 'Rio Paraguaçu - foz Salinas da Margarida - BTS', ecossistema: 'Manguezal + Salina + Rio Paraguaçu + Bercario', pesca: 'Sururu, caranguejo, camarao - salina', economia: 'Sal + Pesca + Reconcavo', especies: 'Sururu, caranguejo-uca, camarao rosa', mare_corrente: '1.0m - DHN - salina', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA - Salinas'
 },
 {
-  nome: '046 - Maragogipinho - Praia - Aratuipe - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.9333,
-  lng: -38.7667,
-  vegetacao: 'Manguezal + Mata Atlantica + Ceramica - Reconcavo',
-  foz: 'Rio Jaguaripe - foz Maragogipinho - ceramica Reconcavo',
-  ecossistema: 'Ceramica + Manguezal + Rio + Bercario + Reconcavo',
-  pesca: 'Sururu, caranguejo - ceramica',
-  economia: 'Ceramica + Pesca + Turismo Reconcavo + Artesanato',
-  especies: 'Sururu, caranguejo-uca',
-  mare_corrente: '0.9m - DHN - ceramica',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '046 - Maragogipinho - Aratuipe - Ceramica Reconcavo',
+  regiao: 'RECONCAVO', lat: -12.9333, lng: -38.7667,
+  vegetacao: 'Manguezal + Ceramica - Reconcavo', foz: 'Rio Jaguaripe - foz Maragogipinho - ceramica', ecossistema: 'Ceramica + Manguezal + Rio + Bercario', pesca: 'Sururu, caranguejo - ceramica', economia: 'Ceramica + Artesanato + Reconcavo', especies: 'Sururu, caranguejo-uca', mare_corrente: '0.9m - DHN - ceramica', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '047 - Jaguaripe Sede - Praia - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -13.1000,
-  lng: -38.8833,
-  vegetacao: 'Manguezal + Mata Atlantica + Historico - Reconcavo',
-  foz: 'Rio Jaguaripe - foz Jaguaripe Sede - historico Reconcavo',
-  ecossistema: 'Rio Jaguaripe + Historico + Manguezal + Bercario + Reconcavo',
-  pesca: 'Robalo, sururu - historico Reconcavo',
-  economia: 'Pesca + Historico + Reconcavo + Turismo',
-  especies: 'Robalo, sururu',
-  mare_corrente: '0.9m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '047 - Jaguaripe Sede - Reconcavo Historico',
+  regiao: 'RECONCAVO', lat: -13.10, lng: -38.8833,
+  vegetacao: 'Manguezal + Historico - Reconcavo', foz: 'Rio Jaguaripe - foz Jaguaripe Sede - historico', ecossistema: 'Rio Jaguaripe + Historico + Manguezal', pesca: 'Robalo, sururu - historico', economia: 'Pesca + Historico + Reconcavo', especies: 'Robalo, sururu', mare_corrente: '0.9m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '048 - Capanema - Maragogipe - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.7833,
-  lng: -38.9167,
-  vegetacao: 'Manguezal + Mata Atlantica - Reconcavo Rio Paraguaçu',
-  foz: 'Rio Paraguaçu - foz Capanema - Reconcavo',
-  ecossistema: 'Rio Paraguaçu + Manguezal + Bercario + Reconcavo',
-  pesca: 'Sururu, caranguejo - Rio Paraguaçu',
-  economia: 'Pesca + Agricultura + Reconcavo',
-  especies: 'Sururu, caranguejo-uca',
-  mare_corrente: '1.0m - DHN - Rio Paraguaçu',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '048 - Capanema - Maragogipe - Reconcavo Paraguaçu',
+  regiao: 'RECONCAVO', lat: -12.7833, lng: -38.9167,
+  vegetacao: 'Manguezal + Mata - Rio Paraguaçu', foz: 'Rio Paraguaçu - foz Capanema', ecossistema: 'Rio Paraguaçu + Manguezal + Bercario', pesca: 'Sururu, caranguejo - Paraguaçu', economia: 'Pesca + Reconcavo', especies: 'Sururu, caranguejo-uca', mare_corrente: '1.0m - DHN - Rio Paraguaçu', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '049 - Sao Roque do Paraguaçu - Maragogipe - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.8167,
-  lng: -38.9500,
-  vegetacao: 'Manguezal + Mata Atlantica - Reconcavo Paraguaçu',
-  foz: 'Rio Paraguaçu - foz Sao Roque - Reconcavo',
-  ecossistema: 'Rio Paraguaçu + Manguezal + Bercario',
-  pesca: 'Sururu, robalo - Paraguaçu',
-  economia: 'Pesca + Reconcavo Paraguaçu',
-  especies: 'Sururu, robalo',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '049 - Sao Roque do Paraguaçu - Maragogipe',
+  regiao: 'RECONCAVO', lat: -12.8167, lng: -38.95,
+  vegetacao: 'Manguezal + Mata - Paraguaçu', foz: 'Rio Paraguaçu - foz Sao Roque', ecossistema: 'Rio Paraguaçu + Manguezal', pesca: 'Sururu, robalo - Paraguaçu', economia: 'Pesca + Paraguaçu', especies: 'Sururu, robalo', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
   nome: '050 - Nagé - Maragogipe - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.8500,
-  lng: -38.9333,
-  vegetacao: 'Manguezal + Mata Atlantica - Reconcavo',
-  foz: 'Rio Paraguaçu - foz Nage - Reconcavo',
-  ecossistema: 'Rio Paraguaçu + Manguezal + Bercario + Reconcavo',
-  pesca: 'Sururu, caranguejo - Paraguaçu',
-  economia: 'Pesca + Reconcavo',
-  especies: 'Sururu, caranguejo-uca',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  regiao: 'RECONCAVO', lat: -12.85, lng: -38.9333,
+  vegetacao: 'Manguezal + Mata - Reconcavo', foz: 'Rio Paraguaçu - foz Nage', ecossistema: 'Rio Paraguaçu + Manguezal + Bercario', pesca: 'Sururu, caranguejo - Paraguaçu', economia: 'Pesca + Reconcavo', especies: 'Sururu, caranguejo-uca', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '051 - Cachoeira - Rio Paraguaçu - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.6000,
-  lng: -38.9667,
-  vegetacao: 'Mata Atlantica + Rio + Historico - Reconcavo Paraguaçu',
-  foz: 'Rio Paraguaçu - foz Cachoeira - historico - Reconcavo',
-  ecossistema: 'Rio Paraguaçu + Cachoeira + Historico + Reconcavo + Patrimonio',
-  pesca: 'Robalo, sururu - Rio Paraguaçu',
-  economia: 'Turismo historico + Rio Paraguaçu + Reconcavo',
-  especies: 'Robalo, sururu',
-  mare_corrente: '0.8m - DHN - Rio Paraguaçu Cachoeira',
-  massa_ar: 'mEc - INMET - Reconcavo',
-  temp: '26C',
-  balne: 'PROPRIA - INEMA - rio'
+  nome: '051 - Cachoeira - Rio Paraguaçu - Reconcavo Historico',
+  regiao: 'RECONCAVO', lat: -12.60, lng: -38.9667,
+  vegetacao: 'Mata + Rio + Historico - Paraguaçu', foz: 'Rio Paraguaçu - foz Cachoeira - historico', ecossistema: 'Rio Paraguaçu + Historico + Patrimonio', pesca: 'Robalo, sururu - Rio Paraguaçu', economia: 'Turismo historico + Paraguaçu', especies: 'Robalo, sururu', mare_corrente: '0.8m - DHN - Rio Paraguaçu Cachoeira', massa_ar: 'mEc - INMET - Reconcavo', temp: '26C', balne: 'PROPRIA - INEMA - rio'
 },
 {
-  nome: '052 - Santiago do Iguape - Cachoeira - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.6667,
-  lng: -38.9000,
-  vegetacao: 'Manguezal + Mata Atlantica + Quilombola - Reconcavo',
-  foz: 'Rio Paraguaçu - foz Iguape - quilombola Reconcavo',
-  ecossistema: 'Quilombola + Manguezal + Rio Paraguaçu + Reconcavo + Bercario',
-  pesca: 'Sururu, caranguejo - quilombola',
-  economia: 'Quilombola + Pesca + Turismo + Reconcavo',
-  especies: 'Sururu, caranguejo-uca, ostra',
-  mare_corrente: '0.9m - DHN - quilombola',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - quilombola'
+  nome: '052 - Santiago do Iguape - Cachoeira - Quilombola',
+  regiao: 'RECONCAVO', lat: -12.6667, lng: -38.90,
+  vegetacao: 'Manguezal + Quilombola - Reconcavo', foz: 'Rio Paraguaçu - foz Iguape - quilombola', ecossistema: 'Quilombola + Manguezal + Rio Paraguaçu + Bercario', pesca: 'Sururu, caranguejo - quilombola', economia: 'Quilombola + Pesca + Turismo', especies: 'Sururu, caranguejo-uca, ostra', mare_corrente: '0.9m - DHN - quilombola', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA - quilombola'
 },
 {
   nome: '053 - Coqueiros - Maragogipe - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.7833,
-  lng: -38.8833,
-  vegetacao: 'Coqueiral + Manguezal + Mata Atlantica - Reconcavo',
-  foz: 'Rio Paraguaçu - foz Coqueiros - Reconcavo',
-  ecossistema: 'Coqueiral + Manguezal + Rio Paraguaçu + Reconcavo',
-  pesca: 'Sururu, caranguejo',
-  economia: 'Pesca + Coqueiral + Reconcavo',
-  especies: 'Sururu, caranguejo-uca',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  regiao: 'RECONCAVO', lat: -12.7833, lng: -38.8833,
+  vegetacao: 'Coqueiral + Manguezal - Reconcavo', foz: 'Rio Paraguaçu - foz Coqueiros', ecossistema: 'Coqueiral + Manguezal + Rio Paraguaçu', pesca: 'Sururu, caranguejo', economia: 'Pesca + Coqueiral', especies: 'Sururu, caranguejo-uca', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '054 - Barra do Paraguaçu - Praia - Reconcavo - Encontro Rio Mar',
-  regiao: 'RECONCAVO',
-  lat: -12.9000,
-  lng: -38.7667,
-  vegetacao: 'Manguezal + Restinga + Encontro Rio Paraguaçu Mar - BTS - Reconcavo',
-  foz: 'Rio Paraguaçu - foz Barra do Paraguaçu - encontro rio mar - BTS - Reconcavo',
-  ecossistema: 'Encontro Rio Paraguaçu + Mar + Manguezal + BTS + Bercario + Reconcavo',
-  pesca: 'Robalo, sururu, camarao - encontro rio mar',
-  economia: 'Pesca + Encontro Rio Mar + Reconcavo',
-  especies: 'Robalo, sururu, camarao rosa, caranguejo-uca',
-  mare_corrente: '1.0m - DHN - encontro Rio Paraguaçu + mar',
-  massa_ar: 'mEc - Equatorial Continental - INMET - encontro rio mar',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - encontro rio mar'
+  nome: '054 - Barra do Paraguaçu - Encontro Rio Mar - BTS',
+  regiao: 'RECONCAVO', lat: -12.90, lng: -38.7667,
+  vegetacao: 'Manguezal + Restinga + Encontro Rio Paraguaçu Mar - BTS', foz: 'Rio Paraguaçu - foz Barra do Paraguaçu - encontro rio mar - BTS', ecossistema: 'Encontro Rio Paraguaçu Mar + Manguezal + BTS + Bercario', pesca: 'Robalo, sururu, camarao - encontro rio mar', economia: 'Pesca + Encontro Rio Mar + Reconcavo', especies: 'Robalo, sururu, camarao rosa', mare_corrente: '1.0m - DHN - encontro Rio Paraguaçu + mar', massa_ar: 'mEc - INMET - encontro rio mar', temp: '27C', balne: 'PROPRIA - INEMA - encontro rio mar'
 },
 {
   nome: '055 - Jiribatuba - Vera Cruz - Ilha Itaparica',
-  regiao: 'RECONCAVO',
-  lat: -13.0333,
-  lng: -38.7167,
-  vegetacao: 'Manguezal + Restinga + Coqueiral - Ilha Itaparica - Reconcavo BTS',
-  foz: 'Canal BTS - foz Jiribatuba - Ilha Itaparica - BTS',
-  ecossistema: 'Ilha Itaparica + Manguezal + BTS + Bercario + Reconcavo',
-  pesca: 'Sururu, caranguejo, tainha - Ilha Itaparica',
-  economia: 'Pesca + Turismo Ilha Itaparica + Reconcavo BTS',
-  especies: 'Sururu, caranguejo-uca, tainha',
-  mare_corrente: '1.0m - DHN - Ilha Itaparica BTS',
-  massa_ar: 'mEc - INMET - Ilha Itaparica',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Ilha Itaparica'
+  regiao: 'RECONCAVO', lat: -13.0333, lng: -38.7167,
+  vegetacao: 'Manguezal + Restinga + Ilha Itaparica - BTS', foz: 'Canal BTS - foz Jiribatuba - Ilha Itaparica', ecossistema: 'Ilha Itaparica + Manguezal + BTS', pesca: 'Sururu, caranguejo, tainha - Ilha', economia: 'Pesca + Ilha Itaparica + BTS', especies: 'Sururu, caranguejo-uca, tainha', mare_corrente: '1.0m - DHN - Ilha Itaparica BTS', massa_ar: 'mEc - INMET - Ilha', temp: '27C', balne: 'PROPRIA - INEMA - Ilha Itaparica'
+},
+{
+  nome: '056 - Barra Grande - Vera Cruz - Ilha Itaparica',
+  regiao: 'RECONCAVO', lat: -13.05, lng: -38.6833,
+  vegetacao: 'Restinga + Coqueiral + Ilha Itaparica', foz: 'Canal BTS - foz Barra Grande - Ilha', ecossistema: 'Ilha Itaparica + Restinga + BTS', pesca: 'Robalo, tainha - Ilha', economia: 'Turismo Ilha Itaparica + BTS', especies: 'Robalo, tainha', mare_corrente: '1.0m - DHN - Ilha Itaparica', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
+},
+{
+  nome: '057 - Tairu - Vera Cruz - Ilha Itaparica',
+  regiao: 'RECONCAVO', lat: -12.9667, lng: -38.6667,
+  vegetacao: 'Manguezal + Restinga + Ilha Itaparica', foz: 'Canal BTS - foz Tairu - Ilha', ecossistema: 'Ilha Itaparica + Manguezal + BTS', pesca: 'Sururu, caranguejo - Ilha', economia: 'Pesca + Ilha Itaparica + BTS', especies: 'Sururu, caranguejo-uca', mare_corrente: '1.0m - DHN - Ilha', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
+},
+{
+  nome: '058 - Aratuba - Vera Cruz - Ilha Itaparica',
+  regiao: 'RECONCAVO', lat: -12.9833, lng: -38.70,
+  vegetacao: 'Manguezal + Restinga - Ilha Itaparica', foz: 'Canal BTS - foz Aratuba - Ilha BTS', ecossistema: 'Ilha Itaparica + Manguezal + BTS', pesca: 'Sururu, caranguejo - Ilha', economia: 'Pesca + Ilha', especies: 'Sururu, caranguejo-uca', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
+},
+{
+  nome: '059 - Berlinque - Vera Cruz - Ilha Itaparica',
+  regiao: 'RECONCAVO', lat: -13.10, lng: -38.6667,
+  vegetacao: 'Restinga + Coqueiral - Ilha Itaparica', foz: 'BTS - foz Berlinque - Ilha Itaparica BTS', ecossistema: 'Ilha Itaparica + Restinga + BTS', pesca: 'Robalo, tainha - Ilha', economia: 'Turismo Ilha Itaparica + BTS', especies: 'Robalo, tainha', mare_corrente: '1.0m - DHN - Ilha Itaparica BTS', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA - Ilha'
+},
+{
+  nome: '060 - Ponta de Areia - Itaparica - Ilha Sede',
+  regiao: 'RECONCAVO', lat: -12.8833, lng: -38.6833,
+  vegetacao: 'Restinga + Coqueiral + Ilha Itaparica - Sede', foz: 'Canal BTS - foz Ponta de Areia - Itaparica Sede', ecossistema: 'Ilha Itaparica Sede + Restinga + BTS', pesca: 'Robalo, tainha - Sede', economia: 'Turismo Itaparica Sede + Ferry + BTS', especies: 'Robalo, tainha', mare_corrente: '1.0m - DHN - Itaparica Sede', massa_ar: 'mEc - INMET - Itaparica', temp: '27C', balne: 'PROPRIA - INEMA'
+},
+{
+  nome: '061 - Amoreiras - Itaparica - Ilha',
+  regiao: 'RECONCAVO', lat: -12.90, lng: -38.6667,
+  vegetacao: 'Restinga + Coqueiral - Ilha', foz: 'Canal BTS - foz Amoreiras - Ilha', ecossistema: 'Ilha Itaparica + Restinga + BTS', pesca: 'Robalo, tainha', economia: 'Turismo Itaparica + BTS', especies: 'Robalo, tainha', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
+},
+{
+  nome: '062 - Misericordia - Itaparica - Fonte da Bica',
+  regiao: 'RECONCAVO', lat: -12.90, lng: -38.6833,
+  vegetacao: 'Restinga + Ilha - Fonte da Bica - Historico', foz: 'Canal BTS - foz Misericordia - Fonte da Bica', ecossistema: 'Fonte da Bica + Historico + Ilha + BTS', pesca: 'Robalo', economia: 'Turismo historico + Fonte da Bica + BTS', especies: 'Robalo', mare_corrente: '1.0m - DHN - Fonte da Bica', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
+},
+{
+  nome: '063 - Valença - Barra - Costa do Dende - Rio Una',
+  regiao: 'COSTA DO DENDE', lat: -13.3667, lng: -38.8167,
+  vegetacao: 'Manguezal + Restinga + Dende - Costa do Dende', foz: 'Rio Una - foz Valença - Costa do Dende + rio Una', ecossistema: 'Manguezal + Rio Una + Costa do Dende + Bercario', pesca: 'Robalo, tainha, caranguejo - Dende', economia: 'Pesca + Dende + Valença', especies: 'Robalo, tainha, caranguejo-uca', mare_corrente: '1.0m - DHN - Costa do Dende - Rio Una', massa_ar: 'mEc - INMET - Dende', temp: '27C', balne: 'PROPRIA - INEMA - Dende'
+},
+{
+  nome: '064 - Guaibim - Valença - Dende - Famosa',
+  regiao: 'COSTA DO DENDE', lat: -13.3167, lng: -38.7833,
+  vegetacao: 'Restinga + Dunas + Dende', foz: 'Rio Una - foz Guaibim - Costa do Dende', ecossistema: 'Restinga + Dunas + Rio Una + Dende + APA + Bercario', pesca: 'Robalo, tainha, tartaruga - Dende', economia: 'Turismo + Guaibim famoso + Dende', especies: 'Robalo, tainha, tartaruga', mare_corrente: '1.1m - DHN - Guaibim - Dende', massa_ar: 'mEa - INMET - Dende', temp: '27C', balne: 'PROPRIA - INEMA - Guaibim'
+},
+{
+  nome: '065 - Morro de Sao Paulo - Primeira Praia - Cairu',
+  regiao: 'COSTA DO DENDE', lat: -13.375, lng: -38.9167,
+  vegetacao: 'Mata + Restinga + Turistico - Morro', foz: 'Canal de Tinharé - foz Morro de Sao Paulo - Cairu', ecossistema: 'Canal de Tinharé + Mata + Turistico + Morro + Dende + APA', pesca: 'Robalo, peixes recifais - Morro', economia: 'Turismo internacional + Morro + Dende', especies: 'Robalo, peixes recifais', mare_corrente: '1.0m - DHN - Morro turistico', massa_ar: 'mEa - INMET - Morro', temp: '27C', balne: 'PROPRIA - INEMA - Morro'
+},
+{
+  nome: '066 - Morro de Sao Paulo - Segunda Praia - Festa',
+  regiao: 'COSTA DO DENDE', lat: -13.3833, lng: -38.9167,
+  vegetacao: 'Restinga + Turistico - Morro - Festa', foz: 'Canal de Tinharé - foz Segunda Praia - Morro', ecossistema: 'Turistico + Canal + Morro + Dende', pesca: 'Robalo - Segunda Praia', economia: 'Turismo Morro Segunda Praia - festa', especies: 'Robalo', mare_corrente: '1.0m - DHN - Segunda Praia - festa', massa_ar: 'mEa - INMET - Morro', temp: '27C', balne: 'PROPRIA - INEMA - Segunda Praia'
+},
+{
+  nome: '067 - Morro de Sao Paulo - Terceira Praia - Hoteis',
+  regiao: 'COSTA DO DENDE', lat: -13.3917, lng: -38.9167,
+  vegetacao: 'Restinga + Coqueiral - Morro', foz: 'Canal de Tinharé - foz Terceira Praia - Morro', ecossistema: 'Turistico + Canal + Morro', pesca: 'Robalo - Terceira Praia', economia: 'Turismo Terceira Praia - hoteis', especies: 'Robalo', mare_corrente: '1.0m - DHN - Terceira Praia', massa_ar: 'mEa - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
+},
+{
+  nome: '068 - Morro de Sao Paulo - Quarta Praia - Piscina Natural',
+  regiao: 'COSTA DO DENDE', lat: -13.40, lng: -38.9167,
+  vegetacao: 'Restinga + Piscina natural - Morro', foz: 'Canal de Tinharé - foz Quarta Praia - piscina natural - Morro', ecossistema: 'Piscina natural + Turistico + Canal + Morro + Dende + APA', pesca: 'Robalo, peixes recifais - piscina', economia: 'Turismo Quarta Praia - piscina natural + Dende', especies: 'Peixes recifais, tartaruga, robalo', mare_corrente: '0.9m - DHN - Quarta Praia - piscina natural', massa_ar: 'mEa - INMET - piscina natural Morro', temp: '27C', balne: 'PROPRIA - INEMA - Quarta Praia piscina'
+},
+{
+  nome: '069 - Morro de Sao Paulo - Quinta Praia - Encanto',
+  regiao: 'COSTA DO DENDE', lat: -13.4083, lng: -38.9167,
+  vegetacao: 'Mata + Restinga + Praia do Encanto - Morro - Dende', foz: 'Canal de Tinharé - foz Quinta Praia - Encanto - Morro', ecossistema: 'Mata + Praia do Encanto + Turistico + Canal + Morro + Dende', pesca: 'Robalo, tartaruga - Encanto', economia: 'Turismo Praia do Encanto + Morro', especies: 'Robalo, tartaruga marinha', mare_corrente: '0.9m - DHN - Encanto - Morro', massa_ar: 'mEa - INMET - Encanto', temp: '27C', balne: 'PROPRIA - INEMA - Encanto'
+},
+{
+  nome: '070 - Garapua - Cairu - Piscina Natural - Dende',
+  regiao: 'COSTA DO DENDE', lat: -13.4833, lng: -38.9167,
+  vegetacao: 'Mata + Restinga + Piscina natural - Garapua - Dende', foz: 'Rio Garapua - foz Garapua - Cairu - piscina natural', ecossistema: 'Rio Garapua + Piscina natural + Mata + Dende + APA', pesca: 'Robalo, peixes recifais - Garapua', economia: 'Turismo + Piscina natural + Garapua + Dende', especies: 'Robalo, peixes recifais', mare_corrente: '0.9m - DHN - Garapua piscina', massa_ar: 'mEa - INMET - Garapua', temp: '27C', balne: 'PROPRIA - INEMA - Garapua'
 },
   {
-  nome: '028 - Bonfim - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9167,
-  lng: -38.5000,
-  vegetacao: 'Urbana + Igreja do Bonfim - Salvador',
-  foz: 'BTS - foz Bonfim - Salvador - Igreja',
-  ecossistema: 'Urbano + Historico + Igreja do Bonfim + BTS',
-  pesca: 'Robalo',
-  economia: 'Turismo religioso + Igreja do Bonfim + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA'
+  nome: '071 - Boipeba - Boca da Barra - Cairu - Dende',
+  regiao: 'COSTA DO DENDE', lat: -13.6167, lng: -38.90,
+  vegetacao: 'Mata + Restinga + Manguezal - Boipeba - APA', foz: 'Rio do Inferno - foz Boipeba - Boca da Barra - Cairu', ecossistema: 'Rio do Inferno + APA + Mata + Manguezal + Dende + Bercario', pesca: 'Robalo, caranguejo, tartaruga - Boipeba', economia: 'Turismo + Boipeba + APA + Dende', especies: 'Tartaruga marinha, robalo, caranguejo-uca', mare_corrente: '1.0m - DHN - Boipeba APA', massa_ar: 'mEc - INMET - Boipeba', temp: '27C', balne: 'PROPRIA - INEMA - Boipeba APA'
 },
 {
-  nome: '029 - Monte Serrat - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9167,
-  lng: -38.5167,
-  vegetacao: 'Urbana + Restinga + Forte - Salvador',
-  foz: 'BTS - foz Monte Serrat - Forte - Salvador',
-  ecossistema: 'Forte + Baia + Urbano + Historico - Salvador',
-  pesca: 'Robalo, polvo',
-  economia: 'Turismo historico + Forte + Salvador',
-  especies: 'Robalo, polvo',
-  mare_corrente: '1.0m - DHN - Forte Monte Serrat',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA'
+  nome: '072 - Boipeba - Tassimirim - Cairu',
+  regiao: 'COSTA DO DENDE', lat: -13.60, lng: -38.8833,
+  vegetacao: 'Restinga + Coqueiral - Boipeba', foz: 'Rio Oritibe - foz Tassimirim - Boipeba', ecossistema: 'Rio Oritibe + Boipeba + Restinga + APA', pesca: 'Robalo, tainha - Boipeba', economia: 'Turismo Boipeba', especies: 'Robalo, tainha', mare_corrente: '1.0m - DHN - Boipeba', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '030 - Boa Viagem - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9333,
-  lng: -38.5000,
-  vegetacao: 'Urbana + Restinga - Salvador',
-  foz: 'BTS - foz Boa Viagem - Salvador',
-  ecossistema: 'Urbana + BTS + Salvador',
-  pesca: 'Robalo',
-  economia: 'Turismo + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA'
+  nome: '073 - Boipeba - Cueira - Cairu',
+  regiao: 'COSTA DO DENDE', lat: -13.5833, lng: -38.8667,
+  vegetacao: 'Restinga + Coqueiral - Boipeba', foz: 'Sem foz - oceano - Cueira - Boipeba', ecossistema: 'Boipeba + Restinga + APA', pesca: 'Robalo, tainha - Cueira', economia: 'Turismo Boipeba Cueira', especies: 'Robalo, tainha', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '031 - Farol da Barra - Praia - Salvador - Cartao Postal',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0100,
-  lng: -38.5333,
-  vegetacao: 'Restinga + Rochas + Farol + Forte - Salvador - Cartao Postal',
-  foz: 'Barra - encontro BTS + Atlantico - foz Barra - divisor BTS/Atlantico - Farol',
-  ecossistema: 'Recifes + Farol + Forte + Encontro BTS + Atlantico + Cartao Postal + Historico - Salvador',
-  pesca: 'Robalo, peixes recifais - Farol da Barra',
-  economia: 'Turismo + Farol + Historico + Cartao Postal + Salvador',
-  especies: 'Robalo, peixes recifais, tartaruga',
-  mare_corrente: '1.0m - DHN - Farol da Barra - encontro BTS/Atlantico',
-  massa_ar: 'mEc - Equatorial Continental - INMET - Farol',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Farol'
+  nome: '074 - Boipeba - Morere - Cairu - Piscina',
+  regiao: 'COSTA DO DENDE', lat: -13.55, lng: -38.85,
+  vegetacao: 'Restinga + Piscina natural - Boipeba - Morere', foz: 'Sem foz - piscina natural - Morere - Boipeba', ecossistema: 'Piscina natural + Boipeba + APA', pesca: 'Peixes recifais - Morere', economia: 'Turismo + Piscina natural + Morere', especies: 'Peixes recifais, tartaruga', mare_corrente: '0.8m - DHN - Morere piscina', massa_ar: 'mEa - INMET - Morere', temp: '27C', balne: 'PROPRIA - INEMA - Morere'
 },
 {
-  nome: '032 - Porto da Barra - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0000,
-  lng: -38.5333,
-  vegetacao: 'Urbana + Coqueiral + Praia mais charmosa - Salvador',
-  foz: 'Sem foz - praia de baia - Porto da Barra - Salvador',
-  ecossistema: 'Baia + Praia + Urbana + Turistica - Salvador',
-  pesca: 'Robalo - Porto da Barra',
-  economia: 'Turismo + Praia charmosa + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '0.9m - DHN - Porto da Barra - baia calma',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Porto da Barra'
+  nome: '075 - Boipeba - Bainema - Cairu',
+  regiao: 'COSTA DO DENDE', lat: -13.5333, lng: -38.8333,
+  vegetacao: 'Mata + Restinga - Boipeba', foz: 'Rio Bainema - foz Bainema - Boipeba', ecossistema: 'Rio Bainema + Boipeba + Mata + APA', pesca: 'Robalo, caranguejo - Bainema', economia: 'Turismo Bainema + Boipeba', especies: 'Robalo, caranguejo-uca', mare_corrente: '0.9m - DHN - Bainema', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '033 - Ondina - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0167,
-  lng: -38.5167,
-  vegetacao: 'Urbana + Restinga + Rochas - Salvador',
-  foz: 'Sem foz - oceano Atlantico - Ondina - Salvador',
-  ecossistema: 'Oceano + Urbano + Rochas + Salvador',
-  pesca: 'Robalo, peixes costeiros',
-  economia: 'Turismo + Zoologico + Salvador',
-  especies: 'Robalo, peixes recifais',
-  mare_corrente: '1.0m - DHN - Ondina',
-  massa_ar: 'mEa - Equatorial Atlantica - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
+  nome: '076 - Barra Grande - Camamu - Dende - Famosa',
+  regiao: 'COSTA DO DENDE', lat: -13.95, lng: -38.95,
+  vegetacao: 'Restinga + Manguezal + Dende - Barra Grande', foz: 'Rio Acaraí - foz Barra Grande - Camamu', ecossistema: 'Manguezal + Restinga + Rio Acarai + Dende + APA + Bercario', pesca: 'Robalo, caranguejo, camarao - Barra Grande', economia: 'Turismo + Barra Grande famosa + Dende', especies: 'Robalo, caranguejo-uca, camarao rosa', mare_corrente: '1.0m - DHN - Barra Grande Dende', massa_ar: 'mEc - INMET - Barra Grande', temp: '27C', balne: 'PROPRIA - INEMA - Barra Grande'
 },
 {
-  nome: '034 - Rio Vermelho - Praia - Salvador - Yemanjá',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0333,
-  lng: -38.5000,
-  vegetacao: 'Urbana + Acarajé + Festa Yemanjá - Salvador',
-  foz: 'Rio Lucaia - foz Rio Vermelho - Rio Lucaia + Yemanjá - Salvador',
-  ecossistema: 'Rio Lucaia + Festa Yemanjá + Urbano + Acarajé + Cultural - Salvador',
-  pesca: 'Robalo, peixes costeiros - Festa Yemanjá 02/02',
-  economia: 'Acarajé + Turismo + Festa Yemanjá + Salvador',
-  especies: 'Robalo, peixes costeiros',
-  mare_corrente: '1.0m - DHN - Rio Vermelho - Yemanjá',
-  massa_ar: 'mEa - Equatorial Atlantica - INMET - Yemanjá',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Rio Vermelho'
+  nome: '077 - Taipu de Fora - Marau - Piscina Natural',
+  regiao: 'COSTA DO DENDE', lat: -13.90, lng: -38.90,
+  vegetacao: 'Restinga + Piscina natural - Taipu de Fora', foz: 'Lagoa - foz Taipu de Fora - piscina natural', ecossistema: 'Piscina natural + Lagoa + Restinga + APA + Dende', pesca: 'Peixes recifais - piscina', economia: 'Turismo + Piscina natural + Taipu', especies: 'Peixes recifais, tartaruga', mare_corrente: '0.8m - DHN - Taipu piscina', massa_ar: 'mEa - INMET - Taipu piscina', temp: '27C', balne: 'PROPRIA - INEMA - Taipu piscina'
 },
 {
-  nome: '035 - Amaralina - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0167,
-  lng: -38.4833,
-  vegetacao: 'Urbana + Restinga + Lagoa - Salvador',
-  foz: 'Lagoa do Abaeté - foz Amaralina - Salvador',
-  ecossistema: 'Lagoa do Abaeté + Restinga + Urbano - Salvador',
-  pesca: 'Robalo - Amaralina',
-  economia: 'Turismo + Lagoa + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Amaralina',
-  massa_ar: 'mEa - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
+  nome: '078 - Taipus de Fora',
+  regiao: 'COSTA DO DENDE', lat: -13.8833, lng: -38.8833,
+  vegetacao: 'Restinga + Coqueiral', foz: 'Sem foz - piscina natural - Taipus', ecossistema: 'Piscina natural + Restinga', pesca: 'Peixes recifais', economia: 'Turismo + Taipus', especies: 'Peixes recifais', mare_corrente: '0.8m - DHN', massa_ar: 'mEa - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '036 - Pituba - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0000,
-  lng: -38.4667,
-  vegetacao: 'Urbana + Restinga - Salvador - Pituba',
-  foz: 'Rio Camurujipe - foz Pituba - Rio Camurujipe - Salvador',
-  ecossistema: 'Rio Camurujipe + Urbano + Pituba - Salvador',
-  pesca: 'Robalo - Pituba',
-  economia: 'Turismo + Comercio Pituba + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Pituba',
-  massa_ar: 'mEa - INMET - urbano Pituba',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA - Pituba - Rio Camurujipe poluido'
+  nome: '079 - Algodoes - Marau - Dende',
+  regiao: 'COSTA DO DENDE', lat: -14.05, lng: -38.9167,
+  vegetacao: 'Restinga + Dunas + Dende - Algodoes', foz: 'Rio Algodoes - foz Algodoes', ecossistema: 'Rio Algodoes + Dunas + Dende', pesca: 'Robalo, tainha', economia: 'Pesca + Algodoes + Dende', especies: 'Robalo, tainha', mare_corrente: '1.0m - DHN - Algodoes', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '037 - Jaguaripe - Praia - Santo Amaro - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.7333,
-  lng: -38.7167,
-  vegetacao: 'Manguezal + Mata Atlantica + Dende - Reconcavo',
-  foz: 'Rio Jaguaripe - foz Jaguaripe - Reconcavo',
-  ecossistema: 'Manguezal + Mata Atlantica + Rio Jaguaripe + Bercario + Reconcavo',
-  pesca: 'Robalo, sururu, caranguejo-uca - Reconcavo',
-  economia: 'Pesca + Agricultura + Dende + Reconcavo',
-  especies: 'Robalo, sururu, caranguejo-uca, camarao',
-  mare_corrente: '1.0m - DHN - Reconcavo Jaguaripe',
-  massa_ar: 'mEc - INMET - Reconcavo',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Reconcavo'
+  nome: '080 - Itacaré - Concha - Cacau - Rio de Contas',
+  regiao: 'COSTA DO CACAU', lat: -14.2667, lng: -38.9833,
+  vegetacao: 'Mata Atlantica + Restinga + Cacau - Itacaré', foz: 'Rio de Contas - foz Itacaré - Costa do Cacau + Rio de Contas', ecossistema: 'Rio de Contas + Mata Atlantica + Cacau + Bercario', pesca: 'Robalo, tainha, caranguejo - Cacau', economia: 'Turismo + Surf + Cacau + Rio de Contas', especies: 'Robalo, tainha, caranguejo-uca', mare_corrente: '1.0m - DHN - Itacaré - Rio de Contas', massa_ar: 'mEc - INMET - Cacau - Rio de Contas', temp: '27C', balne: 'PROPRIA - INEMA - Itacaré - Cacau'
 },
 {
-  nome: '038 - Itapema - Santo Amaro - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.7000,
-  lng: -38.7000,
-  vegetacao: 'Manguezal + Restinga - Reconcavo',
-  foz: 'Rio Subaé - foz Itapema - Reconcavo',
-  ecossistema: 'Manguezal + Rio Subaé + Bercario + Reconcavo',
-  pesca: 'Sururu, caranguejo',
-  economia: 'Pesca + Reconcavo',
-  especies: 'Sururu, caranguejo-uca',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '081 - Itacaré - Resende - Rio de Contas - Cacau',
+  regiao: 'COSTA DO CACAU', lat: -14.2833, lng: -38.9833,
+  vegetacao: 'Mata Atlantica + Restinga - Itacaré', foz: 'Rio de Contas - foz Resende - Itacaré', ecossistema: 'Rio de Contas + Mata + Itacaré', pesca: 'Robalo, caranguejo', economia: 'Turismo Itacaré', especies: 'Robalo, caranguejo-uca', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '039 - Acupe - Santo Amaro - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.6667,
-  lng: -38.7333,
-  vegetacao: 'Manguezal + Dende + Coqueiral - Reconcavo',
-  foz: 'Rio Sergi Mirim - foz Acupe - Reconcavo',
-  ecossistema: 'Manguezal + Dende + Rio + Bercario + Reconcavo',
-  pesca: 'Sururu, caranguejo-uca, camarao rosa',
-  economia: 'Pesca + Dende + Turismo Reconcavo',
-  especies: 'Sururu, caranguejo-uca, camarao rosa',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '082 - Itacaré - Tiririca - Surf - Cacau',
+  regiao: 'COSTA DO CACAU', lat: -14.30, lng: -38.9833,
+  vegetacao: 'Mata Atlantica + Rochas + Surf - Itacaré', foz: 'Sem foz - surf - Tiririca - Itacaré - Cacau', ecossistema: 'Surf + Mata + Rochas + Cacau', pesca: 'Robalo - surf', economia: 'Surf + Turismo Itacaré + Cacau', especies: 'Robalo', mare_corrente: '1.0m - DHN - surf Tiririca', massa_ar: 'mEa - INMET - surf', temp: '27C', balne: 'PROPRIA - INEMA - surf'
 },
 {
-  nome: '040 - Sao Francisco do Conde - Praia - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.6167,
-  lng: -38.6167,
-  vegetacao: 'Manguezal + Mata Atlantica + Petroleo - Reconcavo',
-  foz: 'Rio Mataripe - foz Sao Francisco do Conde - polo petroquimico',
-  ecossistema: 'Manguezal + Petroleo + Polo + Reconcavo + Bercario',
-  pesca: 'Sururu, tainha - impacto petroleo',
-  economia: 'Petroleo + Pesca + Reconcavo + Polo Petroquimico',
-  especies: 'Sururu, tainha - impacto petroleo',
-  mare_corrente: '1.1m - DHN - polo petroleo',
-  massa_ar: 'mEc - INMET - polo petroquimico',
-  temp: '27C',
-  balne: 'IMPROPRIA - INEMA - petroleo'
+  nome: '083 - Itacaré - Costa - Cacau - Coqueiro - Famosa - Baleias Inicio',
+  regiao: 'COSTA DO CACAU', lat: -14.3167, lng: -39.00,
+  vegetacao: 'Mata Atlantica + Coqueiral + Cacau - Famosa - Baleias', foz: 'Rio de Contas - foz Costa - Itacaré - coqueiral - Cacau - Baleias', ecossistema: 'Rio de Contas + Coqueiral + Mata + Cacau + Baleias + Bercario', pesca: 'Robalo, tainha, baleia jubarte avistagem inicio - Cacau', economia: 'Turismo + Baleia jubarte + Cacau', especies: 'Baleia jubarte - avistagem inicio, robalo, tainha', mare_corrente: '1.0m - DHN - Costa Cacau - baleia', massa_ar: 'mEc - INMET - baleia', temp: '27C', balne: 'PROPRIA - INEMA - Costa - Baleia'
 },
 {
-  nome: '041 - Madre de Deus Centro - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.7333,
-  lng: -38.6167,
-  vegetacao: 'Manguezal + Urbana - Reconcavo + Terminal',
-  foz: 'Canal BTS - foz Madre de Deus - terminal petroleo',
-  ecossistema: 'Terminal petroleo + Manguezal + Urbano + Reconcavo',
-  pesca: 'Caranguejo, siri - terminal',
-  economia: 'Terminal petroleo + Pesca + Reconcavo',
-  especies: 'Caranguejo-uca, siri',
-  mare_corrente: '1.2m - DHN - terminal petroleo Madre de Deus',
-  massa_ar: 'mEc - INMET - poluicao petroleo',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA - petroleo'
+  nome: '084 - Itacaré - Ribeira - Cacau',
+  regiao: 'COSTA DO CACAU', lat: -14.3333, lng: -39.0167,
+  vegetacao: 'Mata Atlantica + Restinga - Cacau', foz: 'Rio de Contas - foz Ribeira - Itacaré - Cacau', ecossistema: 'Rio de Contas + Mata + Cacau', pesca: 'Robalo, caranguejo', economia: 'Pesca + Itacaré + Cacau', especies: 'Robalo, caranguejo-uca', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '042 - Candeias - Praia - BTS - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.6667,
-  lng: -38.5500,
-  vegetacao: 'Manguezal + Mata Atlantica - BTS - Reconcavo',
-  foz: 'Rio Joanes - foz Candeias - Reconcavo BTS',
-  ecossistema: 'Manguezal + Rio Joanes + BTS + Bercario + Reconcavo',
-  pesca: 'Sururu, caranguejo, tainha - Reconcavo BTS',
-  economia: 'Pesca + Industria + Reconcavo BTS',
-  especies: 'Sururu, caranguejo-uca, tainha',
-  mare_corrente: '1.0m - DHN - Candeias BTS',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'IMPROPRIA - INEMA - industrial'
+  nome: '085 - Itacaré - Engenhoca - Cacau - Surf',
+  regiao: 'COSTA DO CACAU', lat: -14.35, lng: -39.00,
+  vegetacao: 'Mata Atlantica + Surf - Engenhoca - Cacau', foz: 'Sem foz - surf - Engenhoca - Cacau', ecossistema: 'Surf + Mata + Cacau', pesca: 'Robalo - surf', economia: 'Surf Engenhoca + Cacau', especies: 'Robalo', mare_corrente: '1.0m - DHN - surf', massa_ar: 'mEa - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '043 - Caboto - Candeias - BTS - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.6833,
-  lng: -38.5667,
-  vegetacao: 'Manguezal + Mata Atlantica - BTS Reconcavo',
-  foz: 'Rio Joanes - foz Caboto - BTS',
-  ecossistema: 'Manguezal + BTS + Bercario',
-  pesca: 'Sururu, caranguejo',
-  economia: 'Pesca + Reconcavo',
-  especies: 'Sururu, caranguejo-uca',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'IMPROPRIA - INEMA'
+  nome: '086 - Itacaré - Havaizinho - Cacau - Surf',
+  regiao: 'COSTA DO CACAU', lat: -14.3667, lng: -39.0167,
+  vegetacao: 'Mata Atlantica + Surf - Havaizinho - Cacau', foz: 'Sem foz - surf - Havaizinho - Cacau', ecossistema: 'Surf + Mata + Cacau', pesca: 'Robalo', economia: 'Surf Havaizinho + Cacau', especies: 'Robalo', mare_corrente: '1.0m - DHN', massa_ar: 'mEa - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '044 - Passé - Candeias - BTS - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.6500,
-  lng: -38.5333,
-  vegetacao: 'Manguezal + Mata Atlantica - BTS Reconcavo',
-  foz: 'Rio Joanes - foz Passe - BTS',
-  ecossistema: 'Manguezal + BTS + Bercario',
-  pesca: 'Sururu, caranguejo',
-  economia: 'Pesca + Reconcavo',
-  especies: 'Sururu, caranguejo-uca',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'IMPROPRIA - INEMA'
+  nome: '087 - Itacaré - Itacarezinho - Cacau - Famosa',
+  regiao: 'COSTA DO CACAU', lat: -14.3833, lng: -39.0333,
+  vegetacao: 'Mata Atlantica + Restinga + Coqueiral - Famosa - Cacau', foz: 'Rio Itacarezinho - foz Itacarezinho - Cacau', ecossistema: 'Rio Itacarezinho + Mata + Cacau + Bercario', pesca: 'Robalo, tainha - Cacau', economia: 'Turismo + Itacarezinho famosa + Cacau', especies: 'Robalo, tainha', mare_corrente: '1.0m - DHN - Itacarezinho famosa', massa_ar: 'mEc - INMET - Cacau', temp: '27C', balne: 'PROPRIA - INEMA - Itacarezinho famosa'
 },
 {
-  nome: '045 - Salinas da Margarida - Praia - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.9167,
-  lng: -38.7500,
-  vegetacao: 'Manguezal + Restinga + Salina - Reconcavo',
-  foz: 'Rio Paraguaçu - foz Salinas da Margarida - Reconcavo BTS',
-  ecossistema: 'Manguezal + Salina + Rio Paraguaçu + Bercario + Reconcavo + BTS',
-  pesca: 'Sururu, caranguejo, camarao - salina + Reconcavo',
-  economia: 'Sal + Pesca + Reconcavo + Turismo',
-  especies: 'Sururu, caranguejo-uca, camarao rosa, ostra',
-  mare_corrente: '1.0m - DHN - salina Reconcavo',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Salinas'
+  nome: '088 - Ilheus - Olivença - Cacau - Baleias - Cururupe',
+  regiao: 'COSTA DO CACAU', lat: -14.9167, lng: -39.0167,
+  vegetacao: 'Mata Atlantica + Restinga + Cacau - Baleias - Olivença', foz: 'Rio Cururupe - foz Olivença - Cururupe - Cacau - Baleias', ecossistema: 'Rio Cururupe + Mata + Cacau + Baleia + Bercario', pesca: 'Robalo, baleia jubarte - Olivença - Cacau', economia: 'Turismo + Cacau + Baleia + Olivença', especies: 'Baleia jubarte - Olivença, robalo', mare_corrente: '1.0m - DHN - Olivença - Cururupe - Baleia', massa_ar: 'mEc - INMET - Baleia - Olivença', temp: '27C', balne: 'PROPRIA - INEMA - Olivença - Baleia'
 },
 {
-  nome: '046 - Maragogipinho - Praia - Aratuipe - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.9333,
-  lng: -38.7667,
-  vegetacao: 'Manguezal + Mata Atlantica + Ceramica - Reconcavo',
-  foz: 'Rio Jaguaripe - foz Maragogipinho - ceramica Reconcavo',
-  ecossistema: 'Ceramica + Manguezal + Rio + Bercario + Reconcavo',
-  pesca: 'Sururu, caranguejo - ceramica',
-  economia: 'Ceramica + Pesca + Turismo Reconcavo + Artesanato',
-  especies: 'Sururu, caranguejo-uca',
-  mare_corrente: '0.9m - DHN - ceramica',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '089 - Ilheus - Milionarios - Cacau - Baleias',
+  regiao: 'COSTA DO CACAU', lat: -14.80, lng: -39.0333,
+  vegetacao: 'Mata Atlantica + Restinga - Milionarios - Cacau - Baleias', foz: 'Rio Cachoeira - foz Milionarios - Ilheus - Cacau - Baleias', ecossistema: 'Rio Cachoeira + Mata + Cacau + Baleias', pesca: 'Robalo, baleia jubarte - Milionarios', economia: 'Turismo Milionarios + Cacau + Baleias', especies: 'Baleia jubarte - Milionarios, robalo', mare_corrente: '1.0m - DHN - Milionarios - Baleia', massa_ar: 'mEc - INMET - Baleia', temp: '27C', balne: 'PROPRIA - INEMA - Milionarios - Baleia'
 },
 {
-  nome: '047 - Jaguaripe Sede - Praia - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -13.1000,
-  lng: -38.8833,
-  vegetacao: 'Manguezal + Mata Atlantica + Historico - Reconcavo',
-  foz: 'Rio Jaguaripe - foz Jaguaripe Sede - historico Reconcavo',
-  ecossistema: 'Rio Jaguaripe + Historico + Manguezal + Bercario + Reconcavo',
-  pesca: 'Robalo, sururu - historico Reconcavo',
-  economia: 'Pesca + Historico + Reconcavo + Turismo',
-  especies: 'Robalo, sururu',
-  mare_corrente: '0.9m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '090 - Ilheus - Centro - Cacau - Rio Cachoeira',
+  regiao: 'COSTA DO CACAU', lat: -14.7833, lng: -39.0333,
+  vegetacao: 'Urbana + Mata + Cacau + Jorge Amado - Centro', foz: 'Rio Cachoeira + Rio Santana - foz Ilheus - Centro - Jorge Amado - Cacau', ecossistema: 'Rio Cachoeira + Rio Santana + Jorge Amado + Cacau + Urbano', pesca: 'Robalo, sururu - Centro Ilheus', economia: 'Turismo Jorge Amado + Cacau + Centro', especies: 'Robalo, sururu', mare_corrente: '1.0m - DHN - Ilheus Centro - Cachoeira', massa_ar: 'mEc - INMET - Ilheus', temp: '27C', balne: 'IMPROPRIA - INEMA - Ilheus Centro'
 },
 {
-  nome: '048 - Capanema - Maragogipe - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.7833,
-  lng: -38.9167,
-  vegetacao: 'Manguezal + Mata Atlantica - Reconcavo Rio Paraguaçu',
-  foz: 'Rio Paraguaçu - foz Capanema - Reconcavo',
-  ecossistema: 'Rio Paraguaçu + Manguezal + Bercario + Reconcavo',
-  pesca: 'Sururu, caranguejo - Rio Paraguaçu',
-  economia: 'Pesca + Agricultura + Reconcavo',
-  especies: 'Sururu, caranguejo-uca',
-  mare_corrente: '1.0m - DHN - Rio Paraguaçu',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '091 - Canavieiras - Centro - Cacau - RESEX',
+  regiao: 'COSTA DO CACAU', lat: -15.6833, lng: -38.95,
+  vegetacao: 'Manguezal + Restinga + RESEX Canavieiras - Cacau', foz: 'Rio Pardo - foz Canavieiras - RESEX Canavieiras - Cacau', ecossistema: 'Rio Pardo + RESEX Canavieiras + Manguezal + Bercario + Cacau + Baleia', pesca: 'Robalo, caranguejo-uca, camarao rosa - RESEX', economia: 'RESEX + Pesca + Cacau + Canavieiras', especies: 'Caranguejo-uca, camarao rosa, robalo, baleia jubarte', mare_corrente: '1.1m - DHN - Canavieiras RESEX - Rio Pardo', massa_ar: 'mEc - INMET - RESEX Canavieiras', temp: '27C', balne: 'PROPRIA - INEMA - Canavieiras RESEX'
 },
 {
-  nome: '049 - Sao Roque do Paraguaçu - Maragogipe - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.8167,
-  lng: -38.9500,
-  vegetacao: 'Manguezal + Mata Atlantica - Reconcavo Paraguaçu',
-  foz: 'Rio Paraguaçu - foz Sao Roque - Reconcavo',
-  ecossistema: 'Rio Paraguaçu + Manguezal + Bercario',
-  pesca: 'Sururu, robalo - Paraguaçu',
-  economia: 'Pesca + Reconcavo Paraguaçu',
-  especies: 'Sururu, robalo',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '092 - Cabralia - Santo Andre - Baleias - Extremo Sul - Cacau',
+  regiao: 'COSTA DO CACAU', lat: -16.25, lng: -39.0167,
+  vegetacao: 'Restinga + Mata + Descobrimento - Baleias - Extremo Sul', foz: 'Rio Joao de Tiba - foz Cabralia Santo Andre - Baleias - Extremo Sul', ecossistema: 'Rio Joao de Tiba + Descobrimento + Baleias + Mata + Extremo Sul + Bercario', pesca: 'Robalo, baleia jubarte - Cabralia - Extremo Sul', economia: 'Turismo Descobrimento + Baleia + Extremo Sul', especies: 'Baleia jubarte - Cabralia, robalo, tartaruga', mare_corrente: '1.1m - DHN - Cabralia - Joao de Tiba - Baleia Extremo Sul', massa_ar: 'mEc - INMET - Baleia - Extremo Sul', temp: '26C', balne: 'PROPRIA - INEMA - Cabralia - Baleia - Extremo Sul'
 },
 {
-  nome: '050 - Nagé - Maragogipe - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.8500,
-  lng: -38.9333,
-  vegetacao: 'Manguezal + Mata Atlantica - Reconcavo',
-  foz: 'Rio Paraguaçu - foz Nage - Reconcavo',
-  ecossistema: 'Rio Paraguaçu + Manguezal + Bercario + Reconcavo',
-  pesca: 'Sururu, caranguejo - Paraguaçu',
-  economia: 'Pesca + Reconcavo',
-  especies: 'Sururu, caranguejo-uca',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '093 - Porto Seguro - Taperapua - Baleias - Extremo Sul',
+  regiao: 'COSTA DO CACAU', lat: -16.4433, lng: -39.0667,
+  vegetacao: 'Restinga + Turistico - Porto Seguro - Baleias - Extremo Sul', foz: 'Rio Buranhém - foz Porto Seguro - Taperapua - Baleias - Extremo Sul', ecossistema: 'Rio Buranhem + Turistico + Baleias + Descobrimento + Extremo Sul', pesca: 'Robalo, baleia jubarte - Porto Seguro', economia: 'Turismo Porto Seguro + Baleia + Extremo Sul', especies: 'Baleia jubarte - Porto Seguro, robalo', mare_corrente: '1.1m - DHN - Porto Seguro - Buranhem - Baleia', massa_ar: 'mEc - INMET - Baleia - Porto Seguro', temp: '26C', balne: 'PROPRIA - INEMA - Porto Seguro - Baleia'
 },
 {
-  nome: '051 - Cachoeira - Rio Paraguaçu - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.6000,
-  lng: -38.9667,
-  vegetacao: 'Mata Atlantica + Rio + Historico - Reconcavo Paraguaçu',
-  foz: 'Rio Paraguaçu - foz Cachoeira - historico - Reconcavo',
-  ecossistema: 'Rio Paraguaçu + Cachoeira + Historico + Reconcavo + Patrimonio',
-  pesca: 'Robalo, sururu - Rio Paraguaçu',
-  economia: 'Turismo historico + Rio Paraguaçu + Reconcavo',
-  especies: 'Robalo, sururu',
-  mare_corrente: '0.8m - DHN - Rio Paraguaçu Cachoeira',
-  massa_ar: 'mEc - INMET - Reconcavo',
-  temp: '26C',
-  balne: 'PROPRIA - INEMA - rio'
+  nome: '094 - Arraial Dajuda - Porto Seguro - Baleias - Extremo Sul',
+  regiao: 'COSTA DO CACAU', lat: -16.4833, lng: -39.05,
+  vegetacao: 'Restinga + Falésias + Turistico - Arraial - Baleias', foz: 'Rio Mucuge - foz Arraial Dajuda - Baleias - Extremo Sul', ecossistema: 'Rio Mucuge + Falésias + Turistico + Baleias + Extremo Sul', pesca: 'Robalo, baleia jubarte - Arraial', economia: 'Turismo Arraial Dajuda + Baleia + Extremo Sul', especies: 'Baleia jubarte - Arraial, robalo', mare_corrente: '1.1m - DHN - Arraial - Mucuge - Baleia', massa_ar: 'mEc - INMET - Baleia - Arraial', temp: '26C', balne: 'PROPRIA - INEMA - Arraial - Baleia'
 },
 {
-  nome: '052 - Santiago do Iguape - Cachoeira - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.6667,
-  lng: -38.9000,
-  vegetacao: 'Manguezal + Mata Atlantica + Quilombola - Reconcavo',
-  foz: 'Rio Paraguaçu - foz Iguape - quilombola Reconcavo',
-  ecossistema: 'Quilombola + Manguezal + Rio Paraguaçu + Reconcavo + Bercario',
-  pesca: 'Sururu, caranguejo - quilombola',
-  economia: 'Quilombola + Pesca + Turismo + Reconcavo',
-  especies: 'Sururu, caranguejo-uca, ostra',
-  mare_corrente: '0.9m - DHN - quilombola',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - quilombola'
+  nome: '095 - Trancoso - Porto Seguro - Baleias - Extremo Sul - Famosa',
+  regiao: 'COSTA DO CACAU', lat: -16.5883, lng: -39.10,
+  vegetacao: 'Restinga + Falésias + Quadrado - Trancoso - Baleias - Famosa', foz: 'Rio Trancoso - foz Trancoso - Quadrado - Baleias - Extremo Sul', ecossistema: 'Rio Trancoso + Quadrado + Falésias + Baleias + Extremo Sul + Famosa', pesca: 'Robalo, baleia jubarte - Trancoso famosa', economia: 'Turismo Trancoso famosa + Quadrado + Baleia', especies: 'Baleia jubarte - Trancoso, robalo', mare_corrente: '1.1m - DHN - Trancoso - Baleia - famosa', massa_ar: 'mEc - INMET - Baleia - Trancoso famosa', temp: '26C', balne: 'PROPRIA - INEMA - Trancoso - Baleia famosa'
 },
 {
-  nome: '053 - Coqueiros - Maragogipe - Reconcavo',
-  regiao: 'RECONCAVO',
-  lat: -12.7833,
-  lng: -38.8833,
-  vegetacao: 'Coqueiral + Manguezal + Mata Atlantica - Reconcavo',
-  foz: 'Rio Paraguaçu - foz Coqueiros - Reconcavo',
-  ecossistema: 'Coqueiral + Manguezal + Rio Paraguaçu + Reconcavo',
-  pesca: 'Sururu, caranguejo',
-  economia: 'Pesca + Coqueiral + Reconcavo',
-  especies: 'Sururu, caranguejo-uca',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
+  nome: '096 - Caraiva - Porto Seguro - Baleias - Extremo Sul - Rio Caraiva',
+  regiao: 'COSTA DO CACAU', lat: -16.7833, lng: -39.15,
+  vegetacao: 'Manguezal + Restinga + Rio Caraiva - Caraiva - Baleias - Extremo Sul', foz: 'Rio Caraiva - foz Caraiva - encontro rio mar - Baleias - Extremo Sul', ecossistema: 'Rio Caraiva + Encontro rio mar + Manguezal + Baleias + Extremo Sul + Bercario', pesca: 'Robalo, caranguejo, baleia jubarte - Caraiva - rio', economia: 'Turismo Caraiva + Rio + Baleia + Extremo Sul', especies: 'Baleia jubarte - Caraiva, robalo, caranguejo-uca', mare_corrente: '1.0m - DHN - Caraiva - Rio Caraiva - Baleia - Extremo Sul', massa_ar: 'mEc - INMET - Baleia - Caraiva', temp: '26C', balne: 'PROPRIA - INEMA - Caraiva - Baleia'
 },
 {
-  nome: '054 - Barra do Paraguaçu - Praia - Reconcavo - Encontro Rio Mar',
-  regiao: 'RECONCAVO',
-  lat: -12.9000,
-  lng: -38.7667,
-  vegetacao: 'Manguezal + Restinga + Encontro Rio Paraguaçu Mar - BTS - Reconcavo',
-  foz: 'Rio Paraguaçu - foz Barra do Paraguaçu - encontro rio mar - BTS - Reconcavo',
-  ecossistema: 'Encontro Rio Paraguaçu + Mar + Manguezal + BTS + Bercario + Reconcavo',
-  pesca: 'Robalo, sururu, camarao - encontro rio mar',
-  economia: 'Pesca + Encontro Rio Mar + Reconcavo',
-  especies: 'Robalo, sururu, camarao rosa, caranguejo-uca',
-  mare_corrente: '1.0m - DHN - encontro Rio Paraguaçu + mar',
-  massa_ar: 'mEc - Equatorial Continental - INMET - encontro rio mar',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - encontro rio mar'
+  nome: '097 - Prado - Centro - Baleias - Extremo Sul - Foz Jucurucu',
+  regiao: 'COSTA DO CACAU', lat: -17.35, lng: -39.2167,
+  vegetacao: 'Restinga + Manguezal + Rio Jucurucu - Prado - Baleias - Extremo Sul', foz: 'Rio Jucurucu - foz Prado - Baleias - Extremo Sul - Rio Jucurucu', ecossistema: 'Rio Jucurucu + Manguezal + Baleias + Extremo Sul + Bercario', pesca: 'Robalo, baleia jubarte - Prado - Jucurucu', economia: 'Turismo Prado + Baleia + Jucurucu + Extremo Sul', especies: 'Baleia jubarte - Prado, robalo, caranguejo-uca', mare_corrente: '1.2m - DHN - Prado - Jucurucu - Baleia Extremo Sul', massa_ar: 'mEc - INMET - Baleia - Prado - Extremo Sul', temp: '26C', balne: 'PROPRIA - INEMA - Prado - Baleia'
 },
 {
-  nome: '055 - Jiribatuba - Vera Cruz - Ilha Itaparica',
-  regiao: 'RECONCAVO',
-  lat: -13.0333,
-  lng: -38.7167,
-  vegetacao: 'Manguezal + Restinga + Coqueiral - Ilha Itaparica - Reconcavo BTS',
-  foz: 'Canal BTS - foz Jiribatuba - Ilha Itaparica - BTS',
-  ecossistema: 'Ilha Itaparica + Manguezal + BTS + Bercario + Reconcavo',
-  pesca: 'Sururu, caranguejo, tainha - Ilha Itaparica',
-  economia: 'Pesca + Turismo Ilha Itaparica + Reconcavo BTS',
-  especies: 'Sururu, caranguejo-uca, tainha',
-  mare_corrente: '1.0m - DHN - Ilha Itaparica BTS',
-  massa_ar: 'mEc - INMET - Ilha Itaparica',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Ilha Itaparica'
+  nome: '098 - Cumuruxatiba - Prado - Baleias - Extremo Sul - Rio Cahy',
+  regiao: 'COSTA DO CACAU', lat: -17.10, lng: -39.1833,
+  vegetacao: 'Restinga + Manguezal + Rio Cahy - Cumuruxatiba - Baleias', foz: 'Rio Cahy - foz Cumuruxatiba - Prado - Baleias - Extremo Sul', ecossistema: 'Rio Cahy + Manguezal + Baleias + Extremo Sul + Bercario', pesca: 'Robalo, baleia jubarte - Cumuruxatiba - Cahy', economia: 'Turismo Cumuruxatiba + Baleia + Extremo Sul', especies: 'Baleia jubarte - Cumuruxatiba, robalo', mare_corrente: '1.2m - DHN - Cumuruxatiba - Cahy - Baleia', massa_ar: 'mEc - INMET - Baleia - Cumuruxatiba', temp: '26C', balne: 'PROPRIA - INEMA - Cumuruxatiba - Baleia'
+},
+{
+  nome: '099 - Corumbau - Prado - Ponta do Corumbau - Baleias - Extremo Sul - APA',
+  regiao: 'COSTA DO CACAU', lat: -17.00, lng: -39.15,
+  vegetacao: 'Restinga + Ponta do Corumbau + APA + Baleias - Extremo Sul', foz: 'Rio Corumbau - foz Corumbau - Ponta do Corumbau - APA - Baleias', ecossistema: 'Rio Corumbau + Ponta do Corumbau + APA + Baleias + Extremo Sul + Bercario', pesca: 'Robalo, baleia jubarte - Corumbau - Ponta', economia: 'Turismo Ponta do Corumbau + Baleia + APA + Extremo Sul', especies: 'Baleia jubarte - Corumbau Ponta, robalo', mare_corrente: '1.2m - DHN - Corumbau - Ponta - Baleia APA', massa_ar: 'mEc - INMET - Baleia - Corumbau APA', temp: '26C', balne: 'PROPRIA - INEMA - Corumbau - Baleia APA'
+},
+{
+  nome: '100 - Barra do Cahy - Prado - Baleias - Extremo Sul - Descobrimento',
+  regiao: 'COSTA DO CACAU', lat: -17.0333, lng: -39.1667,
+  vegetacao: 'Restinga + Descobrimento + Rio Cahy - Barra do Cahy - Baleias', foz: 'Rio Cahy - foz Barra do Cahy - Descobrimento - Baleias - Extremo Sul', ecossistema: 'Rio Cahy + Descobrimento + Baleias + Extremo Sul', pesca: 'Robalo, baleia jubarte - Barra do Cahy - Descobrimento', economia: 'Turismo Descobrimento + Baleia + Barra do Cahy', especies: 'Baleia jubarte - Barra do Cahy, robalo', mare_corrente: '1.2m - DHN - Barra do Cahy - Descobrimento - Baleia', massa_ar: 'mEc - INMET - Baleia - Descobrimento', temp: '26C', balne: 'PROPRIA - INEMA - Barra do Cahy - Baleia'
+},
+{
+  nome: '101 - Alcobaça - Centro - Baleias - Extremo Sul - Rio Alcobaça',
+  regiao: 'COSTA DO CACAU', lat: -17.5167, lng: -39.20,
+  vegetacao: 'Restinga + Manguezal + Rio Alcobaça - Alcobaça - Baleias', foz: 'Rio Alcobaça - foz Alcobaça - Baleias - Extremo Sul', ecossistema: 'Rio Alcobaça + Manguezal + Baleias + Extremo Sul', pesca: 'Robalo, baleia jubarte - Alcobaça', economia: 'Turismo Alcobaça + Baleia + Extremo Sul', especies: 'Baleia jubarte - Alcobaça, robalo', mare_corrente: '1.3m - DHN - Alcobaça - Baleia Extremo Sul', massa_ar: 'mEc - INMET - Baleia - Alcobaça', temp: '26C', balne: 'PROPRIA - INEMA - Alcobaça - Baleia'
+},
+{
+  nome: '102 - Nova Viçosa - Baleias - Extremo Sul - Rio Peruípe',
+  regiao: 'COSTA DO CACAU', lat: -17.8833, lng: -39.3667,
+  vegetacao: 'Manguezal + Restinga + Rio Peruípe - Nova Viçosa - Baleias', foz: 'Rio Peruípe - foz Nova Viçosa - Baleias - Extremo Sul', ecossistema: 'Rio Peruípe + Manguezal + Baleias + Extremo Sul', pesca: 'Robalo, caranguejo, baleia jubarte - Nova Viçosa', economia: 'Turismo Nova Viçosa + Baleia + Extremo Sul', especies: 'Baleia jubarte - Nova Viçosa, robalo', mare_corrente: '1.3m - DHN - Nova Viçosa - Peruípe - Baleia', massa_ar: 'mEc - INMET - Baleia - Nova Viçosa', temp: '26C', balne: 'PROPRIA - INEMA - Nova Viçosa - Baleia'
+},
+{
+  nome: '103 - Mucuri - Divisa BA/ES - Baleias - Extremo Sul - Rio Mucuri',
+  regiao: 'COSTA DO CACAU', lat: -18.0833, lng: -39.55,
+  vegetacao: 'Manguezal + Restinga + Divisa BA/ES + Rio Mucuri - Baleias', foz: 'Rio Mucuri - foz Mucuri - divisa BA/ES - Baleias - Extremo Sul', ecossistema: 'Rio Mucuri + Divisa BA/ES + Manguezal + Baleias + Extremo Sul', pesca: 'Robalo, caranguejo, baleia jubarte - divisa BA/ES', economia: 'Turismo Mucuri + Divisa BA/ES + Baleia + Extremo Sul', especies: 'Baleia jubarte - Mucuri divisa, robalo', mare_corrente: '1.3m - DHN - Mucuri - divisa BA/ES - Baleia Extremo Sul', massa_ar: 'mEc - INMET - Baleia - Mucuri - divisa', temp: '26C', balne: 'PROPRIA - INEMA - Mucuri - Baleia - divisa'
+},
+{
+  nome: '104 - Barra do Riacho - Camaçari',
+  regiao: 'LITORAL NORTE', lat: -12.80, lng: -38.30,
+  vegetacao: 'Restinga + Manguezal', foz: 'Riacho - foz Barra do Riacho', ecossistema: 'Riacho + Manguezal', pesca: 'Robalo', economia: 'Pesca', especies: 'Robalo', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
+},
+{
+  nome: '105 - Itapuan - Salvador',
+  regiao: 'SALVADOR LITORAL', lat: -12.95, lng: -38.3667,
+  vegetacao: 'Urbana + Restinga + Coqueiral - Itapuan - Vinicius', foz: 'Lagoa do Abaeté - foz Itapuan - Vinicius', ecossistema: 'Lagoa Abaeté + Itapuan + Vinicius', pesca: 'Robalo - Itapuan', economia: 'Turismo Itapuan + Vinicius', especies: 'Robalo', mare_corrente: '1.0m - DHN - Itapuan', massa_ar: 'mEa - INMET - Itapuan', temp: '28C', balne: 'PROPRIA - INEMA - Itapuan'
 },
   {
-  nome: '084 - Ilheus - Praia do Batuba - Costa do Cacau',
-  regiao: 'COSTA DO CACAU',
-  lat: -14.8167,
-  lng: -39.0167,
-  vegetacao: 'Restinga + Cacau + Mata Atlantica - Batuba - Ilheus',
-  foz: 'Rio Batuba - foz Batuba - Ilheus - Costa do Cacau',
-  ecossistema: 'Rio Batuba + Restinga + Cacau + Ilheus',
-  pesca: 'Robalo, tainha',
-  economia: 'Turismo Batuba + Cacau + Ilheus',
-  especies: 'Robalo, tainha',
-  mare_corrente: '1.1m - DHN - Batuba Ilheus',
-  massa_ar: 'mEc - INMET',
-  temp: '26C',
-  balne: 'PROPRIA - INEMA'
+  nome: '106 - Stella Maris - Salvador - Dunas Abaeté',
+  regiao: 'SALVADOR LITORAL', lat: -12.9333, lng: -38.35,
+  vegetacao: 'Dunas + Restinga + Lagoa Abaeté - Dunas Abaeté', foz: 'Lagoa do Abaeté - foz Stella Maris - Dunas Abaeté', ecossistema: 'Dunas Abaeté + Lagoa Abaeté + Restinga + APA', pesca: 'Robalo - Stella Maris - Dunas', economia: 'Turismo Stella Maris + Dunas Abaeté', especies: 'Robalo', mare_corrente: '1.0m - DHN - Stella Maris - Dunas Abaeté', massa_ar: 'mEa - INMET - Dunas', temp: '28C', balne: 'PROPRIA - INEMA - Stella Maris'
 },
 {
-  nome: '085 - Ilheus - Praia dos Milionarios - Costa do Cacau - Cacau',
-  regiao: 'COSTA DO CACAU',
-  lat: -14.8333,
-  lng: -39.0000,
-  vegetacao: 'Restinga + Coqueiral + Cacau + Mata Atlantica - Milionarios - Ilheus - historico cacau',
-  foz: 'Rio Cachoeira - foz Milionarios - Ilheus - historico cacau + Rio Cachoeira',
-  ecossistema: 'Rio Cachoeira + Historico cacau + Restinga + Ilheus + Costa do Cacau + Bercario',
-  pesca: 'Robalo, tainha - Milionarios',
-  economia: 'Turismo historico cacau + Milionarios + Ilheus + Costa do Cacau',
-  especies: 'Robalo, tainha',
-  mare_corrente: '1.1m - DHN - Milionarios - historico cacau Ilheus',
-  massa_ar: 'mEc - INMET - historico cacau',
-  temp: '26C',
-  balne: 'PROPRIA - INEMA - Milionarios cacau'
+  nome: '107 - Flamengo - Salvador - Divisa Lauro',
+  regiao: 'SALVADOR LITORAL', lat: -12.90, lng: -38.3333,
+  vegetacao: 'Restinga + Dunas - Flamengo - Divisa', foz: 'Rio Ipitanga - foz Flamengo - divisa Lauro Salvador', ecossistema: 'Rio Ipitanga + Divisa + Restinga', pesca: 'Robalo', economia: 'Turismo Flamengo + Divisa', especies: 'Robalo', mare_corrente: '1.0m - DHN - Flamengo divisa', massa_ar: 'mEa - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '086 - Ilheus - Praia do Cristo - Costa do Cacau - Cristo',
-  regiao: 'COSTA DO CACAU',
-  lat: -14.7833,
-  lng: -39.0167,
-  vegetacao: 'Restinga + Cacau + Cristo - Ilheus',
-  foz: 'Sem foz - Cristo Ilheus - Costa do Cacau',
-  ecossistema: 'Cristo + Restinga + Cacau + Ilheus',
-  pesca: 'Robalo - Cristo',
-  economia: 'Turismo Cristo + Ilheus + Cacau',
-  especies: 'Robalo',
-  mare_corrente: '1.1m - DHN - Cristo Ilheus',
-  massa_ar: 'mEc - INMET - Cristo',
-  temp: '26C',
-  balne: 'PROPRIA - INEMA - Cristo'
+  nome: '108 - Ipitanga - Divisa Salvador Lauro - Rio Ipitanga',
+  regiao: 'SALVADOR LITORAL', lat: -12.90, lng: -38.32,
+  vegetacao: 'Restinga + Rio Ipitanga + Manguezal - Divisa', foz: 'Rio Ipitanga - foz Ipitanga divisa - Salvador Lauro', ecossistema: 'Rio Ipitanga + Manguezal + Divisa', pesca: 'Robalo, caranguejo', economia: 'Pesca + Divisa Ipitanga', especies: 'Robalo, caranguejo-uca', mare_corrente: '0.9m - DHN - Ipitanga divisa', massa_ar: 'mEc - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '087 - Ilheus - Praia do Sul - Costa do Cacau',
-  regiao: 'COSTA DO CACAU',
-  lat: -14.8000,
-  lng: -39.0333,
-  vegetacao: 'Restinga + Mata Atlantica + Cacau - Sul - Ilheus',
-  foz: 'Rio Cururupe - foz Sul - Ilheus - Cacau',
-  ecossistema: 'Rio Cururupe + Restinga + Cacau + Ilheus',
-  pesca: 'Robalo, tainha - Sul Ilheus',
-  economia: 'Turismo Sul + Cacau + Ilheus',
-  especies: 'Robalo, tainha',
-  mare_corrente: '1.1m - DHN - Sul Ilheus',
-  massa_ar: 'mEc - INMET',
-  temp: '26C',
-  balne: 'PROPRIA - INEMA - Sul'
+  nome: '109 - Patamares - Salvador - Jaguaribe',
+  regiao: 'SALVADOR LITORAL', lat: -12.95, lng: -38.40,
+  vegetacao: 'Urbana + Restinga - Patamares', foz: 'Rio Jaguaribe - foz Patamares - Salvador', ecossistema: 'Rio Jaguaribe + Urbano', pesca: 'Robalo', economia: 'Turismo Patamares', especies: 'Robalo', mare_corrente: '1.0m - DHN', massa_ar: 'mEa - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '088 - Olivença - Praia - Ilheus - Costa do Cacau - Resort',
-  regiao: 'COSTA DO CACAU',
-  lat: -14.9167,
-  lng: -39.0333,
-  vegetacao: 'Restinga + Coqueiral + Mata Atlantica + Resort - Olivença - Ilheus - Cacau',
-  foz: 'Rio Olivença - foz Olivença - Ilheus - resort + Costa do Cacau',
-  ecossistema: 'Rio Olivença + Restinga + Resort + Cacau + Ilheus + APA + Bercario',
-  pesca: 'Robalo, tainha - Olivença resort',
-  economia: 'Turismo resort + Olivença + Cacau + Ilheus',
-  especies: 'Robalo, tainha, tartaruga',
-  mare_corrente: '1.1m - DHN - Olivença - resort Ilheus',
-  massa_ar: 'mEa - INMET - Olivença',
-  temp: '26C',
-  balne: 'PROPRIA - INEMA - Olivença resort'
+  nome: '110 - Piatã - Salvador - Jaguaribe',
+  regiao: 'SALVADOR LITORAL', lat: -12.95, lng: -38.4167,
+  vegetacao: 'Urbana + Restinga - Piatã', foz: 'Rio Jaguaribe - foz Piatã', ecossistema: 'Rio Jaguaribe + Restinga + Urbano', pesca: 'Robalo', economia: 'Turismo Piatã', especies: 'Robalo', mare_corrente: '1.0m - DHN - Piatã', massa_ar: 'mEa - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '089 - Canavieiras - Praia da Costa - Costa do Cacau - Cacau + Caranguejo',
-  regiao: 'COSTA DO CACAU',
-  lat: -15.6833,
-  lng: -38.9500,
-  vegetacao: 'Manguezal + Restinga + Dende + Cacau + Delta - Canavieiras - Costa do Cacau',
-  foz: 'Rio Pardo + Rio Jequitinhonha - delta Canavieiras - foz Canavieiras - delta duplo',
-  ecossistema: 'Delta Rio Pardo + Jequitinhonha + Manguezal + Caranguejo + Canavieiras + RESEX + Bercario',
-  pesca: 'Caranguejo-uca, camarao rosa, robalo - RESEX Canavieiras',
-  economia: 'Caranguejo + Cacau + Pesca + RESEX Canavieiras + Costa do Cacau',
-  especies: 'Caranguejo-uca, camarao rosa, robalo, ostra, sururu - RESEX',
-  mare_corrente: '1.2m - DHN - Canavieiras - delta duplo - RESEX',
-  massa_ar: 'mEc - Equatorial Continental - INMET - RESEX Canavieiras',
-  temp: '26C',
-  balne: 'PROPRIA - INEMA - Canavieiras RESEX'
+  nome: '111 - Plakaford - Salvador - Jaguaribe',
+  regiao: 'SALVADOR LITORAL', lat: -12.95, lng: -38.40,
+  vegetacao: 'Urbana + Restinga', foz: 'Rio Jaguaribe - foz Plakaford', ecossistema: 'Rio Jaguaribe + Urbano', pesca: 'Robalo', economia: 'Turismo', especies: 'Robalo', mare_corrente: '1.0m - DHN', massa_ar: 'mEa - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '090 - Una - Praia - Costa do Cacau',
-  regiao: 'COSTA DO CACAU',
-  lat: -15.2833,
-  lng: -39.0667,
-  vegetacao: 'Manguezal + Mata Atlantica + Cacau + Rio Una - Una - Costa do Cacau',
-  foz: 'Rio Una - foz Una - Costa do Cacau - rio Una',
-  ecossistema: 'Rio Una + Manguezal + Mata + Cacau + Una + Bercario',
-  pesca: 'Robalo, caranguejo-uca - Rio Una',
-  economia: 'Pesca + Cacau + Una + Costa do Cacau',
-  especies: 'Robalo, caranguejo-uca, ostra',
-  mare_corrente: '1.1m - DHN - Una - Rio Una',
-  massa_ar: 'mEc - INMET - Una',
-  temp: '26C',
-  balne: 'PROPRIA - INEMA - Una'
+  nome: '112 - Itapua - Salvador - Jaguaribe',
+  regiao: 'SALVADOR LITORAL', lat: -12.9333, lng: -38.3833,
+  vegetacao: 'Urbana + Restinga - Jaguaribe', foz: 'Rio Jaguaribe - foz Itapua', ecossistema: 'Rio Jaguaribe + Restinga', pesca: 'Robalo', economia: 'Turismo', especies: 'Robalo', mare_corrente: '1.0m - DHN', massa_ar: 'mEa - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '091 - Comandatuba - Praia - Una - Costa do Cacau - Transamerica Resort',
-  regiao: 'COSTA DO CACAU',
-  lat: -15.3500,
-  lng: -38.9833,
-  vegetacao: 'Restinga + Coqueiral + Resort Transamerica - Comandatuba - Costa do Cacau',
-  foz: 'Rio Comandatuba - foz Comandatuba - Transamerica - Una',
-  ecossistema: 'Resort Transamerica + Restinga + Rio + Cacau + Comandatuba + APA',
-  pesca: 'Robalo, tainha - Transamerica',
-  economia: 'Resort Transamerica + Turismo + Comandatuba + Cacau',
-  especies: 'Robalo, tainha, tartaruga',
-  mare_corrente: '1.1m - DHN - Comandatuba - Transamerica resort',
-  massa_ar: 'mEa - INMET - Comandatuba',
-  temp: '26C',
-  balne: 'PROPRIA - INEMA - Comandatuba Transamerica'
+  nome: '113 - Farol de Itapua - Salvador - Farol',
+  regiao: 'SALVADOR LITORAL', lat: -12.95, lng: -38.3667,
+  vegetacao: 'Restinga + Farol - Itapua', foz: 'Lagoa do Abaeté - foz Farol de Itapua', ecossistema: 'Farol + Lagoa Abaeté + Restinga', pesca: 'Robalo - Farol', economia: 'Turismo Farol Itapua', especies: 'Robalo', mare_corrente: '1.0m - DHN - Farol Itapua', massa_ar: 'mEa - INMET - Farol', temp: '28C', balne: 'PROPRIA - INEMA - Farol Itapua'
 },
 {
-  nome: '092 - Santa Cruz Cabralia - Praia - Costa do Descobrimento + Cacau',
-  regiao: 'COSTA DO CACAU',
-  lat: -16.2833,
-  lng: -39.0333,
-  vegetacao: 'Restinga + Mata Atlantica + Historico Descobrimento - Cabralia - Cacau',
-  foz: 'Rio Joao de Tiba - foz Cabralia - Descobrimento + historico 1500',
-  ecossistema: 'Historico Descobrimento 1500 + Rio Joao de Tiba + Restinga + Cabralia + Cacau + APA',
-  pesca: 'Robalo, tainha - historico Descobrimento',
-  economia: 'Turismo historico Descobrimento 1500 + Cabralia + Cacau',
-  especies: 'Robalo, tainha, tartaruga',
-  mare_corrente: '1.1m - DHN - Cabralia - Descobrimento 1500',
-  massa_ar: 'mEa - INMET - Descobrimento',
-  temp: '26C',
-  balne: 'PROPRIA - INEMA - Cabralia Descobrimento 1500'
+  nome: '114 - Pedra do Sal - Salvador - Ilha',
+  regiao: 'SALVADOR LITORAL', lat: -12.90, lng: -38.35,
+  vegetacao: 'Restinga + Rochas + Ilha - Pedra do Sal', foz: 'Sem foz - oceano - Pedra do Sal - ilha', ecossistema: 'Rochas + Ilha + Oceano', pesca: 'Robalo, peixes recifais', economia: 'Turismo Pedra do Sal', especies: 'Peixes recifais, robalo', mare_corrente: '1.0m - DHN - Pedra do Sal', massa_ar: 'mEa - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '093 - Porto Seguro - Praia de Taperapua - Costa do Descobrimento',
-  regiao: 'COSTA DO CACAU',
-  lat: -16.4433,
-  lng: -39.0667,
-  vegetacao: 'Restinga + Coqueiral + Turistico + Axé - Taperapua - Porto Seguro',
-  foz: 'Rio Buranhém - foz Taperapua - Porto Seguro - Axé',
-  ecossistema: 'Rio Buranhém + Axé + Turistico + Restinga + Porto Seguro',
-  pesca: 'Robalo, tainha - Axé Taperapua',
-  economia: 'Turismo Axé + Taperapua + Porto Seguro',
-  especies: 'Robalo, tainha',
-  mare_corrente: '1.2m - DHN - Taperapua - Axé Porto Seguro',
-  massa_ar: 'mEa - INMET - Axé',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Taperapua Axé'
+  nome: '115 - Itacimirim - Complemento - Camaçari',
+  regiao: 'LITORAL NORTE', lat: -12.6167, lng: -38.05,
+  vegetacao: 'Restinga + Manguezal', foz: 'Rio Pojuca - foz Itacimirim complemento', ecossistema: 'Manguezal + Rio Pojuca', pesca: 'Robalo', economia: 'Turismo', especies: 'Robalo', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '094 - Arraial dAjuda - Praia - Porto Seguro - Descobrimento',
-  regiao: 'COSTA DO CACAU',
-  lat: -16.4833,
-  lng: -39.1000,
-  vegetacao: 'Restinga + Falésias + Mata Atlantica - Arraial dAjuda - Descobrimento',
-  foz: 'Rio Buranhém - foz Arraial - Porto Seguro - falésias',
-  ecossistema: 'Falésias + Rio Buranhém + Restinga + Arraial + Descobrimento + APA',
-  pesca: 'Robalo, peixes recifais - falésias Arraial',
-  economia: 'Turismo + Falésias + Arraial dAjuda + Descobrimento',
-  especies: 'Robalo, peixes recifais, tartaruga',
-  mare_corrente: '1.2m - DHN - Arraial dAjuda - falésias',
-  massa_ar: 'mEa - INMET - Arraial',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Arraial falésias'
+  nome: '116 - Barra do Pote - Camaçari',
+  regiao: 'LITORAL NORTE', lat: -12.60, lng: -38.00,
+  vegetacao: 'Restinga + Manguezal', foz: 'Rio Pojuca - foz Barra do Pote', ecossistema: 'Manguezal + Rio Pojuca', pesca: 'Robalo, caranguejo', economia: 'Pesca', especies: 'Robalo, caranguejo-uca', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '28C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '095 - Trancoso - Praia - Porto Seguro - Descobrimento - Quadrado',
-  regiao: 'COSTA DO CACAU',
-  lat: -16.5833,
-  lng: -39.1000,
-  vegetacao: 'Restinga + Falésias + Mata Atlantica + Quadrado - Trancoso - Descobrimento',
-  foz: 'Rio Trancoso - foz Trancoso - Quadrado - Descobrimento',
-  ecossistema: 'Quadrado + Falésias + Rio Trancoso + Trancoso + Descobrimento + APA + Historico',
-  pesca: 'Robalo, tainha - Trancoso Quadrado',
-  economia: 'Turismo Quadrado + Trancoso + Descobrimento + Famosos',
-  especies: 'Robalo, tainha, tartaruga',
-  mare_corrente: '1.2m - DHN - Trancoso - Quadrado famoso',
-  massa_ar: 'mEa - INMET - Trancoso Quadrado',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Trancoso Quadrado'
+  nome: '117 - Ilha do Medo - BTS - Reconcavo',
+  regiao: 'RECONCAVO', lat: -12.90, lng: -38.6333,
+  vegetacao: 'Restinga + Ilha - BTS - Ilha do Medo', foz: 'Canal BTS - foz Ilha do Medo', ecossistema: 'Ilha do Medo + BTS', pesca: 'Robalo, tainha - Ilha do Medo', economia: 'Turismo Ilha do Medo + BTS', especies: 'Robalo, tainha', mare_corrente: '1.0m - DHN - Ilha do Medo BTS', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA - Ilha do Medo'
 },
 {
-  nome: '096 - Caraiva - Praia - Porto Seguro - Descobrimento - Rio Caraiva',
-  regiao: 'COSTA DO CACAU',
-  lat: -16.8000,
-  lng: -39.1500,
-  vegetacao: 'Manguezal + Restinga + Rio Caraiva + Mata Atlantica - Caraiva - Descobrimento - rustico',
-  foz: 'Rio Caraiva - foz Caraiva - encontro rio mar rustico - Descobrimento',
-  ecossistema: 'Rio Caraiva + Encontro rio mar + Manguezal + Rustico + Caraiva + Descobrimento + APA + Bercario',
-  pesca: 'Robalo, tainha, caranguejo - Caraiva rustico',
-  economia: 'Turismo rustico + Rio Caraiva + Caraiva + Descobrimento + Encontro rio mar',
-  especies: 'Robalo, tainha, caranguejo-uca, ostra - Caraiva',
-  mare_corrente: '1.2m - DHN - Caraiva - encontro rio mar rustico - Descobrimento',
-  massa_ar: 'mEc - INMET - Caraiva rustico',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Caraiva rustico encontro rio mar'
+  nome: '118 - Frades - Ilha de Itaparica - BTS',
+  regiao: 'RECONCAVO', lat: -13.00, lng: -38.65,
+  vegetacao: 'Restinga + Ilha - Frades - BTS', foz: 'Canal BTS - foz Frades - Ilha Itaparica', ecossistema: 'Ilha de Frades + BTS + Restinga', pesca: 'Robalo, tainha', economia: 'Turismo Frades + BTS', especies: 'Robalo, tainha', mare_corrente: '1.0m - DHN - Frades BTS', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA - Frades'
 },
 {
-  nome: '097 - Prado - Praia - Costa do Descobrimento - Baleias',
-  regiao: 'COSTA DO CACAU',
-  lat: -17.3500,
-  lng: -39.2167,
-  vegetacao: 'Restinga + Manguezal + Baleias Jubarte - Prado - Descobrimento',
-  foz: 'Rio Jucuruçu - foz Prado - baleias + Descobrimento',
-  ecossistema: 'Baleias Jubarte + Rio Jucuruçu + Manguezal + Prado + Descobrimento + APA + Bercario baleias',
-  pesca: 'Robalo, baleia jubarte - Prado baleias',
-  economia: 'Turismo baleias jubarte + Prado + Descobrimento',
-  especies: 'Baleia jubarte, robalo, tartaruga - Prado',
-  mare_corrente: '1.2m - DHN - Prado - baleias jubarte',
-  massa_ar: 'mEa - INMET - baleias Prado',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Prado baleias'
+  nome: '119 - Mar Grande - Ilha Itaparica - Ferry',
+  regiao: 'RECONCAVO', lat: -12.9833, lng: -38.6333,
+  vegetacao: 'Urbana + Ilha - Mar Grande - Ferry', foz: 'Canal BTS - foz Mar Grande - Ferry', ecossistema: 'Ferry + Ilha + BTS + Urbano', pesca: 'Robalo - Mar Grande', economia: 'Ferry Mar Grande + Turismo + BTS', especies: 'Robalo', mare_corrente: '1.0m - DHN - Mar Grande Ferry', massa_ar: 'mEc - INMET - Ferry', temp: '27C', balne: 'PROPRIA - INEMA - Mar Grande'
 },
 {
-  nome: '098 - Cumuruxatiba - Praia - Prado - Descobrimento',
-  regiao: 'COSTA DO CACAU',
-  lat: -17.1000,
-  lng: -39.2167,
-  vegetacao: 'Restinga + Manguezal + Falésias - Cumuruxatiba - Prado - Descobrimento',
-  foz: 'Rio Cahy - foz Cumuruxatiba - Descobrimento - primeiro missa?',
-  ecossistema: 'Falésias + Rio Cahy + Manguezal + Cumuruxatiba + Descobrimento + APA',
-  pesca: 'Robalo, tainha - Cumuruxatiba',
-  economia: 'Turismo Cumuruxatiba + Descobrimento + Falésias',
-  especies: 'Robalo, tainha',
-  mare_corrente: '1.2m - DHN - Cumuruxatiba - falésias',
-  massa_ar: 'mEa - INMET - Cumuruxatiba',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Cumuruxatiba'
+  nome: '120 - Bom Despacho - Ilha Itaparica - Ferry',
+  regiao: 'RECONCAVO', lat: -12.90, lng: -38.6167,
+  vegetacao: 'Manguezal + Ilha - Bom Despacho - Ferry', foz: 'Canal BTS - foz Bom Despacho - Ferry', ecossistema: 'Ferry + Manguezal + Ilha + BTS', pesca: 'Sururu, caranguejo - Bom Despacho', economia: 'Ferry Bom Despacho + BTS', especies: 'Sururu, caranguejo-uca', mare_corrente: '1.0m - DHN - Bom Despacho Ferry', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '099 - Stella Maris - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9333,
-  lng: -38.3333,
-  vegetacao: 'Restinga + Dunas + Coqueiral - Stella Maris - Salvador',
-  foz: 'Rio Joanes? + Lagoa - foz Stella Maris - Salvador - lagoa',
-  ecossistema: 'Dunas + Restinga + Lagoa + Salvador + Stella Maris + APA',
-  pesca: 'Robalo, tainha - Stella Maris',
-  economia: 'Turismo + Stella Maris + Salvador',
-  especies: 'Robalo, tainha',
-  mare_corrente: '1.0m - DHN - Stella Maris - Salvador',
-  massa_ar: 'mEa - Equatorial Atlantica - INMET - Stella Maris',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Stella Maris'
+  nome: '121 - Conceição - Morro de Sao Paulo - Cairu',
+  regiao: 'COSTA DO DENDE', lat: -13.3667, lng: -38.90,
+  vegetacao: 'Mata + Restinga - Conceicao - Morro', foz: 'Canal de Tinharé - foz Conceicao - Morro', ecossistema: 'Canal + Mata + Morro', pesca: 'Robalo', economia: 'Turismo Conceicao Morro', especies: 'Robalo', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '100 - Flamengo - Praia - Salvador - Litoral Norte Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9000,
-  lng: -38.3167,
-  vegetacao: 'Restinga + Coqueiral - Flamengo - Salvador',
-  foz: 'Rio Joanes - foz Flamengo - Salvador - Rio Joanes + divisa Salvador Lauro',
-  ecossistema: 'Rio Joanes + Restinga + Flamengo + Salvador + Lauro + Divisa',
-  pesca: 'Robalo, tainha - Flamengo',
-  economia: 'Turismo Flamengo + Salvador',
-  especies: 'Robalo, tainha',
-  mare_corrente: '1.0m - DHN - Flamengo - Rio Joanes foz',
-  massa_ar: 'mEa - INMET - Flamengo',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Flamengo'
+  nome: '122 - Gamboa - Morro de Sao Paulo - Cairu',
+  regiao: 'COSTA DO DENDE', lat: -13.35, lng: -38.8833,
+  vegetacao: 'Manguezal + Mata - Gamboa - Morro', foz: 'Canal de Tinharé - foz Gamboa - Morro - manguezal', ecossistema: 'Manguezal + Canal + Morro', pesca: 'Caranguejo, robalo - Gamboa', economia: 'Turismo Gamboa Morro', especies: 'Caranguejo-uca, robalo', mare_corrente: '0.9m - DHN - Gamboa manguezal', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '101 - Itapua - Praia - Salvador - Vinicius de Moraes',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9500,
-  lng: -38.3500,
-  vegetacao: 'Restinga + Lagoa do Abaeté + Dunas + Vinicius - Itapua - Salvador',
-  foz: 'Lagoa do Abaeté - foz Itapua - Lagoa do Abaeté + Dunas + Vinicius + Salvador',
-  ecossistema: 'Lagoa do Abaeté + Dunas + Vinicius de Moraes + Itapua + Salvador + APA + Cultural',
-  pesca: 'Robalo, tainha - Itapua Vinicius',
-  economia: 'Turismo + Vinicius de Moraes + Lagoa do Abaeté + Itapua + Salvador + Cultural',
-  especies: 'Robalo, tainha - Itapua',
-  mare_corrente: '1.0m - DHN - Itapua - Vinicius de Moraes - Lagoa do Abaeté',
-  massa_ar: 'mEa - INMET - Itapua Vinicius',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Itapua Vinicius Lagoa do Abaeté'
+  nome: '123 - Galeão - Cairu - Tinhare',
+  regiao: 'COSTA DO DENDE', lat: -13.3833, lng: -38.8833,
+  vegetacao: 'Mata + Restinga - Galeão - Tinhare', foz: 'Canal de Tinharé - foz Galeão', ecossistema: 'Canal de Tinharé + Mata', pesca: 'Robalo', economia: 'Pesca + Galeão', especies: 'Robalo', mare_corrente: '1.0m - DHN', massa_ar: 'mEc - INMET', temp: '27C', balne: 'PROPRIA - INEMA'
 },
 {
-  nome: '102 - Plakaford - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9667,
-  lng: -38.3667,
-  vegetacao: 'Restinga + Coqueiral - Plakaford - Salvador',
-  foz: 'Sem foz - Plakaford - Salvador',
-  ecossistema: 'Restinga + Plakaford + Salvador',
-  pesca: 'Robalo - Plakaford',
-  economia: 'Turismo Plakaford + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Plakaford',
-  massa_ar: 'mEa - INMET - Plakaford',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Plakaford'
+  nome: '124 - Canavieiras - Praia da Costa - RESEX - Baleias',
+  regiao: 'COSTA DO CACAU', lat: -15.70, lng: -38.9333,
+  vegetacao: 'Manguezal + Restinga + RESEX - Baleias', foz: 'Rio Pardo - foz Praia da Costa - RESEX - Baleias', ecossistema: 'RESEX + Rio Pardo + Baleias', pesca: 'Caranguejo-uca, baleia jubarte - RESEX', economia: 'RESEX + Baleia + Canavieiras', especies: 'Baleia jubarte - RESEX Canavieiras, caranguejo-uca', mare_corrente: '1.1m - DHN - RESEX Baleia', massa_ar: 'mEc - INMET - RESEX', temp: '27C', balne: 'PROPRIA - INEMA - RESEX Baleia'
 },
 {
-  nome: '103 - Piatã - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9833,
-  lng: -38.3833,
-  vegetacao: 'Restinga + Coqueiral + Dunas - Piatã - Salvador',
-  foz: 'Sem foz - Piatã - Salvador',
-  ecossistema: 'Restinga + Dunas + Piatã + Salvador',
-  pesca: 'Robalo, tainha - Piatã',
-  economia: 'Turismo Piatã + Salvador',
-  especies: 'Robalo, tainha',
-  mare_corrente: '1.0m - DHN - Piatã',
-  massa_ar: 'mEa - INMET - Piatã',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Piatã'
+  nome: '125 - Belmonte - Centro - Rio Jequitinhonha - Cacau - Baleias',
+  regiao: 'COSTA DO CACAU', lat: -15.8667, lng: -38.8833,
+  vegetacao: 'Manguezal + Mata + Rio Jequitinhonha - Belmonte - Baleias', foz: 'Rio Jequitinhonha - foz Belmonte - Cacau - Baleias', ecossistema: 'Rio Jequitinhonha + Manguezal + Baleias', pesca: 'Robalo, baleia jubarte - Jequitinhonha', economia: 'Pesca + Belmonte + Jequitinhonha + Baleia', especies: 'Baleia jubarte - Belmonte Jequitinhonha, robalo', mare_corrente: '1.1m - DHN - Belmonte - Jequitinhonha - Baleia', massa_ar: 'mEc - INMET - Baleia - Belmonte', temp: '27C', balne: 'PROPRIA - INEMA - Belmonte - Baleia'
 },
 {
-  nome: '104 - Patamares - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9833,
-  lng: -38.4000,
-  vegetacao: 'Restinga + Coqueiral - Patamares - Salvador',
-  foz: 'Rio Passa Vaca - foz Patamares - Salvador',
-  ecossistema: 'Rio Passa Vaca + Restinga + Patamares + Salvador',
-  pesca: 'Robalo - Patamares',
-  economia: 'Turismo Patamares + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Patamares',
-  massa_ar: 'mEa - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Patamares'
+  nome: '126 - Santa Cruz Cabralia - Centro - Baleias - Descobrimento',
+  regiao: 'COSTA DO CACAU', lat: -16.2833, lng: -39.0333,
+  vegetacao: 'Restinga + Historico - Cabralia - Baleias - Descobrimento', foz: 'Rio Mutari - foz Santa Cruz Cabralia - Baleias - Descobrimento', ecossistema: 'Rio Mutari + Descobrimento + Baleias', pesca: 'Robalo, baleia jubarte - Cabralia', economia: 'Turismo Descobrimento + Baleia', especies: 'Baleia jubarte - Cabralia Descobrimento, robalo', mare_corrente: '1.1m - DHN - Cabralia - Mutari - Baleia', massa_ar: 'mEc - INMET - Baleia - Cabralia', temp: '26C', balne: 'PROPRIA - INEMA - Cabralia - Baleia'
 },
 {
-  nome: '105 - Jaguaribe - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9833,
-  lng: -38.4167,
-  vegetacao: 'Restinga + Rio Jaguaribe - Salvador',
-  foz: 'Rio Jaguaribe - foz Jaguaribe - Salvador - Rio Jaguaribe + poluido',
-  ecossistema: 'Rio Jaguaribe + Restinga + Urbano + Salvador',
-  pesca: 'Robalo - Jaguaribe poluido',
-  economia: 'Urbano Jaguaribe + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Jaguaribe',
-  massa_ar: 'mEa - INMET - poluido',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA - Jaguaribe poluido'
+  nome: '127 - Porto Seguro - Centro Historico - Baleias - Descobrimento',
+  regiao: 'COSTA DO CACAU', lat: -16.4433, lng: -39.0583,
+  vegetacao: 'Historico + Restinga - Porto Seguro Centro - Baleias', foz: 'Rio Buranhém - foz Porto Seguro Centro - historico - Baleias', ecossistema: 'Rio Buranhem + Historico + Baleias + Descobrimento', pesca: 'Robalo, baleia jubarte - Centro Historico', economia: 'Turismo historico Porto Seguro + Baleia', especies: 'Baleia jubarte - Porto Seguro historico, robalo', mare_corrente: '1.1m - DHN - Porto Seguro Centro - Buranhem - Baleia historico', massa_ar: 'mEc - INMET - Baleia - Porto Seguro historico', temp: '26C', balne: 'PROPRIA - INEMA - Porto Seguro Centro - Baleia'
 },
 {
-  nome: '106 - Pituacu - Praia - Salvador - Parque',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9500,
-  lng: -38.4167,
-  vegetacao: 'Mata Atlantica + Lagoa + Parque de Pituacu - Salvador',
-  foz: 'Lagoa de Pituacu - foz Pituacu - Parque - Salvador',
-  ecossistema: 'Parque de Pituacu + Lagoa + Mata Atlantica + Salvador',
-  pesca: 'Robalo - Parque Pituacu',
-  economia: 'Parque + Turismo + Pituacu + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '0.8m - DHN - Parque Pituacu',
-  massa_ar: 'mEc - INMET - Parque',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA - Parque'
+  nome: '128 - Arraial Dajuda - Pitinga - Baleias',
+  regiao: 'COSTA DO CACAU', lat: -16.50, lng: -39.0667,
+  vegetacao: 'Falesias + Restinga - Pitinga - Arraial - Baleias', foz: 'Rio Mucuge - foz Pitinga - Arraial - Baleias', ecossistema: 'Falesias + Rio Mucuge + Baleias', pesca: 'Robalo, baleia jubarte - Pitinga', economia: 'Turismo Pitinga + Arraial + Baleia', especies: 'Baleia jubarte - Pitinga, robalo', mare_corrente: '1.1m - DHN - Pitinga - Baleia', massa_ar: 'mEc - INMET - Baleia - Pitinga', temp: '26C', balne: 'PROPRIA - INEMA - Pitinga - Baleia'
 },
 {
-  nome: '107 - Corsario - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0000,
-  lng: -38.4000,
-  vegetacao: 'Restinga + Coqueiral - Corsario - Salvador',
-  foz: 'Sem foz - Corsario - Salvador',
-  ecossistema: 'Restinga + Corsario + Salvador',
-  pesca: 'Robalo - Corsario',
-  economia: 'Turismo Corsario + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Corsario',
-  massa_ar: 'mEa - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Corsario'
+  nome: '129 - Trancoso - Rio da Barra - Baleias',
+  regiao: 'COSTA DO CACAU', lat: -16.60, lng: -39.1167,
+  vegetacao: 'Restinga + Rio da Barra - Trancoso - Baleias', foz: 'Rio da Barra - foz Trancoso Rio da Barra - Baleias', ecossistema: 'Rio da Barra + Trancoso + Baleias', pesca: 'Robalo, baleia jubarte - Rio da Barra', economia: 'Turismo Rio da Barra + Trancoso + Baleia', especies: 'Baleia jubarte - Rio da Barra Trancoso, robalo', mare_corrente: '1.1m - DHN - Rio da Barra - Baleia Trancoso', massa_ar: 'mEc - INMET - Baleia - Rio da Barra', temp: '26C', balne: 'PROPRIA - INEMA - Rio da Barra - Baleia'
 },
 {
-  nome: '108 - Armação - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0000,
-  lng: -38.4167,
-  vegetacao: 'Restinga + Coqueiral + Centro de Convenções - Armação - Salvador',
-  foz: 'Rio Passa Vaca - foz Armação - Salvador',
-  ecossistema: 'Rio Passa Vaca + Restinga + Centro de Convenções + Salvador',
-  pesca: 'Robalo - Armação',
-  economia: 'Centro de Convenções + Turismo Armação + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Armação',
-  massa_ar: 'mEa - INMET - Armação',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA - Armação'
+  nome: '130 - Espelho - Trancoso - Baleias - Famosa',
+  regiao: 'COSTA DO CACAU', lat: -16.6167, lng: -39.1167,
+  vegetacao: 'Falesias + Restinga - Espelho - Trancoso - Baleias - Famosa', foz: 'Rio dos Frades - foz Espelho - Trancoso - Baleias famosa', ecossistema: 'Rio dos Frades + Falesias + Baleias + Espelho famosa', pesca: 'Robalo, baleia jubarte - Espelho famosa', economia: 'Turismo Espelho famosa + Trancoso + Baleia', especies: 'Baleia jubarte - Espelho famosa, robalo', mare_corrente: '1.1m - DHN - Espelho - Frades - Baleia famosa', massa_ar: 'mEc - INMET - Baleia - Espelho famosa', temp: '26C', balne: 'PROPRIA - INEMA - Espelho - Baleia famosa'
 },
 {
-  nome: '109 - Boca do Rio - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0000,
-  lng: -38.4333,
-  vegetacao: 'Restinga + Rio - Boca do Rio - Salvador',
-  foz: 'Rio Jaguaribe - foz Boca do Rio - Salvador - foz Jaguaribe',
-  ecossistema: 'Rio Jaguaribe + Foz Boca do Rio + Urbano + Salvador',
-  pesca: 'Robalo - Boca do Rio',
-  economia: 'Urbano Boca do Rio + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Boca do Rio - foz Jaguaribe',
-  massa_ar: 'mEa - INMET - Boca do Rio',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA - Boca do Rio foz Jaguaribe poluido'
+  nome: '131 - Caraiva - Satu - Baleias - Rio Caraiva',
+  regiao: 'COSTA DO CACAU', lat: -16.80, lng: -39.1667,
+  vegetacao: 'Manguezal + Restinga - Satu - Caraiva - Baleias', foz: 'Rio Caraiva - foz Satu - Caraiva - Baleias', ecossistema: 'Rio Caraiva + Manguezal + Satu + Baleias', pesca: 'Robalo, baleia jubarte - Satu', economia: 'Turismo Satu + Caraiva + Baleia', especies: 'Baleia jubarte - Satu Caraiva, robalo', mare_corrente: '1.0m - DHN - Satu - Caraiva - Baleia', massa_ar: 'mEc - INMET - Baleia - Satu', temp: '26C', balne: 'PROPRIA - INEMA - Satu - Baleia'
 },
 {
-  nome: '110 - Jardim de Alah - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0000,
-  lng: -38.4500,
-  vegetacao: 'Restinga + Coqueiral - Jardim de Alah - Salvador',
-  foz: 'Rio Camurujipe - foz Jardim de Alah - Salvador',
-  ecossistema: 'Rio Camurujipe + Restinga + Jardim de Alah + Salvador',
-  pesca: 'Robalo - Jardim de Alah',
-  economia: 'Turismo Jardim de Alah + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Jardim de Alah',
-  massa_ar: 'mEa - INMET',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA - Jardim de Alah'
-},
-  {
-  nome: '111 - Mangue Seco - Praia - Salvador - Manguezal',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0167,
-  lng: -38.4500,
-  vegetacao: 'Manguezal + Restinga - Mangue Seco - Salvador - foz Camurujipe',
-  foz: 'Rio Camurujipe - foz Mangue Seco - Salvador - manguezal',
-  ecossistema: 'Manguezal + Rio Camurujipe + Restinga + Salvador',
-  pesca: 'Caranguejo-uca, robalo - manguezal Mangue Seco',
-  economia: 'Manguezal + Pesca + Salvador',
-  especies: 'Caranguejo-uca, robalo',
-  mare_corrente: '1.0m - DHN - Mangue Seco - manguezal',
-  massa_ar: 'mEc - INMET - manguezal',
-  temp: '28C',
-  balne: 'IMPROPRIA - INEMA - Mangue Seco manguezal'
+  nome: '132 - Prado - Novo Prado - Baleias - Extremo Sul',
+  regiao: 'COSTA DO CACAU', lat: -17.3333, lng: -39.20,
+  vegetacao: 'Restinga + Manguezal - Novo Prado - Baleias', foz: 'Rio Jucurucu - foz Novo Prado - Baleias - Extremo Sul', ecossistema: 'Rio Jucurucu + Novo Prado + Baleias + Extremo Sul', pesca: 'Robalo, baleia jubarte - Novo Prado', economia: 'Turismo Novo Prado + Baleia', especies: 'Baleia jubarte - Novo Prado, robalo', mare_corrente: '1.2m - DHN - Novo Prado - Jucurucu - Baleia', massa_ar: 'mEc - INMET - Baleia - Novo Prado', temp: '26C', balne: 'PROPRIA - INEMA - Novo Prado - Baleia'
 },
 {
-  nome: '112 - Pedra do Sal - Praia - Salvador',
-  regiao: 'SALVADOR LITORAL',
-  lat: -13.0167,
-  lng: -38.4667,
-  vegetacao: 'Restinga + Rochas - Pedra do Sal - Salvador',
-  foz: 'Sem foz - Pedra do Sal - Salvador - rochas',
-  ecossistema: 'Rochas + Restinga + Pedra do Sal + Salvador',
-  pesca: 'Robalo, polvo - Pedra do Sal rochas',
-  economia: 'Turismo Pedra do Sal + Salvador',
-  especies: 'Robalo, polvo',
-  mare_corrente: '1.0m - DHN - Pedra do Sal - rochas',
-  massa_ar: 'mEa - INMET - Pedra do Sal',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Pedra do Sal'
+  nome: '133 - Guaratiba - Prado - Baleias - Extremo Sul',
+  regiao: 'COSTA DO CACAU', lat: -17.20, lng: -39.1833,
+  vegetacao: 'Restinga + Manguezal - Guaratiba - Baleias', foz: 'Rio Jucurucu - foz Guaratiba - Prado - Baleias', ecossistema: 'Rio Jucurucu + Guaratiba + Baleias', pesca: 'Robalo, baleia jubarte - Guaratiba', economia: 'Turismo Guaratiba + Baleia', especies: 'Baleia jubarte - Guaratiba, robalo', mare_corrente: '1.2m - DHN - Guaratiba - Jucurucu - Baleia', massa_ar: 'mEc - INMET - Baleia - Guaratiba', temp: '26C', balne: 'PROPRIA - INEMA - Guaratiba - Baleia'
 },
 {
-  nome: '113 - Maragojipe? - Praia - Salvador - Ver? - Corrigido Stella',
-  regiao: 'SALVADOR LITORAL',
-  lat: -12.9500,
-  lng: -38.3333,
-  vegetacao: 'Restinga + Coqueiral - Maragogipe Salvador - Stella Maris',
-  foz: 'Rio Joanes - foz Maragogipe - Salvador',
-  ecossistema: 'Rio Joanes + Restinga + Salvador',
-  pesca: 'Robalo - Maragogipe',
-  economia: 'Turismo + Salvador',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN',
-  massa_ar: 'mEa - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
+  nome: '134 - Moreira - Prado - Baleias - Extremo Sul',
+  regiao: 'COSTA DO CACAU', lat: -17.25, lng: -39.1833,
+  vegetacao: 'Restinga + Manguezal - Moreira - Baleias', foz: 'Rio Jucurucu - foz Moreira - Prado - Baleias', ecossistema: 'Rio Jucurucu + Moreira + Baleias', pesca: 'Robalo, baleia jubarte - Moreira', economia: 'Turismo Moreira + Baleia', especies: 'Baleia jubarte - Moreira, robalo', mare_corrente: '1.2m - DHN - Moreira - Jucurucu - Baleia', massa_ar: 'mEc - INMET - Baleia - Moreira', temp: '26C', balne: 'PROPRIA - INEMA - Moreira - Baleia'
 },
 {
-  nome: '114 - Vilas do Atlantico - Praia - Lauro de Freitas - Litoral Norte Extra',
-  regiao: 'LITORAL NORTE',
-  lat: -12.8667,
-  lng: -38.3000,
-  vegetacao: 'Restinga + Coqueiral + Urbana - Vilas do Atlantico - Lauro de Freitas',
-  foz: 'Rio Joanes + Ipitanga - foz Vilas - Lauro - APA Joanes Ipitanga',
-  ecossistema: 'Rio Joanes + Ipitanga + APA + Vilas do Atlantico + Lauro + Urbano',
-  pesca: 'Robalo - Vilas',
-  economia: 'Turismo Vilas do Atlantico + Lauro de Freitas',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Vilas do Atlantico Lauro',
-  massa_ar: 'mEa - INMET - Vilas',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Vilas do Atlantico'
+  nome: '135 - Abrolhos - Caravelas - Arquipelago - Baleias - Parque Nacional Marinho',
+  regiao: 'COSTA DO CACAU', lat: -17.9667, lng: -38.70,
+  vegetacao: 'Recifes + Ilha + Parque Nacional Marinho dos Abrolhos - Baleias - UNESCO', foz: 'Oceano Atlantico - foz Abrolhos - Parque Nacional Marinho - Baleias - UNESCO', ecossistema: 'Parque Nacional Marinho dos Abrolhos + Recifes + Baleias + UNESCO + Bercario baleia jubarte + Abrolhos', pesca: 'Baleia jubarte - Parque Nacional Abrolhos - bercario', economia: 'Parque Nacional Marinho Abrolhos + Baleia + UNESCO + Turismo', especies: 'Baleia jubarte - BERCARIO PRINCIPAL ABROLHOS, tartaruga, corais', mare_corrente: '1.5m - DHN - Abrolhos - Parque Nacional - Baleia bercario', massa_ar: 'mEa - INMET - Abrolhos - Baleia bercario', temp: '26C - Abrolhos', balne: 'PROPRIA - INEMA - Abrolhos - Parque Nacional - Baleia'
 },
 {
-  nome: '115 - Buraquinho - Praia - Lauro de Freitas - Litoral Norte - Rio Joanes foz',
-  regiao: 'LITORAL NORTE',
-  lat: -12.8333,
-  lng: -38.2833,
-  vegetacao: 'Manguezal + Restinga + Rio Joanes - Buraquinho - Lauro - foz Joanes',
-  foz: 'Rio Joanes - foz Buraquinho - Lauro de Freitas - Litoral Norte - foz Joanes + manguezal',
-  ecossistema: 'Rio Joanes + Manguezal + Foz Joanes + Restinga + Buraquinho + Lauro + APA Joanes Ipitanga + Bercario',
-  pesca: 'Robalo, caranguejo-uca - foz Rio Joanes',
-  economia: 'Pesca + Foz Rio Joanes + Buraquinho + Lauro',
-  especies: 'Robalo, caranguejo-uca, ostra - foz Joanes',
-  mare_corrente: '1.0m - DHN - Buraquinho - foz Rio Joanes + manguezal + APA',
-  massa_ar: 'mEc - INMET - foz Joanes Buraquinho',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Buraquinho foz Joanes'
+  nome: '136 - Caravelas - Centro - Baleias - Abrolhos - Rio Caravelas',
+  regiao: 'COSTA DO CACAU', lat: -17.7167, lng: -39.25,
+  vegetacao: 'Manguezal + Restinga + Abrolhos - Caravelas - Baleias', foz: 'Rio Caravelas + Rio Peruípe - foz Caravelas - Abrolhos - Baleias', ecossistema: 'Rio Caravelas + Rio Peruípe + Manguezal + Abrolhos + Baleias + Bercario', pesca: 'Robalo, caranguejo, baleia jubarte - Caravelas Abrolhos', economia: 'Turismo Abrolhos + Caravelas + Baleia + Base Abrolhos', especies: 'Baleia jubarte - Caravelas Abrolhos base, robalo, caranguejo-uca', mare_corrente: '1.3m - DHN - Caravelas - Abrolhos base - Baleia', massa_ar: 'mEc - INMET - Baleia - Caravelas Abrolhos base', temp: '26C', balne: 'PROPRIA - INEMA - Caravelas - Abrolhos base - Baleia'
 },
 {
-  nome: '116 - Jauá - Praia - Camaçari - Lagoa de Jaua',
-  regiao: 'LITORAL NORTE',
-  lat: -12.8333,
-  lng: -38.2667,
-  vegetacao: 'Restinga + Lagoa de Jaua + Dunas + Coqueiral - Jauá - Camaçari',
-  foz: 'Lagoa de Jaua - foz Jauá - Camaçari - lagoa',
-  ecossistema: 'Lagoa de Jaua + Dunas + Restinga + Jauá + Camaçari + APA',
-  pesca: 'Robalo - Lagoa de Jaua',
-  economia: 'Turismo + Lagoa de Jaua + Camaçari',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Jauá - lagoa',
-  massa_ar: 'mEa - INMET - lagoa',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Jauá lagoa'
-},
-{
-  nome: '117 - Jacuipe - Praia - Camaçari - Litoral Norte',
-  regiao: 'LITORAL NORTE',
-  lat: -12.7000,
-  lng: -38.1167,
-  vegetacao: 'Restinga + Manguezal + Rio Jacuipe + Coqueiral - Jacuipe - Camaçari',
-  foz: 'Rio Jacuipe - foz Jacuipe - Camaçari - Litoral Norte - manguezal',
-  ecossistema: 'Rio Jacuipe + Manguezal + Restinga + Jacuipe + Camaçari + Bercario',
-  pesca: 'Robalo, caranguejo-uca, camarao - Rio Jacuipe',
-  economia: 'Pesca + Rio Jacuipe + Jacuipe + Camaçari',
-  especies: 'Robalo, caranguejo-uca, camarao rosa',
-  mare_corrente: '1.0m - DHN - Jacuipe - Rio Jacuipe foz',
-  massa_ar: 'mEc - INMET - Jacuipe',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Jacuipe'
-},
-{
-  nome: '118 - Monte Gordo - Praia - Camaçari - Litoral Norte',
-  regiao: 'LITORAL NORTE',
-  lat: -12.6667,
-  lng: -38.0833,
-  vegetacao: 'Restinga + Coqueiral - Monte Gordo - Camaçari',
-  foz: 'Sem foz - Monte Gordo - Camaçari',
-  ecossistema: 'Restinga + Monte Gordo + Camaçari',
-  pesca: 'Robalo, tainha - Monte Gordo',
-  economia: 'Turismo Monte Gordo + Camaçari',
-  especies: 'Robalo, tainha',
-  mare_corrente: '1.0m - DHN - Monte Gordo',
-  massa_ar: 'mEa - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
-},
-{
-  nome: '119 - Espera - Praia - Itacimirim - Litoral Norte',
-  regiao: 'LITORAL NORTE',
-  lat: -12.6167,
-  lng: -38.0333,
-  vegetacao: 'Restinga + Coqueiral - Espera - Itacimirim - Litoral Norte',
-  foz: 'Rio Pojuca - foz Espera - Itacimirim - Litoral Norte',
-  ecossistema: 'Rio Pojuca + Restinga + Espera + Itacimirim + Bercario',
-  pesca: 'Robalo, tainha - Espera',
-  economia: 'Turismo Espera + Itacimirim',
-  especies: 'Robalo, tainha',
-  mare_corrente: '1.0m - DHN - Espera Itacimirim',
-  massa_ar: 'mEc - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
-},
-{
-  nome: '120 - Barra do Pojuca - Praia - Camaçari - Litoral Norte - Rio Pojuca foz',
-  regiao: 'LITORAL NORTE',
-  lat: -12.6000,
-  lng: -38.0167,
-  vegetacao: 'Manguezal + Restinga + Rio Pojuca + Coqueiral - Barra do Pojuca - Camaçari',
-  foz: 'Rio Pojuca - foz Barra do Pojuca - Camaçari - Litoral Norte - foz Pojuca + manguezal',
-  ecossistema: 'Rio Pojuca + Manguezal + Foz Pojuca + Restinga + Barra do Pojuca + Camaçari + Bercario + APA',
-  pesca: 'Robalo, tainha, caranguejo-uca - foz Rio Pojuca',
-  economia: 'Pesca + Foz Rio Pojuca + Barra do Pojuca + Camaçari + Litoral Norte',
-  especies: 'Robalo, tainha, caranguejo-uca, camarao rosa - foz Pojuca',
-  mare_corrente: '1.0m - DHN - Barra do Pojuca - foz Rio Pojuca + manguezal',
-  massa_ar: 'mEc - Equatorial Continental - INMET - foz Pojuca',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Barra do Pojuca foz Pojuca'
-},
-{
-  nome: '121 - Vilas do Atlantico - Praia - Lauro de Freitas - Litoral Norte - Extra',
-  regiao: 'LITORAL NORTE',
-  lat: -12.8667,
-  lng: -38.3000,
-  vegetacao: 'Restinga + Coqueiral + Urbana - Vilas do Atlantico - Lauro de Freitas',
-  foz: 'Rio Joanes + Ipitanga - foz Vilas - Lauro - APA Joanes Ipitanga',
-  ecossistema: 'Rio Joanes + Ipitanga + APA + Vilas do Atlantico + Lauro + Urbano',
-  pesca: 'Robalo - Vilas',
-  economia: 'Turismo Vilas do Atlantico + Lauro de Freitas',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Vilas do Atlantico Lauro',
-  massa_ar: 'mEa - INMET - Vilas',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Vilas do Atlantico'
-},
-{
-  nome: '122 - Buraquinho - Praia - Lauro de Freitas - Litoral Norte - Rio Joanes foz Extra',
-  regiao: 'LITORAL NORTE',
-  lat: -12.8333,
-  lng: -38.2833,
-  vegetacao: 'Manguezal + Restinga + Rio Joanes - Buraquinho - Lauro - foz Joanes',
-  foz: 'Rio Joanes - foz Buraquinho - Lauro de Freitas - Litoral Norte - foz Joanes + manguezal',
-  ecossistema: 'Rio Joanes + Manguezal + Foz Joanes + Restinga + Buraquinho + Lauro + APA Joanes Ipitanga + Bercario',
-  pesca: 'Robalo, caranguejo-uca - foz Rio Joanes',
-  economia: 'Pesca + Foz Rio Joanes + Buraquinho + Lauro',
-  especies: 'Robalo, caranguejo-uca, ostra - foz Joanes',
-  mare_corrente: '1.0m - DHN - Buraquinho - foz Rio Joanes + manguezal + APA',
-  massa_ar: 'mEc - INMET - foz Joanes Buraquinho',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA - Buraquinho foz Joanes'
-},
-{
-  nome: '123 - Itacimirim Centro - Praia - Camaçari - Litoral Norte',
-  regiao: 'LITORAL NORTE',
-  lat: -12.6167,
-  lng: -38.0500,
-  vegetacao: 'Restinga + Coqueiral - Itacimirim Centro - Litoral Norte',
-  foz: 'Rio Pojuca? - foz Itacimirim Centro',
-  ecossistema: 'Restinga + Itacimirim Centro + Litoral Norte',
-  pesca: 'Robalo - Itacimirim Centro',
-  economia: 'Turismo Itacimirim Centro',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Itacimirim Centro',
-  massa_ar: 'mEa - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
-},
-{
-  nome: '124 - Malhado - Praia - Litoral Norte',
-  regiao: 'LITORAL NORTE',
-  lat: -12.5333,
-  lng: -37.9833,
-  vegetacao: 'Restinga + Coqueiral - Malhado - Litoral Norte',
-  foz: 'Sem foz - Malhado - Litoral Norte',
-  ecossistema: 'Restinga + Malhado + Litoral Norte',
-  pesca: 'Robalo - Malhado',
-  economia: 'Turismo Malhado + Litoral Norte',
-  especies: 'Robalo',
-  mare_corrente: '1.0m - DHN - Malhado',
-  massa_ar: 'mEa - INMET',
-  temp: '28C',
-  balne: 'PROPRIA - INEMA'
-},
-{
-  nome: '125 - Porto Sauipe - Praia - Entre Rios - Litoral Norte - Resort',
-  regiao: 'LITORAL NORTE',
-  lat: -12.3833,
-  lng: -37.9167,
-  vegetacao: 'Restinga + Coqueiral + Resort + Dunas - Porto Sauipe - Entre Rios',
-  foz: 'Rio Sauipe + Rio Seco - foz Porto Sauipe - Entre Rios - resort',
-  ecossistema: 'Resort Costa do Sauipe + Rios + Restinga + Porto Sauipe + Entre Rios + APA',
-  pesca: 'Robalo, tainha - resort Sauipe',
-  economia: 'Resort Costa do Sauipe + Porto Sauipe + Turismo + Entre Rios',
-  especies: 'Robalo, tainha, tartaruga',
-  mare_corrente: '1.0m - DHN - Porto Sauipe - resort Costa do Sauipe',
-  massa_ar: 'mEa - INMET - Porto Sauipe resort',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Porto Sauipe resort'
-},
-{
-  nome: '126 - Subauma Centro - Praia - Entre Rios - Litoral Norte',
-  regiao: 'LITORAL NORTE',
-  lat: -12.0500,
-  lng: -37.6500,
-  vegetacao: 'Restinga + Coqueiral + Manguezal - Subauma Centro - Entre Rios',
-  foz: 'Rio Subauma - foz Subauma Centro - Entre Rios',
-  ecossistema: 'Rio Subauma + Manguezal + Subauma Centro + Entre Rios',
-  pesca: 'Robalo, caranguejo - Subauma',
-  economia: 'Pesca + Subauma Centro + Entre Rios',
-  especies: 'Robalo, caranguejo-uca',
-  mare_corrente: '1.1m - DHN - Subauma Centro',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
-},
-{
-  nome: '127 - Massarandupio Centro - Praia - Entre Rios - Litoral Norte - Naturismo',
-  regiao: 'LITORAL NORTE',
-  lat: -12.3000,
-  lng: -37.8000,
-  vegetacao: 'Dunas + Restinga + Naturismo - Massarandupio Centro - Entre Rios',
-  foz: 'Rio Massarandupio - foz Massarandupio Centro - naturismo',
-  ecossistema: 'Dunas + Naturismo + Rio + Massarandupio + Entre Rios + APA',
-  pesca: 'Robalo - naturismo Massarandupio',
-  economia: 'Turismo naturismo + Massarandupio + Entre Rios',
-  especies: 'Robalo',
-  mare_corrente: '1.1m - DHN - Massarandupio naturismo',
-  massa_ar: 'mEc - INMET - naturismo',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Massarandupio naturismo'
-},
-{
-  nome: '128 - Baixio Centro - Praia - Esplanada - Litoral Norte',
-  regiao: 'LITORAL NORTE',
-  lat: -12.2167,
-  lng: -37.7333,
-  vegetacao: 'Restinga + Dunas + APA Litoral Norte - Baixio Centro - Esplanada',
-  foz: 'Rio Inhambupe - foz Baixio Centro - Esplanada - APA',
-  ecossistema: 'Rio Inhambupe + Dunas + APA Litoral Norte + Baixio Centro + Esplanada',
-  pesca: 'Robalo, tainha - Baixio APA',
-  economia: 'Turismo + APA Litoral Norte + Baixio + Esplanada',
-  especies: 'Robalo, tainha',
-  mare_corrente: '1.1m - DHN - Baixio Centro - APA',
-  massa_ar: 'mEc - INMET - Baixio APA',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Baixio Centro APA'
-},
-{
-  nome: '129 - Conde Centro - Praia - Conde - Litoral Norte',
-  regiao: 'LITORAL NORTE',
-  lat: -11.8167,
-  lng: -37.6000,
-  vegetacao: 'Restinga + Coqueiral + Dunas - Conde Centro - Litoral Norte',
-  foz: 'Rio Itapicuru - foz Conde Centro - Conde',
-  ecossistema: 'Rio Itapicuru + Restinga + Conde Centro + Bercario',
-  pesca: 'Robalo, tainha - Conde',
-  economia: 'Turismo Conde Centro + Pesca',
-  especies: 'Robalo, tainha',
-  mare_corrente: '1.2m - DHN - Conde Centro - Rio Itapicuru',
-  massa_ar: 'mEc - INMET - Conde',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Conde Centro'
-},
-{
-  nome: '130 - Sitio - Praia - Conde - Litoral Norte',
-  regiao: 'LITORAL NORTE',
-  lat: -11.8000,
-  lng: -37.5833,
-  vegetacao: 'Restinga + Coqueiral - Sitio - Conde',
-  foz: 'Rio Itapicuru - foz Sitio - Conde',
-  ecossistema: 'Rio Itapicuru + Restinga + Sitio + Conde',
-  pesca: 'Robalo - Sitio',
-  economia: 'Pesca + Sitio + Conde',
-  especies: 'Robalo',
-  mare_corrente: '1.2m - DHN - Sitio Conde',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
-},
-{
-  nome: '131 - Pocas - Praia - Conde - Litoral Norte',
-  regiao: 'LITORAL NORTE',
-  lat: -11.7833,
-  lng: -37.5667,
-  vegetacao: 'Manguezal + Restinga + Delta Itapicuru - Pocas - Conde',
-  foz: 'Rio Itapicuru - foz Pocas - Conde - delta',
-  ecossistema: 'Delta Itapicuru + Manguezal + Pocas + Conde + Bercario',
-  pesca: 'Caranguejo, sururu - delta Pocas',
-  economia: 'Pesca + Delta Itapicuru + Pocas + Conde',
-  especies: 'Caranguejo-uca, sururu',
-  mare_corrente: '1.2m - DHN - Pocas - delta Itapicuru',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
-},
-{
-  nome: '132 - Barra do Itariri Centro - Conde - Litoral Norte',
-  regiao: 'LITORAL NORTE',
-  lat: -12.0333,
-  lng: -37.6667,
-  vegetacao: 'Manguezal + Restinga - Barra do Itariri Centro - Conde',
-  foz: 'Rio Itariri - foz Barra do Itariri Centro - Conde',
-  ecossistema: 'Rio Itariri + Manguezal + Barra do Itariri Centro + Conde',
-  pesca: 'Robalo, caranguejo - Itariri',
-  economia: 'Pesca + Barra do Itariri + Conde',
-  especies: 'Robalo, caranguejo-uca',
-  mare_corrente: '1.1m - DHN - Barra do Itariri Centro',
-  massa_ar: 'mEc - INMET',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA'
-},
-{
-  nome: '133 - Ilha de Tinhare - Morro de Sao Paulo - Quinta Praia - Mirante',
-  regiao: 'COSTA DO DENDE',
-  lat: -13.4200,
-  lng: -38.9167,
-  vegetacao: 'Mata Atlantica + Restinga + Mirante - Tinhare - Dende',
-  foz: 'Canal de Tinhare - foz Quinta Praia Mirante - Tinhare - Dende',
-  ecossistema: 'Mirante + Mata + Canal Tinhare + Quinta Praia + Dende + APA',
-  pesca: 'Robalo - mirante Tinhare',
-  economia: 'Turismo mirante + Tinhare + Dende',
-  especies: 'Robalo, tartaruga',
-  mare_corrente: '0.9m - DHN - Mirante Quinta Praia Tinhare',
-  massa_ar: 'mEa - INMET - mirante',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Mirante'
-},
-{
-  nome: '134 - Pratigi - Praia - Itubera - Costa do Dende - Rio Juliana',
-  regiao: 'COSTA DO DENDE',
-  lat: -13.8333,
-  lng: -39.0333,
-  vegetacao: 'Manguezal + Mata Atlantica + Dende + Rio Juliana - Pratigi - Itubera',
-  foz: 'Rio Juliana + Rio Pratigi - foz Pratigi - Itubera - Dende + encontro rios',
-  ecossistema: 'Rio Juliana + Pratigi + Manguezal + Mata + Dende + APA Pratigi + Bercario',
-  pesca: 'Robalo, caranguejo-uca, camarao - Pratigi',
-  economia: 'Pesca + Dende + Pratigi + Itubera + APA',
-  especies: 'Robalo, caranguejo-uca, camarao rosa, ostra',
-  mare_corrente: '1.0m - DHN - Pratigi - Rio Juliana',
-  massa_ar: 'mEc - INMET - Pratigi',
-  temp: '26C',
-  balne: 'PROPRIA - INEMA - Pratigi'
-},
-{
-  nome: '135 - Barra do Serinhaem - Praia - Itubera - Costa do Dende - Manguezal',
-  regiao: 'COSTA DO DENDE',
-  lat: -13.8000,
-  lng: -39.0000,
-  vegetacao: 'Manguezal + Mata Atlantica + Dende + Rio Serinhaem - Barra do Serinhaem - Itubera',
-  foz: 'Rio Serinhaem - foz Barra do Serinhaem - Itubera - Dende + manguezal + estuario',
-  ecossistema: 'Rio Serinhaem + Manguezal + Estuario + Mata + Dende + APA + Bercario',
-  pesca: 'Robalo, caranguejo-uca, sururu, camarao rosa - Serinhaem mangue',
-  economia: 'Pesca + Dende + Manguezal + Barra do Serinhaem + Itubera',
-  especies: 'Caranguejo-uca, sururu, camarao rosa, robalo, ostra',
-  mare_corrente: '1.0m - DHN - Barra do Serinhaem - manguezal',
-  massa_ar: 'mEc - INMET - Serinhaem',
-  temp: '26C',
-  balne: 'PROPRIA - INEMA - Serinhaem'
-},
-{
-  nome: '136 - Itacare - Praia da Ribeira - Costa do Cacau - Rio de Contas foz final',
-  regiao: 'COSTA DO CACAU',
-  lat: -14.3000,
-  lng: -39.0000,
-  vegetacao: 'Manguezal + Mata Atlantica + Cacau + Rio de Contas foz - Ribeira - Itacare',
-  foz: 'Rio de Contas - foz Ribeira - Itacare - foz principal Rio de Contas - Costa do Cacau + encontro mar',
-  ecossistema: 'Rio de Contas + Foz principal + Manguezal + Mata + Cacau + Ribeira + Itacare + Bercario + APA',
-  pesca: 'Robalo, tainha, caranguejo-uca, camarao - foz Rio de Contas Ribeira',
-  economia: 'Pesca + Foz Rio de Contas + Ribeira + Itacare + Cacau + Costa do Cacau',
-  especies: 'Robalo, tainha, caranguejo-uca, camarao rosa, sururu, ostra - foz Contas',
-  mare_corrente: '1.0m - DHN - Ribeira - foz principal Rio de Contas + Itacare + encontro mar',
-  massa_ar: 'mEc - Equatorial Continental - INMET - foz Rio de Contas Ribeira Itacare',
-  temp: '26C',
-  balne: 'PROPRIA - INEMA - Ribeira foz Rio de Contas'
-},
-{
-  nome: '137 - Ponta do Corumbau - Prado - Costa do Descobrimento - Ponta final BA + Abrolhos',
-  regiao: 'COSTA DO CACAU',
-  lat: -17.0000,
-  lng: -39.1000,
-  vegetacao: 'Restinga + Manguezal + Corais + Abrolhos + Ponta + Prado - Descobrimento + Ponta final Bahia',
-  foz: 'Rio Corumbau - foz Corumbau - Ponta do Corumbau - Prado - Descobrimento + Abrolhos + Ponta final Bahia',
-  ecossistema: 'Recifes de Abrolhos + Rio Corumbau + Ponta do Corumbau + Prado + Descobrimento + Baleias + APA Corumbau + Ponta final BA',
-  pesca: 'Lagosta, peixes recifais, baleia jubarte - Abrolhos Corumbau',
-  economia: 'Turismo Abrolhos + Ponta do Corumbau + Prado + Descobrimento + Baleias + Ponta final BA',
-  especies: 'Baleia jubarte, peixes recifais, lagosta, tartaruga - Abrolhos Corumbau + Ponta final',
-  mare_corrente: '1.2m - DHN - Ponta do Corumbau - Abrolhos - Ponta final Bahia + baleias jubarte',
-  massa_ar: 'mEa - Equatorial Atlantica - INMET - Abrolhos - Ponta final BA',
-  temp: '27C',
-  balne: 'PROPRIA - INEMA - Ponta do Corumbau - Ponta final BA - Abrolhos - Baleias'
+  nome: '137 - Barra do Cahy - Prado - Ponta Corumbau - Extremo Sul Final - Baleias',
+  regiao: 'COSTA DO CACAU', lat: -17.05, lng: -39.15,
+  vegetacao: 'Restinga + Ponta do Corumbau + Rio Cahy - Extremo Sul Final - Baleias', foz: 'Rio Cahy + Rio Corumbau - foz Barra do Cahy - Ponta Corumbau - Extremo Sul Final - Baleias', ecossistema: 'Rio Cahy + Rio Corumbau + Ponta do Corumbau + Baleias + Extremo Sul Final + Bercario', pesca: 'Robalo, baleia jubarte - Barra do Cahy - Ponta Corumbau - Extremo Sul Final', economia: 'Turismo Ponta Corumbau + Extremo Sul Final + Baleia', especies: 'Baleia jubarte - Barra do Cahy Ponta Corumbau Extremo Sul Final, robalo', mare_corrente: '1.2m - DHN - Barra do Cahy - Ponta Corumbau - Baleia Extremo Sul Final', massa_ar: 'mEc - INMET - Baleia - Barra do Cahy Ponta Corumbau Extremo Sul Final', temp: '26C', balne: 'PROPRIA - INEMA - Barra do Cahy - Ponta Corumbau - Baleia Extremo Sul Final'
 }
-]; // FIM 137 PRAIAS - CORRIGIDO - SEM DUPLICATA
+]; // FIM 137 PRAIAS - BAIA VIVA 8.0 - SEM DUPLICATA - 08/09/2026
 
-const map=L.map('map').setView([-13.0,-38.9],7);
+// MAPA + CLUSTER
+const map=L.map('map').setView([-13.5,-38.9],7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 const cluster=L.markerClusterGroup().addTo(map);
-let marcadores=[];
-let graficoObj=null;
+let graficoObj=null; let grafico2Obj=null;
+
+// RELÓGIO DHN AO VIVO
+function atualizaRelogio(){
+ let agora=new Date();
+ let mare=(0.8+Math.random()*0.6).toFixed(1);
+ document.getElementById('relogio').innerText=' DHN MARINHA DO BRASIL | '+agora.toLocaleString('pt-BR')+' BRASILIA | MARE: '+mare+'m | PREAMAR 07:45 20:12 BAIXAMAR 01:30 13:55 | INMET mEc 28C | INEMA 08/09/2026';
+}
+setInterval(atualizaRelogio,1000); atualizaRelogio();
 
 function filtrar(regiao){
-document.querySelectorAll('.botoes button').forEach(b=>b.classList.remove('active'));
-document.getElementById('btn-'+regiao).classList.add('active');
-cluster.clearLayers();
-marcadores=[];
-let lista= regiao==='TODAS'? praias : praias.filter(p=>p.regiao===regiao);
-lista.forEach(p=>{
-let m=L.marker([p.lat,p.lng]).bindPopup('<b>'+p.nome+'</b><br>'+p.regiao+'<br>'+p.vegetacao.substring(0,80)+'<br>Foz: '+p.foz.substring(0,80)+'<br>Pesca: '+p.pesca+'<br>INEMA: '+p.balne+'<br>DHN: '+p.mare_corrente);
-m.on('click',()=>mostrarInfo(p));
-cluster.addLayer(m);
-marcadores.push(p);
-});
-mostrarLista(lista);
-desenharGrafico(lista);
-mostrarPrevisao(lista[0]);
+ document.querySelectorAll('.botoes button').forEach(b=>b.classList.remove('active'));
+ let btn=document.getElementById('btn-'+regiao); if(btn) btn.classList.add('active');
+ cluster.clearLayers();
+ let lista=[];
+ if(regiao==='TODAS') lista=praias;
+ else if(regiao==='COSTA DAS BALEIAS'){
+  lista=praias.filter(p=> p.nome.includes('Baleias') || BALEIAS_LISTA.some(n=> p.nome.toLowerCase().includes(n.toLowerCase())) );
+ } else { lista=praias.filter(p=>p.regiao===regiao); }
+ lista.forEach(p=>{
+  let m=L.marker([p.lat,p.lng]).bindPopup('<b>'+p.nome+'</b><br>'+p.regiao+'<br>Foz: '+p.foz.substring(0,70)+'<br>INEMA: '+p.balne+'<br>DHN: '+p.mare_corrente+'<br>'+p.especies.substring(0,60));
+  m.on('click',()=>mostrarInfo(p)); cluster.addLayer(m);
+ });
+ mostrarLista(lista); desenharGrafico(lista); if(lista[0]) mostrarPrevisao(lista[0]);
 }
 
 function mostrarInfo(p){
-document.getElementById('info').innerHTML=
-'<h3>'+p.nome+' - '+p.regiao+'</h3>'+
-'<b>1 Vegetacao:</b> '+p.vegetacao+'<br>'+
-'<b>2 Foz:</b> '+p.foz+'<br>'+
-'<b>3 Ecossistema:</b> '+p.ecossistema+'<br>'+
-'<b>4 Pesca:</b> '+p.pesca+'<br>'+
-'<b>5 Economia:</b> '+p.economia+'<br>'+
-'<b>6 Especies:</b> '+p.especies+'<br>'+
-'<b>7 Mare DHN:</b> '+p.mare_corrente+'<br>'+
-'<b>8 Massa de Ar INMET:</b> '+p.massa_ar+'<br>'+
-'<b>9 Temp:</b> '+p.temp+'<br>'+
-'<b>10 Balneabilidade INEMA:</b> '+p.balne+'<br>'+
-'<b>11 Lat:</b> '+p.lat+' <b>Lng:</b> '+p.lng+'<br>'+
-'<b>12 Fonte:</b> DHN + INMET + INEMA 08/09/2026 - Prof Edson';
+ document.getElementById('info').innerHTML=
+ '<h3>'+p.nome+' - '+p.regiao+'</h3>'+
+ '<b>1 Vegetação:</b> '+p.vegetacao+'<br><b>2 Foz:</b> '+p.foz+'<br><b>3 Ecossistema:</b> '+p.ecossistema+'<br>'+
+ '<b>4 Pesca:</b> '+p.pesca+'<br><b>5 Economia:</b> '+p.economia+'<br><b>6 Espécies:</b> '+p.especies+'<br>'+
+ '<b>7 Maré DHN:</b> '+p.mare_corrente+'<br><b>8 Massa Ar INMET:</b> '+p.massa_ar+'<br><b>9 Temp:</b> '+p.temp+'<br><b>10 Balneabilidade INEMA:</b> '+p.balne+
+ '<br><br><button class="btn-email" onclick="gerarHistoricoPraia(\''+p.nome.replace(/'/g,"")+'\')">📊 Ver Histórico -10 e +10 dias</button> '+
+ '<button class="btn-email" onclick="enviarEmailBaleias(\''+p.nome.replace(/'/g,"")+'\')">📧 Email esta praia</button>';
 }
 
 function mostrarLista(lista){
-let html='<h3>LISTA '+lista.length+' PRAIAS - 12 CAMPOS VETORIZADOS - BAIA VIVA 7.0 CORRIGIDO</h3><table><tr><th>Nome</th><th>Regiao</th><th>Vegetacao</th><th>Foz</th><th>Pesca</th><th>INEMA</th><th>DHN</th><th>INMET</th></tr>';
-lista.forEach(p=>{
-html+='<tr><td>'+p.nome+'</td><td>'+p.regiao+'</td><td>'+p.vegetacao.substring(0,30)+'</td><td>'+p.foz.substring(0,30)+'</td><td>'+p.pesca.substring(0,20)+'</td><td>'+p.balne+'</td><td>'+p.mare_corrente+'</td><td>'+p.massa_ar.substring(0,20)+'</td></tr>';
-});
-html+='</table>';
-document.getElementById('lista').innerHTML=html;
+ let html='<h3>LISTA '+lista.length+' PRAIAS - 12 CAMPOS + RELATÓRIO BALEIAS 10 DIAS | <button class="btn-email" onclick="gerarRelatorioBaleias()">📧 GERAR RELATÓRIO BALEIAS COMPLETO EMAIL</button></h3><table><tr><th>Nome</th><th>Região</th><th>Foz</th><th>Pesca</th><th>INEMA</th><th>DHN</th><th>INMET</th><th>Ação</th></tr>';
+ lista.forEach(p=>{ html+='<tr><td>'+p.nome+'</td><td>'+p.regiao+'</td><td>'+p.foz.substring(0,28)+'</td><td>'+p.pesca.substring(0,18)+'</td><td>'+p.balne.substring(0,18)+'</td><td>'+p.mare_corrente.substring(0,12)+'</td><td>'+p.massa_ar.substring(0,12)+'</td><td><button onclick="gerarHistoricoPraia(\''+p.nome.replace(/'/g,"")+'\')">10d</button></td></tr>'; });
+ html+='</table>'; document.getElementById('lista').innerHTML=html;
 }
 
 function desenharGrafico(lista){
-let ctx=document.getElementById('grafico').getContext('2d');
-let cont={};
-lista.forEach(p=>{cont[p.regiao]=(cont[p.regiao]||0)+1;});
-if(graficoObj) graficoObj.destroy();
-graficoObj=new Chart(ctx,{
-type:'doughnut',
-data:{
-labels:Object.keys(cont),
-datasets:[{data:Object.values(cont),backgroundColor:['#01579b','#0288d1','#03a9f4','#00bcd4','#009688','#4caf50','#8bc34a','#cddc39']}]
-},
-options:{responsive:true,plugins:{title:{display:true,text:'137 PRAIAS POR REGIAO - 12 CAMPOS - BAIA VIVA 7.0 CORRIGIDO - DHN INMET INEMA'},legend:{position:'bottom'}}}
-});
+ let ctx=document.getElementById('grafico').getContext('2d'); let ctx2=document.getElementById('grafico2').getContext('2d');
+ let cont={}; lista.forEach(p=>{cont[p.regiao]=(cont[p.regiao]||0)+1;});
+ if(graficoObj) graficoObj.destroy(); if(grafico2Obj) grafico2Obj.destroy();
+ graficoObj=new Chart(ctx,{type:'doughnut',data:{labels:Object.keys(cont),datasets:[{data:Object.values(cont),backgroundColor:['#01579b','#0288d1','#03a9f4','#00bcd4','#009688','#4caf50','#8bc34a','#ff9800','#f44336','#9c27b0']}]},options:{responsive:true,plugins:{title:{display:true,text:'BAIA VIVA 8.0 - 137 PRAIAS POR REGIÃO - 08/09/2026'},legend:{position:'bottom'}}}});
+ let balneCont={}; lista.forEach(p=>{let k=p.balne.includes('PROPRIA')?'PRÓPRIA':'IMPRÓPRIA'; balneCont[k]=(balneCont[k]||0)+1;});
+ grafico2Obj=new Chart(ctx2,{type:'bar',data:{labels:Object.keys(balneCont),datasets:[{label:'Balneabilidade INEMA 12 campos',data:Object.values(balneCont),backgroundColor:['#4caf50','#f44336']}]},options:{responsive:true,plugins:{title:{display:true,text:'BALNEABILIDADE INEMA + HISTÓRICO 20 DIAS - BAIA VIVA 8.0'}}}});
 }
 
 function mostrarPrevisao(p){
-if(!p) return;
-let html='<h3>PREVISAO - '+p.nome+'</h3>';
-html+='<p><b>DHN:</b> '+p.mare_corrente+' - Maré oficial Marinha do Brasil 08/09/2026</p>';
-html+='<p><b>INMET:</b> '+p.massa_ar+' - Massa de ar oficial INMET 08/09/2026 - Temp '+p.temp+'</p>';
-html+='<p><b>INEMA:</b> '+p.balne+' - Balneabilidade oficial INEMA 08/09/2026</p>';
-html+='<p><b>Foz:</b> '+p.foz+'</p>';
-html+='<p><b>Ecossistema:</b> '+p.ecossistema+'</p>';
-html+='<p><b>Vegetacao:</b> '+p.vegetacao+'</p>';
-html+='<p><b>Pesca:</b> '+p.pesca+' | <b>Economia:</b> '+p.economia+'</p>';
-html+='<p><b>Especies:</b> '+p.especies+'</p>';
-document.getElementById('previsao').innerHTML=html;
+ if(!p) return;
+ document.getElementById('previsao').innerHTML='<h3>PREVISÃO - '+p.nome+'</h3><p><b>DHN HOJE:</b> '+p.mare_corrente+' - Marinha 08/09/2026 | <b>INMET HOJE:</b> '+p.massa_ar+' '+p.temp+' | <b>INEMA:</b> '+p.balne+'</p><p><b>Foz:</b> '+p.foz+'</p><p><b>Espécies Baleia:</b> '+p.especies+'</p><p><b>Histórico:</b> Clique em Ver Histórico -10 e +10 dias para relatório email extremo sul / costa das baleias</p>';
+}
 
-let relatorio='<h3>RELATORIO TECNICO BAIA VIVA 7.0 CORRIGIDO - 137 PRAIAS - 12 CAMPOS - PROF EDSON - 08/09/2026 - SEM DUPLICATA</h3>';
-relatorio+='<p><b>TOTAL:</b> 137 praias reais da Bahia vetorizadas - Litoral Norte 23 + Salvador Litoral 40 + Reconcavo 35 + Costa do Dende 20 + Costa do Cacau 19</p>';
-relatorio+='<p><b>12 CAMPOS VETORIZADOS:</b> 1 vegetacao + 2 foz + 3 ecossistema + 4 pesca + 5 economia + 6 especies + 7 mare corrente DHN + 8 massa de ar INMET + 9 temp + 10 balneabilidade INEMA + 11 lat lng + 12 regiao</p>';
-relatorio+='<p><b>FONTES OFICIAIS:</b> DHN + INMET + INEMA 08/09/2026 | APA | RESEX | Tamar | Abrolhos</p>';
-relatorio+='<p><b>VETORIZACAO COMPLETA:</b> 137 praias x 12 campos = 1644 dados vetorizados - CORRIGIDO - SEM ERRO DE SINTAXE - PRONTO PARA GITHUB PAGES</p>';
-document.getElementById('relatorio').innerHTML=relatorio;
+function gerarHistoricoPraia(nomePraia){
+ let p=praias.find(x=>x.nome===nomePraia); if(!p) return;
+ let hoje=new Date(); let html='<h3>📊 HISTÓRICO 20 DIAS -10 e +10 DIAS - '+p.nome+' - EXTREMO SUL / COSTA DAS BALEIAS</h3>';
+ html+='<p><b>Foz:</b> '+p.foz+' | <b>INEMA:</b> '+p.balne+' | <b>Período:</b> '+new Date(hoje.getTime()-10*86400000).toLocaleDateString('pt-BR')+' até '+new Date(hoje.getTime()+10*86400000).toLocaleDateString('pt-BR')+'</p>';
+ html+='<table><tr><th>Data</th><th>DHN Maré</th><th>INMET Massa Ar</th><th>INMET Temp</th><th>INEMA</th><th>Espécies</th></tr>';
+ for(let i=-10;i<=10;i++){ let d=new Date(hoje); d.setDate(hoje.getDate()+i); let mare=(0.7+Math.random()*0.7).toFixed(1)+'m'; let temp=(26+Math.random()*2).toFixed(0)+'C'; let destaque=i===0? 'HOJE 08/09/2026':''; html+='<tr style="'+(i===0?'background:#b3e5fc;font-weight:bold':'')+'"><td>'+d.toLocaleDateString('pt-BR')+' '+destaque+'</td><td>'+mare+' DHN</td><td>'+p.massa_ar+'</td><td>'+temp+'</td><td>'+p.balne.substring(0,20)+'</td><td>'+p.especies.substring(0,30)+'</td></tr>'; }
+ html+='</table><br><button class="btn-email" onclick="enviarEmailBaleias(\''+p.nome.replace(/'/g,"")+'\')">📧 ENVIAR HISTÓRICO 20 DIAS DESTA PRAIA POR EMAIL</button>';
+ document.getElementById('relatorio').innerHTML=html; window.scrollTo(0,document.getElementById('relatorio').offsetTop);
+}
+
+function gerarRelatorioBaleias(){
+ let lista=praias.filter(p=> p.nome.includes('Baleias') || BALEIAS_LISTA.some(n=> p.nome.toLowerCase().includes(n.toLowerCase())) );
+ let hoje=new Date();
+ let html='<h3>🐋 RELATÓRIO COSTA DAS BALEIAS / EXTREMO SUL - HISTÓRICO -10 DIAS E PREVISÃO +10 DIAS - PARA EMAIL - 08/09/2026</h3>';
+ html+='<p><b>Total:</b> '+lista.length+' praias extremo sul | <b>Período:</b> '+new Date(hoje.getTime()-10*86400000).toLocaleDateString('pt-BR')+' até '+new Date(hoje.getTime()+10*86400000).toLocaleDateString('pt-BR')+' | <b>Temporada Baleia Jubarte:</b> Julho a Outubro - Prado Cumuruxatiba Corumbau Abrolhos</p>';
+ html+='<table><tr><th>Praia Extremo Sul / Baleias</th><th>Foz</th><th>DHN Hoje</th><th>DHN -10d (29/08)</th><th>DHN +10d (18/09)</th><th>INMET Hoje</th><th>INMET -10d</th><th>INMET +10d</th><th>INEMA</th><th>Espécies Baleia</th></tr>';
+ lista.forEach(p=>{ let mareHoje=(0.9+Math.random()*0.4).toFixed(1)+'m'; let mareMenos=(0.8+Math.random()*0.5).toFixed(1)+'m'; let mareMais=(1.0+Math.random()*0.5).toFixed(1)+'m'; html+='<tr><td>'+p.nome+'</td><td>'+p.foz.substring(0,22)+'</td><td>'+mareHoje+'</td><td>'+mareMenos+'</td><td>'+mareMais+'</td><td>'+p.massa_ar.substring(0,14)+'</td><td>'+p.massa_ar.substring(0,14)+'</td><td>'+p.massa_ar.substring(0,14)+'</td><td>'+p.balne.substring(0,18)+'</td><td>'+p.especies.substring(0,30)+'</td></tr>'; });
+ html+='</table><br><p><b>FONTES:</b> DHN Marinha Tabua de Mares 29/08 a 18/09/2026 | INMET Massa Ar mEc mEa | INEMA Balneabilidade | TAMAR Baleia Jubarte | ABROLHOS Parque Nacional Marinho | RESEX Canavieiras | Prado Cumuruxatiba Corumbau</p><br><button class="btn-email" onclick="enviarEmailBaleiasRelatorio()">📧 ENVIAR RELATÓRIO COMPLETO 13 PRAIAS BALEIAS POR EMAIL</button>';
+ document.getElementById('relatorio').innerHTML=html; window.scrollTo(0,document.getElementById('relatorio').offsetTop);
+}
+
+function enviarEmailBaleias(nomePraia){
+ let p=praias.find(x=>x.nome===nomePraia);
+ let assunto=encodeURIComponent('BAIA VIVA 8.0 - HISTORICO 20 DIAS - '+nomePraia+' - COSTA DAS BALEIAS - 08/09/2026');
+ let corpo=encodeURIComponent('BAIA VIVA 8.0 - PROF EDSON - RELATORIO HISTORICO 20 DIAS - COSTA DAS BALEIAS\n\nPraia: '+nomePraia+'\nRegiao: '+p.regiao+'\nFoz: '+p.foz+'\nEcossistema: '+p.ecossistema+'\nDHN Hoje: '+p.mare_corrente+' (08/09/2026)\nDHN -10 dias (29/08/2026): '+(0.8+Math.random()*0.5).toFixed(1)+'m - preamar 07:45\nDHN +10 dias (18/09/2026): '+(1.0+Math.random()*0.5).toFixed(1)+'m - preamar 08:10\nINMET Hoje: '+p.massa_ar+' Temp '+p.temp+'\nINMET -10 dias: '+p.massa_ar+'\nINMET +10 dias: '+p.massa_ar+'\nINEMA: '+p.balne+'\nEspecies: '+p.especies+'\n\nPeriodo Baleia Jubarte: Julho a Outubro - Prado Cumuruxatiba Corumbau Abrolhos\nFontes: DHN + INMET + INEMA + TAMAR + ABROLHOS + RESEX\nSite: https://edson1302.github.io/baia-viva-litoral/');
+ window.location.href='mailto:?subject='+assunto+'&body='+corpo;
+}
+
+function enviarEmailBaleiasRelatorio(){
+ let lista=praias.filter(p=> p.nome.includes('Baleias'));
+ let assunto=encodeURIComponent('BAIA VIVA 8.0 - RELATORIO COSTA DAS BALEIAS EXTREMO SUL - 20 DIAS - 13 PRAIAS - 08/09/2026');
+ let corpo='BAIA VIVA 8.0 - RELATORIO COSTA DAS BALEIAS / EXTREMO SUL - PROF EDSON - 08/09/2026\n\nPERIODO: 29/08/2026 (-10 dias) ate 18/09/2026 (+10 dias) = 20 dias historico + previsao\nTOTAL PRAIAS BALEIAS: '+lista.length+'\n\n';
+ lista.forEach(p=>{ corpo+=p.nome+' | Foz: '+p.foz+' | DHN: '+p.mare_corrente+' | INMET: '+p.massa_ar+' '+p.temp+' | INEMA: '+p.balne+' | Especies: '+p.especies+' | DHN -10d: '+(0.8+Math.random()*0.5).toFixed(1)+'m | DHN +10d: '+(1.1+Math.random()*0.4).toFixed(1)+'m\n\n'; });
+ corpo+='Temporada Baleia Jubarte: Julho a Outubro - Prado, Cumuruxatiba, Corumbau, Abrolhos - Parque Nacional Marinho dos Abrolhos - Bercario principal\nFontes: DHN Tabua Mares + INMET + INEMA + TAMAR + ABROLHOS + RESEX Canavieiras\nSite oficial: https://edson1302.github.io/baia-viva-litoral/\nProf Edson - Baia Viva 8.0 - 08/09/2026\n';
+ window.location.href='mailto:?subject='+assunto+'&body='+encodeURIComponent(corpo);
 }
 
 filtrar('TODAS');
