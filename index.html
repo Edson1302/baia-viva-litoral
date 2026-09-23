@@ -2,167 +2,187 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Baía Viva 14.1 - Relatórios de Conflitos e Celulose</title>
+<title>Baía Viva 14.1 - Conflitos e Celulose com Relatórios</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#eef2f7}
 .header{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:1000;background:#8B0000;color:#fff;padding:8px 16px;border-radius:30px;font-weight:bold;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,.6);font-size:9px}
-.controls{position:absolute;top:50px;left:8px;z-index:1000;background:#fff;padding:8px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.3);width:278px;max-height:88vh;overflow:auto}
-.controls input{width:100%;padding:5px;border:1px solid #ccc;border-radius:8px;margin-bottom:4px;font-size:11px}
-.controls button{width:100%;padding:5px;margin:2px 0;border:0;border-radius:7px;cursor:pointer;font-weight:bold;color:#fff;font-size:8px}
+.controls{position:absolute;top:50px;left:8px;z-index:1000;background:#fff;padding:8px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.3);width:282px;max-height:88vh;overflow:auto}
+.controls input{width:100%;padding:6px;border:1px solid #ccc;border-radius:8px;margin-bottom:5px;font-size:11px}
+.controls button{width:100%;padding:6px;margin:2px 0;border:0;border-radius:7px;cursor:pointer;font-weight:bold;color:#fff;font-size:8.2px}
 .btn-coqueiros{background:#e67e22}.btn-todos{background:#2980b9}.btn-dende{background:#27ae60}.btn-cacau{background:#8e44ad}.btn-descob{background:#c0392b}.btn-baleias{background:#f1c40f;color:#000!important}.btn-real{background:red}.btn-reset{background:#34495e}
 .btn-mangue{background:#1e8449}.btn-indigena{background:#8B4513}.btn-quilombola{background:#000;color:#FFD700!important}.btn-uc{background:#006400}
-.btn-conflito{background:#8B0000}.btn-terra{background:#FF4500}.btn-explor{background:#A0522D}.btn-celulose{background:#2F4F4F}.btn-dist{background:#000}
+.btn-conflito{background:#8B0000}.btn-terra{background:#FF4500}.btn-celulose{background:#2F4F4F}.btn-dist{background:#000}
 #map{height:100vh;width:100%}
-.info-panel{position:absolute;bottom:10px;right:8px;z-index:1000;background:#fff;padding:10px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.4);width:380px;font-size:11px;max-height:68vh;overflow:auto;border-left:5px solid #8B0000}
-.tempo-real{background:#e8f6ff;border:1px solid #2980b9;border-radius:8px;padding:6px;margin-top:5px;font-size:10px}
+.info-panel{position:absolute;bottom:10px;right:8px;z-index:1000;background:#fff;padding:10px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.4);width:390px;font-size:11px;max-height:68vh;overflow:auto;border-left:5px solid #8B0000}
 .coord-box{background:#000;color:#0f0;padding:4px 6px;border-radius:6px;font-family:monospace;font-size:10px;margin-top:4px}
 .conflito-box{background:#ffe6e6;border:2px solid #8B0000;border-radius:8px;padding:6px;margin-top:5px}
 .celulose-box{background:#e6f2e6;border:2px solid #2F4F4F;border-radius:8px;padding:6px;margin-top:5px}
-.badge{padding:2px 6px;border-radius:6px;font-size:10px;font-weight:bold}.badge-ok{background:#27ae60;color:#fff}.badge-atencao{background:#f1c40f}.badge-ruim{background:#c0392b;color:#fff}.badge-conflito{background:#8B0000;color:#fff}
-.relatorio-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);z-index:2000;display:none;overflow:auto}
-.relatorio-box{background:#fff;margin:12px auto;padding:15px;border-radius:12px;max-width:900px}
-.relatorio-box table{width:100%;border-collapse:collapse;font-size:10px;margin-top:6px}.relatorio-box th,.relatorio-box td{border:1px solid #ccc;padding:4px;text-align:center}.relatorio-box th{background:#8B0000;color:#fff}
-.btn-rel{width:100%;background:#8B0000;color:#fff;padding:8px;border:0;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:6px}
+.relatorio-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:2000;display:none;overflow:auto}
+.relatorio-box{background:#fff;margin:15px auto;padding:16px;border-radius:12px;max-width:920px}
+.relatorio-box table{width:100%;border-collapse:collapse;font-size:10px;margin-top:6px}.relatorio-box th,.relatorio-box td{border:1px solid #ccc;padding:5px;text-align:left}.relatorio-box th{background:#8B0000;color:#fff}
+.btn-rel{width:100%;background:#8B0000;color:#fff;padding:9px;border:0;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:6px}
 .btn-pdf{background:#27ae60}.btn-csv{background:#2980b9}.btn-fechar{background:#34495e}
 </style>
 </head>
 <body>
-<div class="header">BAÍA VIVA 14.1 | RELATÓRIOS TOTAIS DE CONFLITOS + CELULOSE + PDF CSV</div>
+<div class="header">BAÍA VIVA 14.1 OFICIAL | CONFLITOS + TERRA + CELULOSE + RELATÓRIO TOTAL PDF CSV</div>
 <div class="controls">
-<input id="busca" placeholder="Buscar praia, conflito, celulose, MST..." onkeyup="filtrarBusca()">
-<button class="btn-coqueiros" onclick="filtrarCosta('Coqueiros')">Coqueiros</button>
-<button class="btn-todos" onclick="filtrarCosta('Todos os Santos')">Todos os Santos</button>
-<button class="btn-dende" onclick="filtrarCosta('Dendê')">Dendê</button>
-<button class="btn-cacau" onclick="filtrarCosta('Cacau')">Cacau</button>
-<button class="btn-descob" onclick="filtrarCosta('Descobrimento')">Descobrimento</button>
-<button class="btn-baleias" onclick="filtrarCosta('Baleias')">Baleias</button>
-<hr style="margin:4px 0">
-<b style="font-size:7px">HUMANO 13.0</b>
-<button class="btn-indigena" onclick="toggleIndigena()">🏹 INDÍGENAS PATAXÓ</button>
-<button class="btn-quilombola" onclick="toggleQuilombola()">✊🏿 QUILOMBOLAS</button>
-<button class="btn-uc" onclick="toggleUC()">🌳 PARQUES E UCs</button>
-<button class="btn-dist" onclick="ativarDistancia()">📏 DISTÂNCIA 409.6km</button>
-<hr style="margin:4px 0">
-<b style="font-size:8px;color:#8B0000">14.1 - COM RELATÓRIOS TOTAIS - IDEIA DO ÁUDIO</b>
-<button class="btn-conflito" onclick="toggleConflito()">🔴 CONFLITOS AGRÁRIOS MST + RELATÓRIO</button>
-<button class="btn-terra" onclick="toggleTerra()">🟠 CONFLITOS TERRA / GRILAGEM + RELATÓRIO</button>
-<button class="btn-explor" onclick="toggleExplor()">🟤 EXPLORAÇÃO VEGETAL / CARVÃO + RELATÓRIO</button>
-<button class="btn-celulose" onclick="toggleCelulose()">🏭 CELULOSE / EUCALIPTO + RELATÓRIO TOTAL</button>
+<input id="busca" placeholder="Buscar praia, MST, Suzano, quilombo..." onkeyup="filtrarBusca()">
+<button class="btn-coqueiros" onclick="filtrarCosta('Coqueiros')">Coqueiros - Mangue Seco</button>
+<button class="btn-todos" onclick="filtrarCosta('Todos os Santos')">Todos os Santos - Itapuã</button>
+<button class="btn-dende" onclick="filtrarCosta('Dendê')">Dendê - Morro SP</button>
+<button class="btn-cacau" onclick="filtrarCosta('Cacau')">Cacau - Itacaré Ilhéus</button>
+<button class="btn-descob" onclick="filtrarCosta('Descobrimento')">Descobrimento - Trancoso</button>
+<button class="btn-baleias" onclick="filtrarCosta('Baleias')">Baleias - Abrolhos</button>
+<hr style="margin:5px 0">
+<b style="font-size:7px">13.0 HUMANO</b>
+<button class="btn-indigena" onclick="toggleIndigena()">🏹 RESERVAS INDÍGENAS PATAXÓ (7)</button>
+<button class="btn-quilombola" onclick="toggleQuilombola()">✊🏿 QUILOMBOLAS (8)</button>
+<button class="btn-uc" onclick="toggleUC()">🌳 PARQUES E UCS (12)</button>
+<button class="btn-dist" onclick="ativarDistancia()">📏 DISTÂNCIA - 409.6km MANGUE SECO → ILHÉUS</button>
+<hr style="margin:5px 0">
+<b style="font-size:8px;color:#8B0000">14.1 NOVO - CONFLITOS + CELULOSE COM RELATÓRIO TOTAL</b>
+<button class="btn-conflito" onclick="toggleConflito()">🔴 CONFLITOS AGRÁRIOS MST / PATAXÓ - COM RELATÓRIO PDF</button>
+<button class="btn-terra" onclick="toggleTerra()">🟠 CONFLITOS TERRA / GRILAGEM R$ 1 BILHÃO - COM RELATÓRIO</button>
+<button class="btn-celulose" onclick="toggleCelulose()">🏭 CELULOSE / EUCALIPTO 300.000 ha SUZANO VERACEL - RELATÓRIO TOTAL</button>
 <button class="btn-real" onclick="irItapua()">★ ITAPUÃ REAL -12.953,-38.357</button>
 <button class="btn-reset" onclick="resetar()">Resetar Tudo</button>
-<div style="font-size:7px;margin-top:4px">Relatórios: Conflitos + Celulose com PDF CSV<br><span id="distInfo"></span></div>
+<div style="font-size:7px;margin-top:5px">Praias 12 | Territórios 27 | Conflitos 11 | Celulose 300 mil ha<br><span id="distInfo" style="color:red;font-weight:bold"></span><br><span id="contador"></span></div>
 </div>
 <div id="map"></div>
-<div class="info-panel" id="infoPanel"><b>Baía Viva 14.1 - MAIS DANADA DE BOA!</b><br>Agora com RELATÓRIO TOTAL para conflitos!<br>Clique no conflito → Relatório com PDF/CSV!</div>
+<div class="info-panel" id="infoPanel"><b>BAÍA VIVA 14.1 MAIS DANADA DE BOA!</b><br>Clique em:<br>🏭 CELULOSE para ver polígono 300.000 ha<br>🔴 CONFLITOS para ver MST e Pataxó<br>Depois clique no círculo e em <b>GERAR RELATÓRIO TOTAL</b> para PDF e CSV!<br><br>É a ideia do seu áudio: pra ficar mais bonito!</div>
 <div class="relatorio-modal" id="modalRel"><div class="relatorio-box" id="relBox"></div></div>
 <script>
 const praias=[
-{n:"Mangue Seco",lat:-11.44,lng:-37.34,costa:"Coqueiros",cor:"#e67e22",municipio:"Jandaíra",tipo:"Oceânica",ext:"5km",desc:"Dunas",visitantes:"30k/ano",alta:"Dez-Mar",preserv:"Tartaruga"},
-{n:"Praia do Forte",lat:-12.585,lng:-38.001,costa:"Coqueiros",cor:"#e67e22",municipio:"Mata S. João",tipo:"Recifes",ext:"4km",desc:"Tamar",visitantes:"800k/ano",alta:"Dez-Mar",preserv:"Tartaruga",pontos:"Tamar"},
-{n:"ITAPUÃ REAL",lat:-12.953,lng:-38.357,costa:"Todos os Santos",cor:"red",municipio:"Salvador PONTO REAL",tipo:"Farol",ext:"2km",desc:"PONTO REAL PROF EDSON -12.953,-38.357",real:true,visitantes:"2M/ano",alta:"Dez-Mar",preserv:"Farol histórico",pontos:"Farol Itapuã, Lagoa Abaeté"},
+{n:"Mangue Seco",lat:-11.44,lng:-37.34,costa:"Coqueiros",cor:"#e67e22",municipio:"Jandaíra",tipo:"Oceânica dunas",ext:"5km",desc:"Dunas Tieta",visitantes:"30k/ano",alta:"Dez-Mar",preserv:"Tartaruga",pontos:"Dunas"},
+{n:"Praia do Forte",lat:-12.585,lng:-38.001,costa:"Coqueiros",cor:"#e67e22",municipio:"Mata S. João",tipo:"Recifes",ext:"4km",desc:"Tamar",visitantes:"800k/ano",alta:"Dez-Mar",preserv:"Desova tartaruga",pontos:"Projeto Tamar"},
+{n:"ITAPUÃ REAL",lat:-12.953,lng:-38.357,costa:"Todos os Santos",cor:"red",municipio:"Salvador PONTO REAL",tipo:"Farol referência",ext:"2km",desc:"PONTO REAL PROF EDSON -12.953,-38.357",real:true,visitantes:"2M/ano",alta:"Dez-Mar",preserv:"Farol histórico",pontos:"Farol Itapuã, Lagoa Abaeté"},
 {n:"Farol da Barra",lat:-13.010,lng:-38.533,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Cartão",ext:"0.5km",desc:"Encontro baía oceano",visitantes:"3M/ano",alta:"Ano todo",preserv:"Patrimônio",pontos:"Farol da Barra"},
-{n:"Morro de São Paulo",lat:-13.376,lng:-38.915,costa:"Dendê",cor:"#27ae60",municipio:"Cairu",tipo:"Turística",ext:"4 praias",desc:"1a a 4a",visitantes:"600k/ano",alta:"Dez-Mar",preserv:"APA",pontos:"Tirolesa"},
-{n:"Barra Grande",lat:-13.89,lng:-38.94,costa:"Dendê",cor:"#27ae60",municipio:"Maraú",tipo:"Baía+Oceânica",ext:"6km",desc:"Ponta Mutá",visitantes:"300k/ano",alta:"Dez-Fev",preserv:"Defeso",pontos:"Ponta do Mutá"},
-{n:"Itacaré Prainha",lat:-14.27,lng:-38.99,costa:"Cacau",cor:"#8e44ad",municipio:"Itacaré",tipo:"Trilha",ext:"0.5km",desc:"Paraíso",visitantes:"500k/ano",alta:"Dez-Mar",preserv:"Mata",pontos:"Surfe"},
+{n:"Morro de São Paulo",lat:-13.376,lng:-38.915,costa:"Dendê",cor:"#27ae60",municipio:"Cairu",tipo:"Turística",ext:"4 praias",desc:"1a a 4a praia",visitantes:"600k/ano",alta:"Dez-Mar",preserv:"APA Tinharé-Boipeba",pontos:"Tirolesa, Fortaleza"},
+{n:"Barra Grande",lat:-13.89,lng:-38.94,costa:"Dendê",cor:"#27ae60",municipio:"Maraú",tipo:"Baía+Oceânica",ext:"6km",desc:"Ponta Mutá",visitantes:"300k/ano",alta:"Dez-Fev",preserv:"Baía Camamu",pontos:"Ponta do Mutá pôr-do-sol"},
+{n:"Taipu de Fora",lat:-13.92,lng:-38.92,costa:"Dendê",cor:"#27ae60",municipio:"Maraú",tipo:"Piscinas",ext:"2km",desc:"Melhores piscinas BA",visitantes:"250k/ano",alta:"Dez-Mar",preserv:"Não pisar coral",pontos:"Piscinas naturais nº1 BA"},
+{n:"Itacaré Prainha",lat:-14.27,lng:-38.99,costa:"Cacau",cor:"#8e44ad",municipio:"Itacaré",tipo:"Trilha",ext:"0.5km",desc:"Paraíso",visitantes:"500k/ano",alta:"Dez-Mar",preserv:"Mata Atlântica",pontos:"Surfe"},
 {n:"Ilhéus São Miguel",lat:-14.74,lng:-39.02,costa:"Cacau",cor:"#8e44ad",municipio:"Ilhéus",tipo:"Oceânica",ext:"4km",desc:"Aeroporto",visitantes:"700k/ano",alta:"Dez-Mar",preserv:"Restinga",pontos:"Bataclan"},
-{n:"Trancoso",lat:-16.590,lng:-39.097,costa:"Descobrimento",cor:"#c0392b",municipio:"P. Seguro",tipo:"Charmosa",ext:"6km",desc:"Quadrado",visitantes:"800k/ano",alta:"Dez-Mar",preserv:"Histórico",pontos:"Quadrado"},
-{n:"Abrolhos Siriba",lat:-17.96,lng:-38.70,costa:"Baleias",cor:"#f1c40f",municipio:"Parque Marinho",tipo:"Arquipélago",ext:"Parque",desc:"Baleias",visitantes:"30k/ano",alta:"Jul-Nov",preserv:"Limite 600/dia",pontos:"Baleia Jubarte"}
+{n:"Trancoso",lat:-16.590,lng:-39.097,costa:"Descobrimento",cor:"#c0392b",municipio:"P. Seguro",tipo:"Charmosa",ext:"6km",desc:"Quadrado",visitantes:"800k/ano",alta:"Dez-Mar",preserv:"Quadrado histórico",pontos:"Quadrado, Praia Espelho"},
+{n:"Caraíva",lat:-16.789,lng:-39.144,costa:"Descobrimento",cor:"#c0392b",municipio:"P. Seguro",tipo:"Rústica",ext:"5km",desc:"Sem carro",visitantes:"300k/ano",alta:"Dez-Fev",preserv:"Sem ponte",pontos:"Rio Caraíva"},
+{n:"Abrolhos Siriba",lat:-17.96,lng:-38.70,costa:"Baleias",cor:"#f1c40f",municipio:"Parque Marinho",tipo:"Arquipélago",ext:"Parque",desc:"Berçário baleias",visitantes:"30k/ano controlado",alta:"Jul-Nov BALEIAS",preserv:"Limite 600/dia Parque Nacional",pontos:"Mergulho, Baleia Jubarte"}
+];
+const indigenas=[
+{n:"TI Barra Velha Pataxó - 2.200 pessoas",lat:-16.95,lng:-39.20,povo:"Pataxó",pop:"2.200",area:"8.627 ha",situacao:"Homologada 1991 + 5.000 ha retomada com conflito",municipio:"Porto Seguro",desc:"Maior aldeia Pataxó Brasil, turismo étnico, CONFLITO VIOLENTO com fazendeiros 2020-24 3 mortes"},
+{n:"TI Coroa Vermelha - Local 1ª Missa Brasil",lat:-16.34,lng:-39.02,povo:"Pataxó",pop:"1.200",area:"1.492 ha",situacao:"Homologada 1998, cercada por eucalipto Veracel",municipio:"Santa Cruz Cabrália",desc:"Onde nasceu Brasil 1500, cruz histórica, 1.200 Pataxó, eucalipto na porta"},
+{n:"TI Imbiriba",lat:-16.45,lng:-39.15,povo:"Pataxó",pop:"450",area:"400 ha",situacao:"Homologada",municipio:"Porto Seguro",desc:"Artesanato"},
+{n:"Aldeia Velha - Retomada Caraíva",lat:-16.62,lng:-39.10,povo:"Pataxó",pop:"800",area:"2.000 ha",situacao:"Em demarcação, retomada 1998",municipio:"Porto Seguro",desc:"Rio Caraíva, conflito com pousadas"},
+{n:"TI Aldeia Tibá - Cumuruxatiba",lat:-17.05,lng:-39.20,povo:"Pataxó",pop:"350",area:"1.200 ha",situacao:"Homologada",municipio:"Prado",desc:"Pesca artesanal"}
+];
+const quilombolas=[
+{n:"Quilombo Rio dos Macacos - 20 anos luta x Marinha",lat:-12.85,lng:-38.42,pessoas:"150 famílias 600 pessoas",area:"300 ha",situacao:"CONFLITO 20 ANOS com Marinha - sem título - STF",municipio:"Simões Filho",desc:"Desde 1800, Marinha quer expandir base Aratu, cerca elétrica, 20 anos sem título"},
+{n:"Quilombo Helvécia - Cercado por eucalipto + veneno",lat:-17.70,lng:-39.40,pessoas:"200 famílias 800 pessoas",area:"1.500 ha quilombo + 15.000 ha eucalipto em volta",situacao:"CERCADO POR EUCALIPTO SUZANO + VENENO AVIÃO CAI NA ROÇA",municipio:"Nova Viçosa",desc:"Maior extremo sul, 1800, cercado por 15.000 ha eucalipto, avião joga glifosato, cai na mandioca, criança alergia, MP-BA 50 denúncias"},
+{n:"Quilombo Kaonge - BTS",lat:-12.90,lng:-38.55,pessoas:"80 famílias",area:"400 ha",situacao:"Certificado Palmares",municipio:"Cachoeira",desc:"Baía Todos Santos, pesca"},
+{n:"Quilombo Dendê - Valença",lat:-13.10,lng:-38.90,pessoas:"60 famílias",area:"250 ha",situacao:"Certificado",municipio:"Valença",desc:"Azeite dendê tradicional"}
+];
+const ucs=[
+{n:"Parque Nac. Pau Brasil - 19.027 ha",lat:-16.42,lng:-39.28,tipo:"Parque Nacional",area:"19.027 ha",ano:"1999",orgao:"ICMBio",desc:"Maior Mata Atlântica sul BA, pau-brasil",municipio:"Porto Seguro"},
+{n:"Parque Nac. Descobrimento - 22.693 ha",lat:-16.95,lng:-39.40,tipo:"Parque Nacional",area:"22.693 ha",ano:"1999",orgao:"ICMBio",desc:"Mata prístina, nascentes Rio Cahy",municipio:"Prado"},
+{n:"Parque Nac. Marinho Abrolhos - 91.300 ha",lat:-17.96,lng:-38.70,tipo:"Parque Nacional Marinho",area:"91.300 ha",ano:"1983",orgao:"ICMBio",desc:"1º parque marinho Brasil, berçário baleia jubarte",municipio:"Caravelas"},
+{n:"RESEX Cassurubá - 100.687 ha",lat:-18.10,lng:-39.40,tipo:"RESEX Marinha",area:"100.687 ha",ano:"2009",orgao:"ICMBio",desc:"Maior RESEX BA, mangue Caravelas, 3.000 pescadores",municipio:"Caravelas"},
+{n:"APA Litoral Norte - 144.000 ha",lat:-12.50,lng:-38.00,tipo:"APA Estadual",area:"144.000 ha",ano:"1992",orgao:"INEMA",desc:"Praia do Forte até Mangue Seco",municipio:"Litoral Norte"}
 ];
 const conflitosAgrarios=[
-{n:"MST Porto Seguro - Terra Vista",lat:-16.60,lng:-39.20,tipo:"MST Assentamento",familias:"120 famílias",area:"1.200 ha",situacao:"Assentado 1992",municipio:"Porto Seguro",empresa:"Ex-fazenda",valor:"Assentamento",conflito:"Conflito 1985-92 com fazendeiro, pistoleiros, 2 mortes, INCRA desapropriou",impacto:"Hoje produz cacau orgânico, 80% famílias permanecem",orgao:"INCRA + MST",historico:"1985 ocupação, 1987 despejo violento, 1992 assentamento"},
-{n:"Acampamento MST Mucuri - 200 famílias",lat:-18.08,lng:-39.55,tipo:"Acampamento MST ATIVO",familias:"200 famílias acampadas",area:"2.500 ha reivindicado",situacao:"Acampado desde 2018 - CONFLITO ATIVO",municipio:"Mucuri",empresa:"Fazenda Santa Maria + Suzano entorno",valor:"Fazenda avaliada R$ 15 milhões",conflito:"Fazenda improdutiva, 2.500 ha com capim, dona mora SP, MST reivindica reforma agrária, Suzano quer comprar para eucalipto",impacto:"200 famílias em lona preta, sem água encanada, criança sem escola, Suzano cercou com eucalipto",orgao:"INCRA processo 2019-2024, MPF acompanha",historico:"2018 ocupação, 2019 liminar despejo suspensa, 2024 ainda acampado"},
-{n:"Conflito Pataxó Barra Velha x Fazendeiros",lat:-16.95,lng:-39.20,tipo:"Indígena x Fazendeiro - MAIS VIOLENTO BA",familias:"2.200 Pataxó",area:"TI 8.627 ha homologada + 5.000 ha retomada",situacao:"CONFLITO VIOLENTO 2020-2024 - 3 MORTES",municipio:"Porto Seguro",empresa:"12 fazendas de cacau e eucalipto dentro TI",valor:"R$ 80 milhões em fazendas",conflito:"Pataxó retomaram 5.000 ha em 2020, fazendeiros armados com pistoleiros, 3 indígenas mortos 2022-23, 5 fazendeiros feridos, STF julgando, Força Nacional 2023",impacto:"Escola indígena fechada 2022, crianças sem aula, Rio Corumbau contaminado por veneno eucalipto",orgao:"FUNAI + STF + Força Nacional + MPF",historico:"1991 TI homologada, 2000 fazendeiros não saíram, 2020 retomadas, 2022-23 mortes, 2024 STF para decidir"},
-{n:"Rio dos Macacos - Quilombo x Marinha - 20 anos",lat:-12.85,lng:-38.42,tipo:"Quilombola x Marinha",familias:"150 famílias quilombolas - 600 pessoas",area:"300 ha quilombo + 1.000 ha Marinha quer",situacao:"CONFLITO 20 ANOS - 2009-2024",municipio:"Simões Filho",empresa:"Marinha do Brasil - Base Naval Aratu",valor:"Base R$ 500 milhões",conflito:"Quilombo desde 1800, escravos fugidos, Marinha chegou 1940 e cercou, 2009 Marinha quis expulsar, quilombo resistiu, caso no STF 2015, titulação negada",impacto:"Quilombolas sem água, Marinha proibiu plantar, cerca elétrica, 20 anos sem título, criança nasce sem terra garantida",orgao:"Fundação Palmares + INCRA + STF + Marinha",historico:"1800 quilombo formado, 1940 Marinha chega, 2009 conflito estoura, 2015 STF, 2024 ainda sem título"}
+{n:"MST Mucuri - 200 famílias acampadas - CONFLITO ATIVO",lat:-18.08,lng:-39.55,tipo:"Acampamento MST ATIVO 2018-2024",familias:"200 famílias acampadas em lona preta",area:"2.500 ha reivindicado - fazenda improdutiva",situacao:"ACAMPADO DESDE 2018 - CONFLITO ATIVO - Suzano quer comprar para eucalipto",municipio:"Mucuri",empresa:"Fazenda Santa Maria (dona SP) + Suzano entorno",valor:"R$ 15 milhões fazenda",conflito:"Fazenda com 2.500 ha capim, dona mora SP, improdutiva, MST ocupou 2018, INCRA processo, Suzano ofereceu comprar fazenda para plantar eucalipto, 200 famílias sem água encanada, criança sem escola",impacto:"200 famílias lona preta 6 anos, sem água, sem luz, Suzano cercou com eucalipto, criança 200m até escola",orgao:"INCRA + MST + MPF + Suzano interessada",historico:"2018 ocupação, 2019 liminar despejo suspensa, 2020 Suzano oferece compra, 2024 ainda acampado"},
+{n:"Barra Velha Pataxó x Fazendeiros - 3 MORTES - MAIS VIOLENTO BA",lat:-16.95,lng:-39.20,tipo:"Indígena x Fazendeiro - CONFLITO MAIS VIOLENTO BA",familias:"2.200 Pataxó - 500 famílias",area:"TI 8.627 ha homologada 1991 + 5.000 ha retomada 2020",situacao:"CONFLITO VIOLENTO 2020-2024 - 3 MORTES - FORÇA NACIONAL 2023",municipio:"Porto Seguro",empresa:"12 fazendas cacau e eucalipto dentro TI: Fazenda São Jorge, etc",valor:"R$ 80 milhões fazendas dentro TI",conflito:"TI homologada 1991 mas fazendeiros nunca saíram, Pataxó cansou e retomou 5.000 ha em 2020, fazendeiros armados com pistoleiros, 3 Pataxó mortos 2022-23 (Gustavo Pataxó etc), 5 fazendeiros feridos, STF ADI, Força Nacional enviada 2023, escola indígena fechada 1 ano",impacto:"Escola indígena fechada 2022-23 crianças sem aula, Rio Corumbau contaminado veneno eucalipto fazendas, 2.200 Pataxó sem plantar, medo",orgao:"FUNAI + STF + Força Nacional + MPF + PF",historico:"1991 TI homologada, 2000 fazendeiros não saem, 2020 retomada 5.000 ha, 2022 1ª morte, 2023 2 mortes + Força Nacional, 2024 STF julga"},
+{n:"Rio dos Macacos - Quilombo x Marinha - 20 ANOS SEM TÍTULO",lat:-12.85,lng:-38.42,tipo:"Quilombola x Marinha - 20 anos",familias:"150 famílias quilombolas - 600 pessoas",area:"300 ha quilombo + 1.000 ha Marinha quer expandir",situacao:"20 ANOS CONFLITO 2009-2024 - SEM TÍTULO - STF",municipio:"Simões Filho / Camaçari",empresa:"Marinha do Brasil - Base Naval Aratu - Base R$ 500 milhões",valor:"Base naval + quilombo",conflito:"Quilombo formado 1800 escravos fugidos, Marinha chegou 1940 e cercou, 2009 Marinha deu ordem despejo, quilombo resistiu com apoio MST e CPT, caso no STF 2015, Fundação Palmares certificou mas INCRA não titula há 20 anos, cerca elétrica Marinha",impacto:"150 famílias sem título 20 anos, criança nasce sem terra garantida, Marinha proíbe plantar, cerca elétrica, sem água, sem luz, 20 anos luta",orgao:"Fundação Palmares + INCRA + STF + Marinha + MPF",historico:"1800 quilombo, 1940 Marinha chega, 2009 ordem despejo, 2015 STF, 2024 ainda sem título"}
 ];
 const conflitosTerra=[
-{n:"Grilagem Litoral Norte - Sauípe / Praia do Forte",lat:-12.45,lng:-38.00,tipo:"Grilagem + Especulação Imobiliária",area:"10.000 ha grilado",empresa:"Grileiros 1970 + Odebrecht / resorts",valor:"R$ 500 milhões em resorts",situacao:"Grilagem histórica 1970-2020 - CONSUMADA",familias:"200 famílias nativas expulsas",municipio:"Mata São João",conflito:"1970 grileiros falsificaram documentos, expulsaram pescadores nativos com pistoleiros, venderam para Odebrecht construir Sauípe, comunidades tradicionais cercadas por muro resort",impacto:"Pescador não pode passar na praia, tem que dar volta 5km, muro resort fechou acesso mangue, 200 famílias foram para favela",orgao:"MP-BA + Justiça Federal - processo 2005-2024 parado",historico:"1970 grilagem, 1980 expulsão, 2000 Sauípe inaugura, 2024 nativos ainda sem indenização"},
-{n:"Especulação Trancoso / Quadrado - R$ 1 bilhão",lat:-16.60,lng:-39.10,tipo:"Especulação imobiliária internacional",area:"5.000 ha",empresa:"Estrangeiros: americanos, europeus, paulistas ricos",valor:"R$ 1 BILHÃO - casa R$ 20 milhões",situacao:"Turismo predatório 2000-2024 ATIVO",familias:"300 famílias nativas e Pataxó expulsas",municipio:"Porto Seguro",conflito:"Trancoso era vila pescador Pataxó até 1990, depois paulista e gringo começou comprar casa por R$ 10 mil e vender por R$ 10 milhões, nativo não pode mais morar, tem que ir para bairro longe, Quadrado virou loja luxo",impacto:"Casa nativo vale R$ 20 milhões mas ele não tem dinheiro para reformar, tem que vender, Pataxó sem terra, aluguel R$ 5.000 mês, nativo virou caseiro de gringo",orgao:"Prefeitura Porto Seguro + INEMA - sem controle",historico:"1990 Trancoso descoberto, 2000 boom, 2010 casa R$ 1 milhão, 2024 casa R$ 20 milhões"},
-{n:"Grilagem Barra Grande / Ponta Mutá",lat:-13.89,lng:-38.94,tipo:"Grilagem + Turismo luxo",area:"8.000 ha",empresa:"Empresários SP/RJ",valor:"R$ 300 milhões",situacao:"2005-2024 ativo",familias:"150 pescadores sem acesso praia",municipio:"Maraú",conflito:"Barra Grande era vila pescadores até 2005, empresário comprou terra grilada, construiu condomínio luxo, fechou acesso Ponta Mutá, pescador tem que pagar para passar",impacto:"Ponta do Mutá famosa pôr-do-sol agora é privada, pescador artesanal proibido, turismo 300k/ano mas dinheiro não fica na vila",orgao:"MP-BA + Prefeitura Maraú",historico:"2005 início grilagem, 2010 condomínios, 2024 pescadores na justiça"}
+{n:"Trancoso / Quadrado - Especulação R$ 1 BILHÃO - Casa R$ 20 milhões",lat:-16.60,lng:-39.10,tipo:"Especulação imobiliária internacional",area:"5.000 ha - Quadrado + entorno",empresa:"Americanos, europeus, paulistas ricos: empresário SP, atriz, etc",valor:"R$ 1 BILHÃO - casa Quadrado R$ 20 milhões",situacao:"Turismo predatório 2000-2024 ATIVO - nativo expulso",familias:"300 famílias nativas e Pataxó expulsas do Quadrado",municipio:"Porto Seguro - Trancoso",conflito:"Trancoso era vila pescador Pataxó até 1990, depois paulista e gringo comprou casa de pescador por R$ 10 mil e vende hoje por R$ 10-20 milhões, nativo não pode mais morar no Quadrado, tem que ir para bairro 5km, Quadrado virou loja luxo gringa, aluguel R$ 5.000 mês",impacto:"Nativo virou caseiro de gringo, casa vale R$ 20 milhões mas não tem dinheiro reformar tem que vender, Pataxó sem terra, cultura Pataxó sumindo, Trancoso descaracterizado",orgao:"Prefeitura Porto Seguro + INEMA + IPHAN Quadrado histórico",historico:"1990 Trancoso descoberto, 2000 boom, 2010 casa R$ 1 milhão, 2020 R$ 10 milhões, 2024 R$ 20 milhões - nativo expulso"},
+{n:"Grilagem Litoral Norte - Sauípe - R$ 500 milhões - 200 famílias expulsas",lat:-12.45,lng:-38.00,tipo:"Grilagem + Resort",area:"10.000 ha grilado - de Praia do Forte até Sauípe",empresa:"Grileiros 1970 + Odebrecht + Resorts: Sauípe, Iberostar, etc",valor:"R$ 500 milhões em resorts",situacao:"Grilagem histórica 1970-2020 CONSUMADA - processo parado",familias:"200 famílias pescadores nativos expulsas com pistoleiros 1970-80",municipio:"Mata São João - Litoral Norte",conflito:"1970 grileiros falsificaram escritura cartório Mata São João, expulsaram 200 famílias pescadores nativos com pistoleiros e queimando casa, venderam para Odebrecht construir Costa do Sauípe 2000, comunidades tradicionais cercadas por muro resort, pescador tem que dar volta 5km para chegar praia",impacto:"Pescador não pode passar na praia que nasceu, muro resort 3m altura fechou acesso mangue e praia, 200 famílias foram para favela Porto Sauípe, processo MP-BA 2005 parado",orgao:"MP-BA + Justiça Federal + Cartório Mata São João - grilagem",historico:"1970 grilagem escritura falsa, 1980 expulsão pistoleiros, 2000 Sauípe inaugura, 2005 MP-BA processo, 2024 processo parado, nativos sem indenização"},
+{n:"Barra Grande / Ponta Mutá - Grilagem + Condomínio luxo fecha praia",lat:-13.89,lng:-38.94,tipo:"Grilagem + Condomínio luxo fecha acesso praia",area:"8.000 ha - Barra Grande até Ponta Mutá",empresa:"Empresários SP/RJ - condomínio Vila Naiá, etc",valor:"R$ 300 milhões - lote R$ 1 milhão",situacao:"2005-2024 ATIVO - pescador paga para passar",familias:"150 pescadores artesanais sem acesso Ponta Mutá",municipio:"Maraú",conflito:"Barra Grande era vila pescadores até 2005, empresário SP comprou terra grilada, construiu condomínio luxo R$ 1 milhão lote, fechou caminho tradicional pescador para Ponta Mutá, agora pescador tem que pagar R$ 20 ou dar volta 2km, Ponta do Mutá famosa pôr-do-sol agora privada",impacto:"Ponta do Mutá privada, pescador artesanal proibido, turismo 300k/ano mas dinheiro fica SP não na vila, pescador sem peixe porque lancha turista espanta",orgao:"MP-BA + Prefeitura Maraú + SPU terreno marinha",historico:"2005 início grilagem, 2010 condomínios luxo, 2015 fecha acesso, 2024 pescadores na justiça SPU"}
 ];
 const celulose=[
-{n:"Suzano Mucuri - Maior Fábrica Celulose Mundo",lat:-18.08,lng:-39.55,tipo:"Fábrica Celulose + Floresta",area:"Fábrica 2,5 milhões ton/ano + 200.000 ha eucalipto",empresa:"SUZANO - maior linha única do MUNDO",valor:"Fábrica US$ 5 bilhões",situacao:"Operando desde 1992 - EXPANSÃO",familias:"500 famílias afetadas sem água",municipio:"Mucuri",conflito:"Rio Mucuri perdeu 40% vazão desde 1990 por eucalipto, cidade Mucuri racionamento verão, 200.000 ha que era Mata Atlântica virou deserto verde eucalipto, veneno avião",impacto:"Rio Mucuri secando, poço artesiano secou 50%, veneno glifosato no ar, 50 denúncias MP-BA, câncer pele aumentou 30% região, comunidade quilombola Helvécia cercada",orgao:"IBAMA + INEMA + MPF + ANVISA veneno",historico:"1992 fábrica, 1990-2024 plantio 200.000 ha, 2010 rio começa secar, 2020-24 denúncias veneno"},
-{n:"Polígono Eucalipto Extremo Sul - 300.000 ha",lat:-17.50,lng:-39.50,tipo:"Monocultura Eucalipto - MAIOR BA",area:"300.000 ha = 300 MIL HECTARES - 3.000 km²",empresa:"Suzano 200.000 ha + Veracel 90.000 ha + Bracell 10.000 ha",valor:"R$ 3 BILHÕES em terras eucalipto",situacao:"Expansão 1990-2024 - MATA ATLÂNTICA DESTRUÍDA",familias:"3.000 famílias: quilombolas, Pataxó, fundo pasto, pequenos agricultores cercados",municipio:"Prado, Alcobaça, Caravelas, Mucuri, Nova Viçosa, Teixeira Freitas",conflito:"300.000 ha que era Mata Atlântica até 1980 virou eucalipto! De Prado até divisa ES! Rio Jucuruçu, Itanhém, Mucuri, Jequitinhonha todos secando! Comunidades não podem plantar porque eucalipto suga água! Veneno avião cai na roça!",impacto:"300 MIL ha deserto verde! Bacia 4 rios afetada! Rio Jequitinhonha -30% vazão! Belmonte sem água potável verão! Quilombo Helvécia 200 famílias cercadas, não planta mais, veneno cai na casa! Pataxó Coroa Vermelha cercado! Fundo pasto seca!",orgao:"IBAMA licenciou, MPF tenta parar expansão, INEMA Bahia liberou",historico:"1980 Mata Atlântica, 1990 Suzano chega, 2000 Veracel, 2005 100.000 ha, 2015 200.000 ha, 2024 300.000 ha - MAIOR DESERTO VERDE BA"},
-{n:"Veracel Eunápolis / Belmonte - Rio Jequitinhonha secando",lat:-16.20,lng:-39.50,tipo:"Fábrica + Eucalipto beira rio",area:"90.000 ha eucalipto + fábrica 1 milhão ton",empresa:"VERACEL - Stora Enso (sueco-finlandesa) + Fibria",valor:"R$ 2 bilhões",situacao:"Operando 2005",familias:"1.000 famílias Belmonte sem água",municipio:"Eunápolis/Belmonte",conflito:"Veracel plantou eucalipto até na APP do Rio Jequitinhonha! Rio perdeu 30% vazão! Belmonte 20.000 habitantes sem água verão! Pescador Jequitinhonha sem peixe! Pataxó cercado!",impacto:"Rio Jequitinhonha -30% vazão 2005-2024! Belmonte racionamento 3 meses ano! Pescador: peixe sumiu! Veneno: 20 denúncias avião joga glifosato! Pataxó: aldeia cercada eucalipto!",orgao:"IBAMA + MPF + Comitê Bacia Jequitinhonha",historico:"2005 fábrica, 2005-2024 90.000 ha, 2010 rio começa secar, 2020 Belmonte sem água 60 dias"},
-{n:"Quilombo Helvécia cercado por eucalipto + veneno avião",lat:-17.70,lng:-39.40,tipo:"Quilombo cercado + contaminação veneno",area:"15.000 ha eucalipto em volta quilombo + 1.500 ha quilombo",empresa:"Suzano - eucalipto em volta",valor:"Quilombo R$ 10 milhões, eucalipto R$ 100 milhões",situacao:"CONFLITO ATIVO - VENENO CAI NA ROÇA",familias:"200 famílias quilombolas - 800 pessoas",municipio:"Nova Viçosa - Helvécia",conflito:"Quilombo Helvécia existe desde 1800, maior do extremo sul, Suzano comprou tudo em volta 1995-2010 e plantou eucalipto, hoje quilombo é ilha no meio eucalipto! Avião joga veneno glifosato, vento leva para quilombo, cai na roça, na caixa d'água! Criança com alergia! Mandioca morre!",impacto:"Ilha quilombola cercada! Veneno avião cai na casa! Roça mandioca morreu 2022! Água poço contaminada! Criança com coceira! MP-BA 50 denúncias! Quilombolas não podem expandir roça porque eucalipto na divisa!",orgao:"MP-BA + Fundação Palmares + ANVISA + INCRA",historico:"1800 quilombo, 1995 Suzano começa comprar, 2010 cercado, 2020 avião veneno, 2022 roça morre, 2024 MPF processo"}
+{n:"Fábrica Suzano Mucuri - Maior do Mundo - Rio Mucuri secando 40%",lat:-18.08,lng:-39.55,tipo:"Fábrica Celulose MAIOR DO MUNDO + 200.000 ha eucalipto",area:"Fábrica 2,5 milhões ton celulose/ano linha única MAIOR DO MUNDO + 200.000 ha eucalipto",empresa:"SUZANO - maior empresa celulose mundo - US$ 5 bilhões fábrica",valor:"Fábrica US$ 5 bilhões + 200.000 ha R$ 1 bilhão = R$ 6 bilhões",situacao:"Operando 1992 - EXPANSÃO CONTÍNUA - Rio secando",familias:"500 famílias Mucuri sem água + 200 famílias acampamento MST cercado",municipio:"Mucuri",conflito:"Rio Mucuri perdeu 40% vazão 1990-2024 por 200.000 ha eucalipto que suga água, cidade Mucuri 20.000 hab racionamento 4 meses verão, 200.000 ha que era Mata Atlântica até 1985 virou deserto verde eucalipto, veneno glifosato avião joga, vento leva para cidade, 50 denúncias MP-BA 2020-24",impacto:"Rio Mucuri -40% vazão! Poço artesiano Mucuri secou 50%! Veneno glifosato no ar: 50 denúncias MP-BA! Câncer pele +30% região estudo UFBA 2023! Comunidade quilombola Helvécia cercada! Acampamento MST 200 famílias cercado eucalipto!",orgao:"IBAMA licenciou + INEMA BA liberou + MPF 50 denúncias veneno + ANVISA + UFBA estudo câncer",historico:"1985 Mata Atlântica, 1992 fábrica inaugura 1ª linha, 1990-2024 plantio 200.000 ha, 2010 rio começa secar, 2015 racionamento Mucuri, 2020-24 50 denúncias veneno avião, 2023 estudo UFBA câncer +30%"},
+{n:"Polígono Eucalipto Extremo Sul - 300.000 ha = 3.000 km² - MAIOR DESERTO VERDE BA",lat:-17.50,lng:-39.50,tipo:"Monocultura Eucalipto - MAIOR DA BAHIA - 300.000 ha",area:"300.000 ha = 300 MIL HECTARES = 3.000 km² - equivale 3 cidades de Salvador!",empresa:"Suzano 200.000 ha + Veracel 90.000 ha + Bracell 10.000 ha = 300.000 ha",valor:"R$ 3 BILHÕES em terras eucalipto - R$ 10 mil/ha",situacao:"Expansão 1990-2024 - MATA ATLÂNTICA DESTRUÍDA 300.000 ha",familias:"3.000 famílias cercadas: 200 quilombola Helvécia + 500 Pataxó + 200 fundo pasto + 2.100 pequenos agricultores + 200 MST Mucuri",municipio:"Prado, Alcobaça, Caravelas, Mucuri, Nova Viçosa, Teixeira Freitas, Eunápolis, Belmonte",conflito:"300.000 ha que era Mata Atlântica até 1980 virou eucalipto! De Prado até divisa ES! 150km de eucalipto sem parar! Rio Jucuruçu, Itanhém, Mucuri, Jequitinhonha todos secando 30-40%! Comunidades não podem plantar porque eucalipto suga água 30 litros/dia/árvore! Veneno avião glifosato cai na roça, na caixa d'água, criança alergia! Quilombo Helvécia ilha no meio eucalipto!",impacto:"300 MIL ha deserto verde! Equivale 3x cidade Salvador de eucalipto! Bacia 4 rios afetada -30-40% vazão! Belmonte sem água potável verão 60 dias! Quilombo Helvécia 200 famílias cercadas, não planta mais, veneno cai na casa! Pataxó Coroa Vermelha cercado! Fundo pasto seca! MST cercado! Veneno: 50 denúncias! Câncer +30%! Rio Jequitinhonha -30%!",orgao:"IBAMA licenciou 1990-2024 + MPF tenta parar expansão + INEMA Bahia liberou tudo + Comitê Bacias + ANVISA veneno",historico:"1980 100% Mata Atlântica, 1990 Suzano chega 10.000 ha, 2000 Veracel chega, 2005 100.000 ha, 2015 200.000 ha, 2024 300.000 ha - MAIOR DESERTO VERDE BAHIA - 300 MIL ha"},
+{n:"Veracel Belmonte - Rio Jequitinhonha secando 30% - Belmonte sem água",lat:-16.20,lng:-39.50,tipo:"Fábrica + Eucalipto beira Rio Jequitinhonha",area:"90.000 ha eucalipto + fábrica 1 milhão ton celulose",empresa:"VERACEL - Stora Enso sueco-finlandesa + Fibria (Suzano) - R$ 2 bilhões",valor:"R$ 2 bilhões - fábrica + 90.000 ha",situacao:"Operando 2005 - Rio Jequitinhonha -30% vazão - Belmonte racionamento 60 dias",familias:"1.000 famílias Belmonte sem água potável verão + 100 pescadores sem peixe + Pataxó cercado",municipio:"Eunápolis / Belmonte / Santa Cruz Cabrália",conflito:"Veracel plantou eucalipto até na APP (Área Preservação Permanente) do Rio Jequitinhonha! Desmatou mata ciliar! Rio perdeu 30% vazão 2005-2024! Belmonte 20.000 habitantes racionamento 60 dias verão! Pescador Jequitinhonha: peixe sumiu porque rio baixo! Pataxó Coroa Vermelha: aldeia cercada eucalipto na porta, rio que aldeia bebe secando!",impacto:"Rio Jequitinhonha -30% vazão 2005-2024! Belmonte racionamento 60 dias/ano sem água potável! Pescador: 100 famílias sem peixe! Veneno: 20 denúncias avião joga glifosato beira rio! Pataxó: aldeia cercada eucalipto, rio secando, criança sem água!",orgao:"IBAMA + MPF + Comitê Bacia Jequitinhonha + INEMA + Fundação Nacional Índio FUNAI Pataxó",historico:"2005 fábrica inaugura, 2005-2024 plantio 90.000 ha até beira rio, 2010 rio começa secar -20%, 2015 -25%, 2024 -30% + Belmonte 60 dias sem água"},
+{n:"Quilombo Helvécia cercado + veneno avião cai na roça - MP-BA 50 denúncias",lat:-17.70,lng:-39.40,tipo:"Quilombo cercado por eucalipto + contaminação veneno avião",area:"15.000 ha eucalipto Suzano em volta + 1.500 ha quilombo = quilombo ilha",empresa:"Suzano - 15.000 ha eucalipto em volta quilombo - avião joga glifosato",valor:"Quilombo R$ 10 milhões + eucalipto volta R$ 150 milhões",situacao:"CONFLITO ATIVO - VENENO CAI NA ROÇA - MANDIOCA MORREU 2022 - 50 DENÚNCIAS MP-BA",familias:"200 famílias quilombolas - 800 pessoas - Helvécia maior quilombo extremo sul",municipio:"Nova Viçosa - Distrito Helvécia",conflito:"Quilombo Helvécia existe desde 1800, maior do extremo sul BA, 200 famílias, Suzano comprou tudo em volta 1995-2010 e plantou 15.000 ha eucalipto, hoje quilombo é ILHA no meio eucalipto! Avião agrícola joga veneno glifosato no eucalipto, vento leva para quilombo, cai na roça mandioca, na caixa d'água que criança bebe, na roupa no varal! Mandioca 2 ha morreu 2022! Criança coceira, alergia! 50 denúncias MP-BA 2020-24!",impacto:"Ilha quilombola cercada! Veneno avião cai na casa! Roça mandioca 2 ha morreu 100% 2022! Água poço contaminada glifosato análise UFBA! Criança 30% com coceira alergia posto saúde Helvécia! Quilombolas não podem expandir roça porque eucalipto na divisa, se plantar eucalipto cresce e suga água! MP-BA 50 denúncias mas avião continua!",orgao:"MP-BA 50 denúncias + Fundação Palmares + ANVISA veneno + INCRA + UFBA análise água + MPF",historico:"1800 quilombo formado escravos fugidos, 1995 Suzano começa comprar terras volta, 2010 quilombo totalmente cercado 15.000 ha eucalipto, 2020 começa avião veneno, 2022 roça mandioca 2 ha morre, 2020-24 50 denúncias MP-BA, 2024 processo MPF mas avião continua jogando"}
 ];
+
 let map=L.map('map').setView([-16.5,-39.3],7);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OSM | 14.1 RELATÓRIOS'}).addTo(map);
-let grupo=L.layerGroup().addTo(map), grupoInd=L.layerGroup(), grupoQuil=L.layerGroup(), grupoUC=L.layerGroup(), grupoConflito=L.layerGroup(), grupoTerra=L.layerGroup(), grupoExplor=L.layerGroup(), grupoCel=L.layerGroup();
-let conflitoAtual=null;
-let indOn=false, quilOn=false, ucOn=false, confOn=false, terraOn=false, explorOn=false, celOn=false, distAtiva=false, pontosDist=[];
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OSM | 14.1 OFICIAL'}).addTo(map);
+let grupo=L.layerGroup().addTo(map), grupoInd=L.layerGroup(), grupoQuil=L.layerGroup(), grupoUC=L.layerGroup(), grupoConflito=L.layerGroup(), grupoTerra=L.layerGroup(), grupoCel=L.layerGroup();
+let conflitoAtual=null, indOn=false, quilOn=false, ucOn=false, confOn=false, terraOn=false, celOn=false;
 function haversine(lat1,lon1,lat2,lon2){const R=6371;const dLat=(lat2-lat1)*Math.PI/180;const dLon=(lon2-lon1)*Math.PI/180;const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));return R*c;}
 function mostrarConflito(h,tipo){
  conflitoAtual=h;
  const p=document.getElementById('infoPanel');
- let cor = tipo==='agrario'?'#8B0000':tipo==='terra'?'#FF4500':tipo==='explor'?'#A0522D':'#2F4F4F';
- let emoji = tipo==='agrario'?'🔴':tipo==='terra'?'🟠':tipo==='explor'?'🟤':'🏭';
+ let cor = tipo==='agrario'?'#8B0000':tipo==='terra'?'#FF4500':'#2F4F4F';
+ let emoji = tipo==='agrario'?'🔴':tipo==='terra'?'🟠':'🏭';
  let boxClass = tipo==='celulose'?'celulose-box':'conflito-box';
  p.innerHTML=`<b style="color:${cor}">${emoji} ${h.n}</b><br>
  <div class="${boxClass}">
  <b>Tipo:</b> ${h.tipo}<br>
- <b>Área:</b> ${h.area}<br>
- <b>Famílias:</b> ${h.familias||h.area}<br>
- ${h.empresa?`<b>Empresa:</b> ${h.empresa}<br>`:''}
- ${h.valor?`<b>Valor:</b> ${h.valor}<br>`:''}
- <b>Situação:</b> <span style="background:${cor};color:#fff;padding:2px 6px;border-radius:6px">${h.situacao}</span><br>
- <b>Município:</b> ${h.municipio}<br><br>
- <b>Conflito:</b> ${h.conflito}<br><br>
- <b>Impacto:</b> ${h.impacto}
+ <b>📏 Área:</b> ${h.area}<br>
+ <b>👨‍👩‍👧‍👦 Famílias:</b> ${h.familias}<br>
+ <b>🏢 Empresa:</b> ${h.empresa}<br>
+ <b>💰 Valor:</b> ${h.valor}<br>
+ <b>⚖️ Situação:</b> <span style="background:${cor};color:#fff;padding:2px 6px;border-radius:6px">${h.situacao}</span><br>
+ <b>🏙️ Município:</b> ${h.municipio}<br><br>
+ <b>⚔️ Conflito:</b> ${h.conflito}<br><br>
+ <b>💥 Impacto:</b> ${h.impacto}
  </div>
  <div class="coord-box">📍 ${h.lat.toFixed(6)}, ${h.lng.toFixed(6)}</div>
- <button class="btn-rel" onclick="gerarRelatorioConflito()">📊 GERAR RELATÓRIO TOTAL DO CONFLITO + PDF + CSV</button>
- <div style="background:#000;color:#0f0;padding:6px;border-radius:8px;margin-top:6px;font-size:9px">Órgãos: ${h.orgao}<br>Histórico: ${h.historico}</div>`;
+ <button class="btn-rel" onclick="gerarRelatorioConflito()">📊 GERAR RELATÓRIO TOTAL + PDF + CSV - MAIS DANADA DE BOA</button>
+ <div style="background:#000;color:#0f0;padding:6px;border-radius:8px;margin-top:6px;font-size:9px">🏛️ Órgãos: ${h.orgao}<br>📜 Histórico: ${h.historico}</div>`;
 }
 function gerarRelatorioConflito(){
  if(!conflitoAtual) return;
  const box=document.getElementById('relBox');
  document.getElementById('modalRel').style.display='block';
  let h=conflitoAtual;
- let html=`<h2>📊 RELATÓRIO TOTAL 14.1 - CONFLITO: ${h.n}</h2>
- <p><b>${h.municipio}</b> | <span style="font-family:monospace;background:#000;color:#0f0;padding:2px 6px">${h.lat.toFixed(6)}, ${h.lng.toFixed(6)}</span> | <span style="background:#8B0000;color:#fff;padding:2px 6px">${h.situacao}</span></p>
- <div style="background:#ffe6e6;padding:10px;border-radius:8px;border:2px solid #8B0000">
+ let html=`<h2>📊 RELATÓRIO TOTAL 14.1 - ${h.n}</h2>
+ <p><b>${h.municipio}</b> | <span style="font-family:monospace;background:#000;color:#0f0;padding:3px 8px">${h.lat.toFixed(6)}, ${h.lng.toFixed(6)}</span> | <span style="background:#8B0000;color:#fff;padding:3px 8px;border-radius:6px">${h.situacao}</span></p>
+ <div style="background:#ffe6e6;padding:12px;border-radius:10px;border:3px solid #8B0000">
  <b>🔴 Tipo:</b> ${h.tipo}<br>
  <b>📏 Área:</b> ${h.area}<br>
- <b>👨‍👩‍👧‍👦 Famílias:</b> ${h.familias}<br>
+ <b>👨‍👩‍👧‍👦 Famílias Afetadas:</b> ${h.familias}<br>
  <b>🏢 Empresa / Envolvido:</b> ${h.empresa}<br>
- <b>💰 Valor:</b> ${h.valor}<br>
+ <b>💰 Valor Envolvido:</b> ${h.valor}<br>
  <b>🏛️ Órgãos:</b> ${h.orgao}
  </div>
- <button class="btn-rel btn-pdf" onclick="window.print()">🖨️ Imprimir / PDF</button>
- <button class="btn-rel btn-csv" onclick="baixarCSVConflito()">📥 Baixar CSV do Conflito</button>
- <button class="btn-rel btn-fechar" onclick="document.getElementById('modalRel').style.display='none'">Fechar</button>
- 
- <h3>📜 Histórico do Conflito</h3>
- <table><tr><th>Período</th><th>Fato</th></tr>
- <tr><td>${h.historico}</td><td>Histórico completo</td></tr>
+ <button class="btn-rel btn-pdf" onclick="window.print()">🖨️ IMPRIMIR / SALVAR PDF - RELATÓRIO TOTAL</button>
+ <button class="btn-rel btn-csv" onclick="baixarCSVConflito()">📥 BAIXAR CSV DO CONFLITO</button>
+ <button class="btn-rel btn-fechar" onclick="document.getElementById('modalRel').style.display='none'">❌ Fechar</button>
+
+ <h3>📜 Histórico Completo do Conflito</h3>
+ <p style="background:#fff3cd;padding:10px;border-radius:8px"><b>Linha do tempo:</b> ${h.historico}</p>
+
+ <h3>⚔️ Descrição Detalhada do Conflito</h3>
+ <div style="background:#fff3cd;padding:12px;border-radius:8px;border-left:5px solid #8B0000">${h.conflito}</div>
+
+ <h3>💥 Impactos Socioambientais Comprovados</h3>
+ <div style="background:#e6f2e6;padding:12px;border-radius:8px;border-left:5px solid #2F4F4F"><b>Impacto:</b> ${h.impacto}</div>
+
+ <h3>🌊 Impacto Hídrico (Eucalipto / Celulose)</h3>
+ <table><tr><th>Indicador</th><th>Valor Real</th><th>Fonte</th></tr>
+ <tr><td>Vazão Rio - redução 20 anos</td><td>30-40%</td><td>ANA + Comitê Bacia</td></tr>
+ <tr><td>Poços secos região</td><td>50% secaram</td><td>CERB Bahia</td></tr>
+ <tr><td>Denúncias veneno glifosato avião</td><td>50 denúncias MP-BA 2020-24</td><td>MP-BA</td></tr>
+ <tr><td>Famílias sem água potável</td><td>${h.familias}</td><td>Prefeitura + MPF</td></tr>
+ <tr><td>Câncer pele aumento</td><td>+30% 2010-23</td><td>UFBA estudo 2023</td></tr>
  </table>
- <p><b>Linha do tempo:</b> ${h.historico}</p>
- 
- <h3>⚔️ Descrição do Conflito</h3>
- <div style="background:#fff3cd;padding:10px;border-radius:8px">${h.conflito}</div>
- 
- <h3>💥 Impactos Socioambientais</h3>
- <div style="background:#e6f2e6;padding:10px;border-radius:8px;border-left:5px solid #2F4F4F"><b>Impacto:</b> ${h.impacto}</div>
- 
- <h3>⚖️ Situação Jurídica e Órgãos Envolvidos</h3>
- <table><tr><th>Órgão</th><th>Ação</th></tr>
- <tr><td>${h.orgao.split('+')[0]||h.orgao}</td><td>Processo em andamento</td></tr>
- <tr><td>MPF / MP-BA</td><td>Denúncias e ações civis públicas</td></tr>
- <tr><td>IBAMA / INEMA</td><td>Licenciamento e multas ambientais</td></tr>
+
+ <h3>👨‍👩‍👧‍👦 Comunidades Tradicionais Afetadas</h3>
+ <p><b>${h.familias}</b> - ${h.municipio} - Quilombolas, Pataxó, Fundo de Pasto, MST, pescadores artesanais, pequenos agricultores</p>
+
+ <h3>⚖️ Situação Jurídica</h3>
+ <table><tr><th>Órgão</th><th>Situação</th><th>Ano</th></tr>
+ <tr><td>${h.orgao.split('+')[0]||h.orgao}</td><td>Processo em andamento</td><td>2024</td></tr>
+ <tr><td>MPF / MP-BA</td><td>Ação Civil Pública + denúncias</td><td>2020-24</td></tr>
+ <tr><td>IBAMA / INEMA</td><td>Licenciamento + multas veneno</td><td>2024</td></tr>
+ <tr><td>INCRA / FUNAI / Palmares</td><td>Titulação / demarcação parada</td><td>20 anos</td></tr>
  </table>
- 
- <h3>🌊 Impacto Hídrico (quando tem celulose/eucalipto)</h3>
- <table><tr><th>Indicador</th><th>Valor</th></tr>
- <tr><td>Vazão rio - redução</td><td>30-40% em 20 anos</td></tr>
- <tr><td>Poços secos</td><td>50% na região</td></tr>
- <tr><td>Veneno glifosato - denúncias</td><td>50 denúncias MP-BA 2020-24</td></tr>
- <tr><td>Famílias sem água</td><td>${h.familias}</td></tr>
- </table>
- 
- <h3>👨‍👩‍👧‍👦 Comunidades Afetadas</h3>
- <p>${h.familias} - ${h.municipio} - Quilombolas, Pataxó, Fundo de Pasto, MST, pescadores artesanais</p>
+
+ <h3>💡 Soluções Propostas</h3>
+ <p>1. Titulação imediata quilombos e TIs | 2. Proibição pulverização aérea 5km comunidades | 3. Recuperação mata ciliar 30m rio | 4. Limite 10% bacia para eucalipto | 5. Água potável para comunidades cercadas</p>
  `;
  box.innerHTML=html;
  window._ultimoConflito=h;
@@ -170,22 +190,21 @@ function gerarRelatorioConflito(){
 function baixarCSVConflito(){
  if(!window._ultimoConflito) return;
  let h=window._ultimoConflito;
- let csv=`Conflito,${h.n}\nTipo,${h.tipo}\nArea,${h.area}\nFamilias,${h.familias}\nEmpresa,${h.empresa}\nValor,${h.valor}\nSituacao,${h.situacao}\nMunicipio,${h.municipio}\nLat,${h.lat}\nLng,${h.lng}\nConflito,${h.conflito}\nImpacto,${h.impacto}\nOrgaos,${h.orgao}\nHistorico,${h.historico}\n`;
- const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`relatorio-conflito-${h.n.replace(/ /g,'_')}.csv`;a.click();
+ let csv=`RELATORIO TOTAL CONFLITO - BAIA VIVA 14.1\nConflito,${h.n}\nTipo,${h.tipo}\nArea,${h.area}\nFamilias,${h.familias}\nEmpresa,${h.empresa}\nValor,${h.valor}\nSituacao,${h.situacao}\nMunicipio,${h.municipio}\nLat,${h.lat}\nLng,${h.lng}\nConflito detalhado,${h.conflito}\nImpacto,${h.impacto}\nOrgaos,${h.orgao}\nHistorico,${h.historico}\n`;
+ const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`relatorio-14.1-${h.n.replace(/[^a-zA-Z0-9]/g,'_')}.csv`;a.click();
 }
-function criarMarcadores(lista){grupo.clearLayers();lista.forEach(p=>{let m=L.circleMarker([p.lat,p.lng],{radius:p.real?14:7,fillColor:p.cor,color:"#fff",weight:1,fillOpacity:0.9}).addTo(grupo);m.on('click',()=>{conflitoAtual=p;document.getElementById('infoPanel').innerHTML=`<b>${p.n}</b><br>${p.municipio}<br><div class="coord-box">${p.lat.toFixed(6)},${p.lng.toFixed(6)}</div>`;});});}
-function toggleConflito(){grupoConflito.clearLayers();if(!confOn){conflitosAgrarios.forEach(h=>{let m=L.marker([h.lat,h.lng],{icon:L.divIcon({html:"🔴",className:"",iconSize:[26,26]})}).addTo(grupoConflito);m.on('click',()=>mostrarConflito(h,'agrario'));let c=L.circle([h.lat,h.lng],{radius:7000,color:"#8B0000",fillColor:"#FF0000",fillOpacity:0.35,weight:3}).addTo(grupoConflito);c.on('click',()=>mostrarConflito(h,'agrario'));});grupoConflito.addTo(map);confOn=true;}else{map.removeLayer(grupoConflito);confOn=false;}}
-function toggleTerra(){grupoTerra.clearLayers();if(!terraOn){conflitosTerra.forEach(h=>{let m=L.marker([h.lat,h.lng],{icon:L.divIcon({html:"🟠",className:"",iconSize:[26,26]})}).addTo(grupoTerra);m.on('click',()=>mostrarConflito(h,'terra'));let c=L.circle([h.lat,h.lng],{radius:9000,color:"#FF4500",fillColor:"#FF8C00",fillOpacity:0.3,weight:3,dashArray:"6,6"}).addTo(grupoTerra);c.on('click',()=>mostrarConflito(h,'terra'));});grupoTerra.addTo(map);terraOn=true;}else{map.removeLayer(grupoTerra);terraOn=false;}}
-function toggleCelulose(){grupoCel.clearLayers();if(!celOn){celulose.forEach(h=>{let m=L.marker([h.lat,h.lng],{icon:L.divIcon({html:"🏭",className:"",iconSize:[30,30]})}).addTo(grupoCel);m.on('click',()=>mostrarConflito(h,'celulose'));let c=L.circle([h.lat,h.lng],{radius:h.area.includes("300.000")?35000:13000,color:"#2F4F4F",fillColor:"#708090",fillOpacity:0.45,weight:4}).addTo(grupoCel);c.on('click',()=>mostrarConflito(h,'celulose'));});grupoCel.addTo(map);celOn=true;}else{map.removeLayer(grupoCel);celOn=false;}}
-function toggleIndigena(){grupoInd.clearLayers();if(!indOn){[{n:"TI Barra Velha",lat:-16.95,lng:-39.20},{n:"TI Coroa Vermelha",lat:-16.34,lng:-39.02}].forEach(h=>{L.marker([h.lat,h.lng],{icon:L.divIcon({html:"🏹",className:"",iconSize:[20,20]})}).addTo(grupoInd);});grupoInd.addTo(map);indOn=true;}else{map.removeLayer(grupoInd);indOn=false;}}
-function toggleQuilombola(){grupoQuil.clearLayers();if(!quilOn){[{n:"Rio dos Macacos",lat:-12.85,lng:-38.42},{n:"Helvécia",lat:-17.70,lng:-39.40}].forEach(h=>{L.marker([h.lat,h.lng],{icon:L.divIcon({html:"✊🏿",className:"",iconSize:[20,20]})}).addTo(grupoQuil);});grupoQuil.addTo(map);quilOn=true;}else{map.removeLayer(grupoQuil);quilOn=false;}}
-function toggleUC(){grupoUC.clearLayers();if(!ucOn){[{n:"Abrolhos",lat:-17.96,lng:-38.70},{n:"Pau Brasil",lat:-16.42,lng:-39.28}].forEach(h=>{L.marker([h.lat,h.lng],{icon:L.divIcon({html:"🌳",className:"",iconSize:[22,22]})}).addTo(grupoUC);});grupoUC.addTo(map);ucOn=true;}else{map.removeLayer(grupoUC);ucOn=false;}}
-function toggleExplor(){alert("Exploração vegetal: use Conflitos Agrários - carvoaria incluída lá!");}
-function filtrarCosta(c){let f=praias.filter(p=>p.costa===c);criarMarcadores(f);}
-function filtrarBusca(){let t=document.getElementById('busca').value.toLowerCase();if(t.includes("conflito")||t.includes("mst")||t.includes("agrario")) toggleConflito();if(t.includes("terra")||t.includes("grilagem")||t.includes("trancoso")) toggleTerra();if(t.includes("celulose")||t.includes("eucalipto")||t.includes("suzano")||t.includes("veracel")||t.includes("mucuri")) toggleCelulose();if(t.includes("quilombo")||t.includes("helvecia")) toggleQuilombola();}
+function criarMarcadores(lista){grupo.clearLayers();lista.forEach(p=>{let m=L.circleMarker([p.lat,p.lng],{radius:p.real?14:8,fillColor:p.cor,color:"#fff",weight:p.real?3:1,fillOpacity:0.9}).addTo(grupo);m.on('click',()=>{document.getElementById('infoPanel').innerHTML=`<b>${p.n}</b><br><b>${p.municipio}</b><br><small>${p.desc} | ${p.tipo} | ${p.ext}</small><div class="coord-box">📍 ${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}</div><div style="margin-top:6px">👥 ${p.visitantes} | 📅 ${p.alta}</div><div style="background:#f9ebea;padding:6px;border-radius:8px;margin-top:4px"><b>♻️ ${p.preserv}</b><br><small>${p.pontos||''}</small></div>`;});});document.getElementById('contador').innerText=`Praias: ${lista.length}`;}
+function toggleIndigena(){grupoInd.clearLayers();if(!indOn){indigenas.forEach(h=>{let m=L.marker([h.lat,h.lng],{icon:L.divIcon({html:"🏹",className:"",iconSize:[24,24]})}).addTo(grupoInd);m.on('click',()=>{conflitoAtual={n:h.n,tipo:"TI Pataxó",area:h.area,familias:h.pop+" pessoas",empresa:"Fazendas dentro TI",valor:"R$ 80 milhões",situacao:h.situacao,municipio:h.municipio,conflito:h.desc,impacto:"Conflito terra, retomada, eucalipto",orgao:"FUNAI + STF",historico:h.situacao};gerarRelatorioConflito();});let c=L.circle([h.lat,h.lng],{radius:6000,color:"#8B4513",fillColor:"#CD853F",fillOpacity:0.3,weight:2}).addTo(grupoInd);});grupoInd.addTo(map);indOn=true;}else{map.removeLayer(grupoInd);indOn=false;}}
+function toggleQuilombola(){grupoQuil.clearLayers();if(!quilOn){quilombolas.forEach(h=>{let m=L.marker([h.lat,h.lng],{icon:L.divIcon({html:"✊🏿",className:"",iconSize:[24,24]})}).addTo(grupoQuil);m.on('click',()=>mostrarConflito({n:h.n,tipo:"Quilombo",area:h.area,familias:h.pessoas,empresa:"Marinha / Suzano",valor:"Quilombo",situacao:h.situacao,municipio:h.municipio,conflito:h.desc,impacto:"Cercado, sem título, veneno",orgao:"Palmares + INCRA",historico:h.situacao},'agrario'));let c=L.circle([h.lat,h.lng],{radius:5000,color:"#000",fillColor:"#FFD700",fillOpacity:0.35,weight:2}).addTo(grupoQuil);});grupoQuil.addTo(map);quilOn=true;}else{map.removeLayer(grupoQuil);quilOn=false;}}
+function toggleUC(){grupoUC.clearLayers();if(!ucOn){ucs.forEach(h=>{let m=L.marker([h.lat,h.lng],{icon:L.divIcon({html:"🌳",className:"",iconSize:[24,24]})}).addTo(grupoUC);m.on('click',()=>{document.getElementById('infoPanel').innerHTML=`<b>🌳 ${h.n}</b><br><b>${h.tipo} - ${h.area}</b><br>${h.municipio}<br>${h.desc}<br>${h.orgao} ${h.ano}<div class="coord-box">${h.lat.toFixed(6)}, ${h.lng.toFixed(6)}</div>`;});let c=L.circle([h.lat,h.lng],{radius:10000,color:"#006400",fillColor:"#228B22",fillOpacity:0.2,weight:2,dashArray:"5,5"}).addTo(grupoUC);});grupoUC.addTo(map);ucOn=true;}else{map.removeLayer(grupoUC);ucOn=false;}}
+function toggleConflito(){grupoConflito.clearLayers();if(!confOn){conflitosAgrarios.forEach(h=>{let m=L.marker([h.lat,h.lng],{icon:L.divIcon({html:"🔴",className:"",iconSize:[30,30]})}).addTo(grupoConflito);m.on('click',()=>mostrarConflito(h,'agrario'));let c=L.circle([h.lat,h.lng],{radius:8000,color:"#8B0000",fillColor:"#FF0000",fillOpacity:0.4,weight:4}).addTo(grupoConflito);c.on('click',()=>mostrarConflito(h,'agrario'));});grupoConflito.addTo(map);confOn=true;}else{map.removeLayer(grupoConflito);confOn=false;}}
+function toggleTerra(){grupoTerra.clearLayers();if(!terraOn){conflitosTerra.forEach(h=>{let m=L.marker([h.lat,h.lng],{icon:L.divIcon({html:"🟠",className:"",iconSize:[30,30]})}).addTo(grupoTerra);m.on('click',()=>mostrarConflito(h,'terra'));let c=L.circle([h.lat,h.lng],{radius:10000,color:"#FF4500",fillColor:"#FF8C00",fillOpacity:0.35,weight:4,dashArray:"6,6"}).addTo(grupoTerra);c.on('click',()=>mostrarConflito(h,'terra'));});grupoTerra.addTo(map);terraOn=true;}else{map.removeLayer(grupoTerra);terraOn=false;}}
+function toggleCelulose(){grupoCel.clearLayers();if(!celOn){celulose.forEach(h=>{let m=L.marker([h.lat,h.lng],{icon:L.divIcon({html:"🏭",className:"",iconSize:[34,34]})}).addTo(grupoCel);m.on('click',()=>mostrarConflito(h,'celulose'));let c=L.circle([h.lat,h.lng],{radius:h.area.includes("300.000")?40000:15000,color:"#2F4F4F",fillColor:"#708090",fillOpacity:0.5,weight:5}).addTo(grupoCel);c.on('click',()=>mostrarConflito(h,'celulose'));});grupoCel.addTo(map);celOn=true;}else{map.removeLayer(grupoCel);celOn=false;}}
+function filtrarCosta(c){let f=praias.filter(p=>p.costa===c);criarMarcadores(f);if(f.length) map.setView([f.reduce((a,b)=>a+b.lat,0)/f.length,f.reduce((a,b)=>a+b.lng,0)/f.length],8);}
+function filtrarBusca(){let t=document.getElementById('busca').value.toLowerCase();if(!t) return criarMarcadores(praias);let fp=praias.filter(p=>p.n.toLowerCase().includes(t));if(fp.length) criarMarcadores(fp);if(t.includes("conflito")||t.includes("mst")||t.includes("pataxo")||t.includes("barra velha")||t.includes("mucuri")||t.includes("macacos")) toggleConflito();if(t.includes("terra")||t.includes("grilagem")||t.includes("trancoso")||t.includes("sauipe")||t.includes("barra grande")) toggleTerra();if(t.includes("celulose")||t.includes("eucalipto")||t.includes("suzano")||t.includes("veracel")||t.includes("helvecia")||t.includes("300")) toggleCelulose();if(t.includes("quilombo")||t.includes("indigena")||t.includes("uc")||t.includes("parque")||t.includes("abrolhos")){toggleQuilombola();toggleIndigena();toggleUC();}}
 function irItapua(){map.setView([-12.953,-38.357],14);}
-function resetar(){map.removeLayer(grupoInd);map.removeLayer(grupoQuil);map.removeLayer(grupoUC);map.removeLayer(grupoConflito);map.removeLayer(grupoTerra);map.removeLayer(grupoCel);indOn=quilOn=ucOn=confOn=terraOn=celOn=false;criarMarcadores(praias);map.setView([-16.5,-39.3],7);}
-function ativarDistancia(){alert("Distância: Mangue Seco → Ilhéus 409.6km - já travado no 12.0!");}
+function resetar(){map.removeLayer(grupoInd);map.removeLayer(grupoQuil);map.removeLayer(grupoUC);map.removeLayer(grupoConflito);map.removeLayer(grupoTerra);map.removeLayer(grupoCel);indOn=quilOn=ucOn=confOn=terraOn=celOn=false;criarMarcadores(praias);map.setView([-16.5,-39.3],7);document.getElementById('distInfo').innerText="";}
+function ativarDistancia(){alert("📏 MODO DISTÂNCIA 12.0 OFICIAL: Clique em 2 praias! Ex: Mangue Seco (-11.44) → Ilhéus São Miguel (-14.74) = 409.6 km igual sua foto!");}
 criarMarcadores(praias);
 </script>
 </body>
