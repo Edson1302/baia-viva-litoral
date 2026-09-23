@@ -1,193 +1,177 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Baía Viva 9.0 - Tempo Real Completo - Prof Edson</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baía Viva 10.0 FINAL - Relatórios 10+10 dias</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-*{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f7}
-.header{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:1000;background:#0a3d62;color:#fff;padding:12px 20px;border-radius:30px;font-weight:bold;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,.5);font-size:12px;line-height:1.3}
-.controls{position:absolute;top:65px;left:8px;z-index:1000;background:#fff;padding:10px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.3);width:250px;max-height:75vh;overflow:auto}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f7}
+.header{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:1000;background:#0a3d62;color:#fff;padding:12px 20px;border-radius:30px;font-weight:bold;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,.5);font-size:12px}
+.controls{position:absolute;top:65px;left:8px;z-index:1000;background:#fff;padding:10px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.3);width:250px;max-height:70vh;overflow:auto}
 .controls input{width:100%;padding:8px;border:1px solid #ccc;border-radius:8px;margin-bottom:8px}
 .controls button{width:100%;padding:7px;margin:2px 0;border:0;border-radius:8px;cursor:pointer;font-weight:bold;color:#fff;font-size:11px}
-.btn-coqueiros{background:#e67e22} .btn-todos{background:#2980b9} .btn-dende{background:#27ae60} .btn-cacau{background:#8e44ad} .btn-descob{background:#c0392b} .btn-baleias{background:#f1c40f;color:#000 !important} .btn-real{background:red;animation:pulse 1.5s infinite} .btn-reset{background:#34495e}
-@keyframes pulse{0%{transform:scale(1)} 50%{transform:scale(1.03)} 100%{transform:scale(1)}}
+.btn-coqueiros{background:#e67e22}.btn-todos{background:#2980b9}.btn-dende{background:#27ae60}.btn-cacau{background:#8e44ad}.btn-descob{background:#c0392b}.btn-baleias{background:#f1c40f;color:#000!important}.btn-real{background:red}.btn-reset{background:#34495e}
 #map{height:100vh;width:100%}
-.info-panel{position:absolute;bottom:15px;right:8px;z-index:1000;background:#fff;padding:12px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.4);width:310px;font-size:12px;max-height:55vh;overflow:auto;border-left:5px solid #0a3d62}
-.legenda{position:absolute;bottom:15px;left:8px;z-index:1000;background:#fff;padding:8px 10px;border-radius:10px;font-size:10px;box-shadow:0 2px 10px rgba(0,0,0,.3);line-height:1.4}
-.tag{display:inline-block;padding:2px 6px;border-radius:10px;color:#fff;font-size:10px;margin-left:4px}
+.info-panel{position:absolute;bottom:15px;right:8px;z-index:1000;background:#fff;padding:12px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.4);width:330px;font-size:12px;max-height:60vh;overflow:auto;border-left:5px solid #0a3d62}
 .tempo-real{background:#e8f6ff;border:1px solid #2980b9;border-radius:10px;padding:8px;margin-top:8px}
-.tempo-real b{color:#0a3d62}
-.badge{display:inline-block;padding:2px 6px;border-radius:6px;font-size:10px;font-weight:bold;margin:2px}
-.badge-ok{background:#27ae60;color:#fff} .badge-atencao{background:#f1c40f;color:#000} .badge-ruim{background:#c0392b;color:#fff}
+.badge{padding:2px 6px;border-radius:6px;font-size:10px;font-weight:bold}.badge-ok{background:#27ae60;color:#fff}.badge-atencao{background:#f1c40f}.badge-ruim{background:#c0392b;color:#fff}
+.relatorio-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:2000;display:none;overflow:auto}
+.relatorio-box{background:#fff;margin:20px auto;padding:20px;border-radius:12px;max-width:800px}
+.relatorio-box table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}.relatorio-box th,.relatorio-box td{border:1px solid #ccc;padding:5px;text-align:center}.relatorio-box th{background:#0a3d62;color:#fff}
+.btn-rel{width:100%;background:#0a3d62;color:#fff;padding:10px;border:0;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:8px}
+.btn-pdf{background:#27ae60}.btn-csv{background:#2980b9}
 </style>
 </head>
 <body>
-<div class="header">BAÍA VIVA 9.0 TEMPO REAL | 1.100KM | 110 PRAIAS | ITAPUÃ REAL -12.953,-38.357 | Prof. Edson - 22/09/2026</div>
+<div class="header">BAÍA VIVA 10.0 FINAL | RELATÓRIOS 10 DIAS PASSADO + 10 DIAS FUTURO | ITAPUÃ REAL -12.953,-38.357</div>
 <div class="controls">
-<input type="text" id="busca" placeholder="Buscar praia... Ex: Trancoso" onkeyup="filtrarBusca()">
+<input id="busca" placeholder="Buscar praia..." onkeyup="filtrarBusca()">
 <button class="btn-coqueiros" onclick="filtrarCosta('Coqueiros')">Costa dos Coqueiros</button>
-<button class="btn-todos" onclick="filtrarCosta('Todos os Santos')">Baía Todos os Santos</button>
-<button class="btn-dende" onclick="filtrarCosta('Dendê')">Costa do Dendê</button>
-<button class="btn-cacau" onclick="filtrarCosta('Cacau')">Costa do Cacau</button>
-<button class="btn-descob" onclick="filtrarCosta('Descobrimento')">Costa Descobrimento</button>
-<button class="btn-baleias" onclick="filtrarCosta('Baleias')">Costa Baleias / Abrolhos</button>
-<button class="btn-real" onclick="irItapua()">★ ITAPUÃ REAL - PONTO OFICIAL</button>
-<button class="btn-reset" onclick="resetar()">Mostrar Todas (110)</button>
-<div style="font-size:10px;margin-top:6px;color:#555">Visíveis: <span id="contador">0</span> | <span id="statusTempo">Tempo Real: Ativo</span></div>
+<button class="btn-todos" onclick="filtrarCosta('Todos os Santos')">Todos os Santos</button>
+<button class="btn-dende" onclick="filtrarCosta('Dendê')">Dendê</button>
+<button class="btn-cacau" onclick="filtrarCosta('Cacau')">Cacau</button>
+<button class="btn-descob" onclick="filtrarCosta('Descobrimento')">Descobrimento</button>
+<button class="btn-baleias" onclick="filtrarCosta('Baleias')">Baleias / Abrolhos</button>
+<button class="btn-real" onclick="irItapua()">★ ITAPUÃ REAL</button>
+<button class="btn-reset" onclick="resetar()">Mostrar Todas</button>
+<div style="font-size:10px;margin-top:6px">Visíveis: <span id="contador">0</span></div>
 </div>
 <div id="map"></div>
-<div class="legenda">
-<b>LEGENDA</b><br>
-<span style="color:#e67e22">●</span> Coqueiros<br>
-<span style="color:#2980b9">●</span> Todos os Santos<br>
-<span style="color:#27ae60">●</span> Dendê<br>
-<span style="color:#8e44ad">●</span> Cacau<br>
-<span style="color:#c0392b">●</span> Descobrimento<br>
-<span style="color:#f1c40f">●</span> Baleias<br>
-<span style="color:red">●</span> ITAPUÃ REAL
-</div>
-<div class="info-panel" id="infoPanel">
-<b>Clique em uma praia</b><br>
-Aqui vai aparecer:<br>
-- Município e coordenada<br>
-- <b>TEMPO REAL</b> agora<br>
-- Maré, vento, pesca, navegação<br><br>
-<small>Fonte: Open-Meteo (INMET) + Marinha do Brasil<br>
-Dados atualizados a cada clique.</small>
-</div>
+<div class="info-panel" id="infoPanel"><b>Clique em uma praia</b><br>Vai aparecer tempo real + botão de relatório.</div>
+
+<div class="relatorio-modal" id="modalRel"><div class="relatorio-box" id="relBox"></div></div>
+
 <script>
-const praias = [
-{n:"Mangue Seco",lat:-11.44,lng:-37.34,costa:"Coqueiros",cor:"#e67e22",municipio:"Jandaíra",tipo:"Oceânica, dunas",ext:"5km",desc:"Divisa SE, dunas do filme Tieta."},
-{n:"Costa Azul",lat:-11.68,lng:-37.46,costa:"Coqueiros",cor:"#e67e22",municipio:"Jandaíra",tipo:"Oceânica",ext:"8km",desc:"Extensa e deserta."},
-{n:"Sítio do Conde",lat:-11.92,lng:-37.60,costa:"Coqueiros",cor:"#e67e22",municipio:"Conde",tipo:"Oceânica, vila",ext:"3km",desc:"Vila de pescadores."},
-{n:"Siribinha",lat:-11.98,lng:-37.65,costa:"Coqueiros",cor:"#e67e22",municipio:"Conde",tipo:"Fluvial+Oceânica",ext:"2km",desc:"Encontro rio com mar."},
-{n:"Baixio",lat:-12.04,lng:-37.70,costa:"Coqueiros",cor:"#e67e22",municipio:"Esplanada",tipo:"Oceânica",ext:"4km",desc:"Muitos coqueirais."},
-{n:"Subaúma",lat:-12.25,lng:-37.84,costa:"Coqueiros",cor:"#e67e22",municipio:"Entre Rios",tipo:"Oceânica",ext:"6km",desc:"Mar calmo."},
-{n:"Massarandupió",lat:-12.31,lng:-37.90,costa:"Coqueiros",cor:"#e67e22",municipio:"Entre Rios",tipo:"Oceânica",ext:"4km",desc:"Trecho naturismo."},
-{n:"Sauípe",lat:-12.34,lng:-37.92,costa:"Coqueiros",cor:"#e67e22",municipio:"Mata S. João",tipo:"Resorts",ext:"5km",desc:"Complexo resorts."},
-{n:"Imbassaí",lat:-12.47,lng:-37.96,costa:"Coqueiros",cor:"#e67e22",municipio:"Mata S. João",tipo:"Rio+Mar",ext:"3km",desc:"Rio Imbassaí."},
-{n:"Praia do Forte",lat:-12.585,lng:-38.001,costa:"Coqueiros",cor:"#e67e22",municipio:"Mata S. João",tipo:"Recifes",ext:"4km",desc:"Projeto Tamar."},
-{n:"Itacimirim",lat:-12.62,lng:-38.05,costa:"Coqueiros",cor:"#e67e22",municipio:"Camaçari",tipo:"Oceânica",ext:"3km",desc:"Pescadores."},
-{n:"Guarajuba",lat:-12.65,lng:-38.09,costa:"Coqueiros",cor:"#e67e22",municipio:"Camaçari",tipo:"Piscinas naturais",ext:"3km",desc:"Recifes."},
-{n:"Arembepe",lat:-12.75,lng:-38.16,costa:"Coqueiros",cor:"#e67e22",municipio:"Camaçari",tipo:"Histórica",ext:"3km",desc:"Aldeia hippie 70."},
-{n:"Jauá",lat:-12.81,lng:-38.21,costa:"Coqueiros",cor:"#e67e22",municipio:"Camaçari",tipo:"Oceânica",ext:"2km",desc:"Perto aeroporto."},
-{n:"Busca Vida",lat:-12.86,lng:-38.25,costa:"Coqueiros",cor:"#e67e22",municipio:"Camaçari",tipo:"Oceânica",ext:"4km",desc:"Condomínios."},
-{n:"Stella Maris",lat:-12.934,lng:-38.330,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Oceânica",ext:"2km",desc:"Ondas fortes."},
-{n:"Flamengo",lat:-12.917,lng:-38.320,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Oceânica",ext:"1.5km",desc:"Perto aeroporto."},
-{n:"ITAPUÃ REAL",lat:-12.953,lng:-38.357,costa:"Todos os Santos",cor:"red",municipio:"Salvador PONTO REAL",tipo:"Farol, referência oficial",ext:"2km",desc:"PONTO REAL PROF EDSON - Coordenada oficial -12.953,-38.357",real:true},
-{n:"Piatã",lat:-12.957,lng:-38.393,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Oceânica urbana",ext:"2.5km",desc:"Mar agitado."},
-{n:"Patamares",lat:-12.98,lng:-38.41,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Oceânica",ext:"2km",desc:"Mar calmo maré baixa."},
-{n:"Pituba",lat:-13.01,lng:-38.49,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Urbana",ext:"2km",desc:"Urbana."},
-{n:"Farol da Barra",lat:-13.010,lng:-38.533,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Cartão postal",ext:"0.5km",desc:"Encontro Baía com oceano."},
-{n:"Porto da Barra",lat:-13.00,lng:-38.53,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Baía calma",ext:"0.4km",desc:"Águas calmas."},
-{n:"Ribeira",lat:-12.91,lng:-38.50,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Baía",ext:"1km",desc:"Vista Itaparica."},
-{n:"Mar Grande",lat:-12.89,lng:-38.67,costa:"Todos os Santos",cor:"#2980b9",municipio:"Vera Cruz",tipo:"Baía",ext:"5km",desc:"Ilha Itaparica."},
-{n:"Ponta Areia",lat:-12.88,lng:-38.68,costa:"Todos os Santos",cor:"#2980b9",municipio:"Itaparica",tipo:"Baía",ext:"2km",desc:"Ponta norte."},
-{n:"Ilha de Maré",lat:-12.78,lng:-38.53,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Baía quilombola",ext:"4km",desc:"Comunidade tradicional."},
-{n:"Guaibim",lat:-13.30,lng:-38.88,costa:"Dendê",cor:"#27ae60",municipio:"Valença",tipo:"Oceânica extensa",ext:"10km",desc:"Famosa Valença."},
-{n:"Morro SP",lat:-13.376,lng:-38.915,costa:"Dendê",cor:"#27ae60",municipio:"Cairu",tipo:"Turística",ext:"4 praias",desc:"1ª 2ª 3ª 4ª Praia."},
-{n:"Gamboa",lat:-13.39,lng:-38.91,costa:"Dendê",cor:"#27ae60",municipio:"Cairu",tipo:"Argila",ext:"2km",desc:"Argila medicinal."},
-{n:"Boipeba",lat:-13.61,lng:-38.92,costa:"Dendê",cor:"#27ae60",municipio:"Cairu",tipo:"Paradisíaca",ext:"5km",desc:"Rio Inferno."},
-{n:"Moreré",lat:-13.62,lng:-38.90,costa:"Dendê",cor:"#27ae60",municipio:"Cairu",tipo:"Piscinas",ext:"3km",desc:"Piscinas naturais."},
-{n:"Barra Grande",lat:-13.89,lng:-38.94,costa:"Dendê",cor:"#27ae60",municipio:"Maraú",tipo:"Baía+Oceânica",ext:"6km",desc:"Ponta do Mutá."},
-{n:"Taipu de Fora",lat:-13.92,lng:-38.92,costa:"Dendê",cor:"#27ae60",municipio:"Maraú",tipo:"Piscinas",ext:"2km",desc:"Melhores piscinas BA."},
-{n:"Prainha Itacaré",lat:-14.27,lng:-38.99,costa:"Cacau",cor:"#8e44ad",municipio:"Itacaré",tipo:"Trilha",ext:"0.5km",desc:"Acesso trilha."},
-{n:"Jeribucaçu",lat:-14.22,lng:-38.98,costa:"Cacau",cor:"#8e44ad",municipio:"Itacaré",tipo:"Selvagem",ext:"1km",desc:"Rio coqueiros."},
-{n:"Resende",lat:-14.28,lng:-39.00,costa:"Cacau",cor:"#8e44ad",municipio:"Itacaré",tipo:"Urbana",ext:"1km",desc:"Centro."},
-{n:"Tiririca",lat:-14.29,lng:-39.01,costa:"Cacau",cor:"#8e44ad",municipio:"Itacaré",tipo:"Surf",ext:"0.8km",desc:"Campeonato surf."},
-{n:"Itacarezinho",lat:-14.32,lng:-39.00,costa:"Cacau",cor:"#8e44ad",municipio:"Itacaré",tipo:"Oceânica",ext:"3km",desc:"Longa."},
-{n:"Ilhéus São Miguel",lat:-14.74,lng:-39.02,costa:"Cacau",cor:"#8e44ad",municipio:"Ilhéus",tipo:"Oceânica",ext:"4km",desc:"Aeroporto."},
-{n:"Olivença",lat:-14.92,lng:-39.02,costa:"Cacau",cor:"#8e44ad",municipio:"Ilhéus",tipo:"Oceânica",ext:"5km",desc:"Olivença."},
-{n:"Canavieiras",lat:-15.67,lng:-38.95,costa:"Cacau",cor:"#8e44ad",municipio:"Canavieiras",tipo:"Ilha",ext:"8km",desc:"Começo Baleias."},
-{n:"Santo André",lat:-16.21,lng:-39.00,costa:"Descobrimento",cor:"#c0392b",municipio:"S.C.Cabrália",tipo:"Rio+Mar",ext:"3km",desc:"Rio João Tiba."},
-{n:"Cabrália",lat:-16.27,lng:-39.02,costa:"Descobrimento",cor:"#c0392b",municipio:"S.C.Cabrália",tipo:"Histórica",ext:"4km",desc:"1ª missa."},
-{n:"Taperapuã",lat:-16.40,lng:-39.05,costa:"Descobrimento",cor:"#c0392b",municipio:"P. Seguro",tipo:"Badalada",ext:"5km",desc:"Barracas."},
-{n:"P. Seguro Centro",lat:-16.443,lng:-39.064,costa:"Descobrimento",cor:"#c0392b",municipio:"P. Seguro",tipo:"Histórica",ext:"2km",desc:"Histórica."},
-{n:"Arraial Ajuda",lat:-16.48,lng:-39.06,costa:"Descobrimento",cor:"#c0392b",municipio:"P. Seguro",tipo:"Falésias",ext:"4km",desc:"Mucugê Pitinga."},
-{n:"Trancoso",lat:-16.590,lng:-39.097,costa:"Descobrimento",cor:"#c0392b",municipio:"P. Seguro",tipo:"Charmosa",ext:"6km",desc:"Quadrado."},
-{n:"Caraíva",lat:-16.789,lng:-39.144,costa:"Descobrimento",cor:"#c0392b",municipio:"P. Seguro",tipo:"Rústica",ext:"5km",desc:"Sem carro."},
-{n:"Corumbau",lat:-17.00,lng:-39.18,costa:"Descobrimento",cor:"#c0392b",municipio:"Prado",tipo:"Selvagem",ext:"10km",desc:"Ponta Corumbau."},
-{n:"Cumuruxatiba",lat:-17.105,lng:-39.225,costa:"Baleias",cor:"#f1c40f",municipio:"Prado",tipo:"Tranquila",ext:"6km",desc:"Pescadores."},
-{n:"Prado Centro",lat:-17.338,lng:-39.221,costa:"Baleias",cor:"#f1c40f",municipio:"Prado",tipo:"Oceânica",ext:"4km",desc:"Centro Baleias."},
-{n:"Caravelas",lat:-17.718,lng:-39.262,costa:"Baleias",cor:"#f1c40f",municipio:"Caravelas",tipo:"Estuário",ext:"8km",desc:"Porto Abrolhos."},
-{n:"Abrolhos Siriba",lat:-17.96,lng:-38.70,costa:"Baleias",cor:"#f1c40f",municipio:"P.N.Marinho",tipo:"Arquipélago",ext:"Parque",desc:"Berçário baleias jubarte."},
-{n:"Abrolhos S. Bárbara",lat:-17.96,lng:-38.69,costa:"Baleias",cor:"#f1c40f",municipio:"Caravelas",tipo:"Ilha farol",ext:"Ilha",desc:"Farol Marinha."}
+const praias=[
+{n:"Mangue Seco",lat:-11.44,lng:-37.34,costa:"Coqueiros",cor:"#e67e22",municipio:"Jandaíra",tipo:"Oceânica dunas",ext:"5km",desc:"Dunas Tieta"},
+{n:"Costa Azul",lat:-11.68,lng:-37.46,costa:"Coqueiros",cor:"#e67e22",municipio:"Jandaíra",tipo:"Oceânica",ext:"8km",desc:"Deserta"},
+{n:"Sítio do Conde",lat:-11.92,lng:-37.60,costa:"Coqueiros",cor:"#e67e22",municipio:"Conde",tipo:"Vila",ext:"3km",desc:"Pescadores"},
+{n:"Siribinha",lat:-11.98,lng:-37.65,costa:"Coqueiros",cor:"#e67e22",municipio:"Conde",tipo:"Fluvial",ext:"2km",desc:"Rio+Mar"},
+{n:"Baixio",lat:-12.04,lng:-37.70,costa:"Coqueiros",cor:"#e67e22",municipio:"Esplanada",tipo:"Oceânica",ext:"4km",desc:"Coqueirais"},
+{n:"Subaúma",lat:-12.25,lng:-37.84,costa:"Coqueiros",cor:"#e67e22",municipio:"Entre Rios",tipo:"Oceânica",ext:"6km",desc:"Calmo"},
+{n:"Massarandupió",lat:-12.31,lng:-37.90,costa:"Coqueiros",cor:"#e67e22",municipio:"Entre Rios",tipo:"Oceânica",ext:"4km",desc:"Naturismo"},
+{n:"Sauípe",lat:-12.34,lng:-37.92,costa:"Coqueiros",cor:"#e67e22",municipio:"Mata S. João",tipo:"Resorts",ext:"5km",desc:"Resorts"},
+{n:"Imbassaí",lat:-12.47,lng:-37.96,costa:"Coqueiros",cor:"#e67e22",municipio:"Mata S. João",tipo:"Rio+Mar",ext:"3km",desc:"Rio Imbassaí"},
+{n:"Praia do Forte",lat:-12.585,lng:-38.001,costa:"Coqueiros",cor:"#e67e22",municipio:"Mata S. João",tipo:"Recifes",ext:"4km",desc:"Tamar"},
+{n:"Guarajuba",lat:-12.65,lng:-38.09,costa:"Coqueiros",cor:"#e67e22",municipio:"Camaçari",tipo:"Piscinas",ext:"3km",desc:"Piscinas"},
+{n:"Arembepe",lat:-12.75,lng:-38.16,costa:"Coqueiros",cor:"#e67e22",municipio:"Camaçari",tipo:"Histórica",ext:"3km",desc:"Hippie"},
+{n:"Busca Vida",lat:-12.86,lng:-38.25,costa:"Coqueiros",cor:"#e67e22",municipio:"Camaçari",tipo:"Oceânica",ext:"4km",desc:"Condomínios"},
+{n:"Stella Maris",lat:-12.934,lng:-38.330,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Oceânica",ext:"2km",desc:"Ondas fortes"},
+{n:"Flamengo",lat:-12.917,lng:-38.320,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Oceânica",ext:"1.5km",desc:"Aeroporto"},
+{n:"ITAPUÃ REAL",lat:-12.953,lng:-38.357,costa:"Todos os Santos",cor:"red",municipio:"Salvador PONTO REAL",tipo:"Farol referência",ext:"2km",desc:"PONTO REAL PROF EDSON",real:true},
+{n:"Piatã",lat:-12.957,lng:-38.393,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Urbana",ext:"2.5km",desc:"Agitado"},
+{n:"Farol da Barra",lat:-13.010,lng:-38.533,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Cartão postal",ext:"0.5km",desc:"Encontro baía oceano"},
+{n:"Porto da Barra",lat:-13.00,lng:-38.53,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Baía calma",ext:"0.4km",desc:"Calma"},
+{n:"Mar Grande",lat:-12.89,lng:-38.67,costa:"Todos os Santos",cor:"#2980b9",municipio:"Vera Cruz",tipo:"Baía",ext:"5km",desc:"Itaparica"},
+{n:"Guaibim",lat:-13.30,lng:-38.88,costa:"Dendê",cor:"#27ae60",municipio:"Valença",tipo:"Oceânica",ext:"10km",desc:"Valença"},
+{n:"Morro de São Paulo",lat:-13.376,lng:-38.915,costa:"Dendê",cor:"#27ae60",municipio:"Cairu",tipo:"Turística",ext:"4 praias",desc:"1a 2a 3a 4a"},
+{n:"Boipeba",lat:-13.61,lng:-38.92,costa:"Dendê",cor:"#27ae60",municipio:"Cairu",tipo:"Paradisíaca",ext:"5km",desc:"Rio Inferno"},
+{n:"Moreré",lat:-13.62,lng:-38.90,costa:"Dendê",cor:"#27ae60",municipio:"Cairu",tipo:"Piscinas",ext:"3km",desc:"Piscinas"},
+{n:"Barra Grande",lat:-13.89,lng:-38.94,costa:"Dendê",cor:"#27ae60",municipio:"Maraú",tipo:"Baía+Oceânica",ext:"6km",desc:"Ponta Mutá"},
+{n:"Taipu de Fora",lat:-13.92,lng:-38.92,costa:"Dendê",cor:"#27ae60",municipio:"Maraú",tipo:"Piscinas",ext:"2km",desc:"Melhores piscinas"},
+{n:"Itacaré Prainha",lat:-14.27,lng:-38.99,costa:"Cacau",cor:"#8e44ad",municipio:"Itacaré",tipo:"Trilha",ext:"0.5km",desc:"Trilha paraíso"},
+{n:"Jeribucaçu",lat:-14.22,lng:-38.98,costa:"Cacau",cor:"#8e44ad",municipio:"Itacaré",tipo:"Selvagem",ext:"1km",desc:"Rio coqueiros"},
+{n:"Ilhéus São Miguel",lat:-14.74,lng:-39.02,costa:"Cacau",cor:"#8e44ad",municipio:"Ilhéus",tipo:"Oceânica",ext:"4km",desc:"Aeroporto"},
+{n:"Canavieiras",lat:-15.67,lng:-38.95,costa:"Cacau",cor:"#8e44ad",municipio:"Canavieiras",tipo:"Ilha",ext:"8km",desc:"Atalaia"},
+{n:"Cabralia",lat:-16.27,lng:-39.02,costa:"Descobrimento",cor:"#c0392b",municipio:"Cabralia",tipo:"Histórica",ext:"4km",desc:"1a missa"},
+{n:"Taperapuã",lat:-16.40,lng:-39.05,costa:"Descobrimento",cor:"#c0392b",municipio:"P. Seguro",tipo:"Badalada",ext:"5km",desc:"Barracas"},
+{n:"Trancoso",lat:-16.590,lng:-39.097,costa:"Descobrimento",cor:"#c0392b",municipio:"P. Seguro",tipo:"Charmosa",ext:"6km",desc:"Quadrado"},
+{n:"Caraíva",lat:-16.789,lng:-39.144,costa:"Descobrimento",cor:"#c0392b",municipio:"P. Seguro",tipo:"Rústica",ext:"5km",desc:"Sem carro"},
+{n:"Corumbau",lat:-17.00,lng:-39.18,costa:"Descobrimento",cor:"#c0392b",municipio:"Prado",tipo:"Selvagem",ext:"10km",desc:"Ponta"},
+{n:"Cumuruxatiba",lat:-17.105,lng:-39.225,costa:"Baleias",cor:"#f1c40f",municipio:"Prado",tipo:"Tranquila",ext:"6km",desc:"Pescadores"},
+{n:"Prado Centro",lat:-17.338,lng:-39.221,costa:"Baleias",cor:"#f1c40f",municipio:"Prado",tipo:"Oceânica",ext:"4km",desc:"Centro Baleias"},
+{n:"Caravelas",lat:-17.718,lng:-39.262,costa:"Baleias",cor:"#f1c40f",municipio:"Caravelas",tipo:"Estuário",ext:"8km",desc:"Porto Abrolhos"},
+{n:"Abrolhos Siriba",lat:-17.96,lng:-38.70,costa:"Baleias",cor:"#f1c40f",municipio:"Parque Marinho",tipo:"Arquipélago",ext:"Parque",desc:"Berçário baleias"}
 ];
-let map = L.map('map').setView([-14.5,-39.0],7);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OSM | Baía Viva 9.0'}).addTo(map);
-let grupo = L.layerGroup().addTo(map);
-let marcadores=[];
-  async function buscarTempoReal(lat,lng){
+let map=L.map('map').setView([-14.5,-39.0],7);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OSM | Baía Viva 10.0'}).addTo(map);
+let grupo=L.layerGroup().addTo(map);
+let praiaAtual=null;
+
+async function buscarTempoReal(lat,lng){
   try{
     const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,wind_speed_10m,wind_direction_10m,weather_code,relative_humidity_2m&timezone=America/Bahia`;
     const r=await fetch(url); const j=await r.json(); const c=j.current;
-    let cond=""; const code=c.weather_code;
-    if(code<=1) cond="Céu limpo ☀️"; else if(code<=3) cond="Parcial nublado ⛅"; else if(code<=48) cond="Nevoeiro 🌫️"; else if(code<=67) cond="Chuva leve 🌧️"; else if(code<=82) cond="Chuva forte 🌧️"; else cond="Tempo instável ⛈️";
-    return {temp:c.temperature_2m, vento:c.wind_speed_10m, dir:c.wind_direction_10m, umid:c.relative_humidity_2m, cond:cond, ok:true};
-  }catch(e){ return {ok:false}; }
+    let cond=c.weather_code<=1?"Céu limpo ☀️":c.weather_code<=3?"Parcial ⛅":c.weather_code<=67?"Chuva 🌧️":"Instável ⛈️";
+    return {temp:c.temperature_2m,vento:c.wind_speed_10m,dir:c.wind_direction_10m,umid:c.relative_humidity_2m,cond:cond,ok:true};
+  }catch(e){return {ok:false};}
 }
 function calculaMare(){
-  const agora=new Date(); const h=agora.getHours()+agora.getMinutes()/60;
+  const h=new Date().getHours()+new Date().getMinutes()/60;
   const altura=(1.2+0.8*Math.sin((h/12.4)*2*Math.PI)).toFixed(1);
-  const fase=h%12.4; let estado=""; 
-  if(fase<3) estado="Enchendo ⬆️"; else if(fase<6) estado="Cheia 🌊"; else if(fase<9) estado="Vazando ⬇️"; else estado="Baixa 🏜️";
-  return {altura, estado, proxima: fase<6 ? "Cheia em "+(6-fase).toFixed(1)+"h" : "Baixa em "+(12.4-fase).toFixed(1)+"h"};
+  const fase=h%12.4; let estado=fase<3?"Enchendo ⬆️":fase<6?"Cheia 🌊":fase<9?"Vazando ⬇️":"Baixa 🏜️";
+  return {altura,estado,proxima:fase<6?"Cheia em "+(6-fase).toFixed(1)+"h":"Baixa em "+(12.4-fase).toFixed(1)+"h"};
 }
-function avaliaPescaNaveg(vento,temp){
-  let pesca=""; let nav=""; let pescaClass=""; let navClass="";
-  if(vento<15){ pesca="BOA - Mar calmo"; pescaClass="badge-ok"; nav="FAVORÁVEL"; navClass="badge-ok"; }
-  else if(vento<25){ pesca="MÉDIA - Vento moderado"; pescaClass="badge-atencao"; nav="ATENÇÃO - Vento moderado"; navClass="badge-atencao"; }
-  else { pesca="RUIM - Vento forte"; pescaClass="badge-ruim"; nav="DESFAVORÁVEL - Vento forte"; navClass="badge-ruim"; }
-  return {pesca,nav,pescaClass,navClass};
+function avalia(vento){return vento<15?{p:"BOA",c:"badge-ok",n:"FAVORÁVEL",nc:"badge-ok"}:vento<25?{p:"MÉDIA",c:"badge-atencao",n:"ATENÇÃO",nc:"badge-atencao"}:{p:"RUIM",c:"badge-ruim",n:"DESFAVORÁVEL",nc:"badge-ruim"};}
+
+// NOVA FUNÇÃO - RELATÓRIO 10+10 DIAS
+async function gerarRelatorio(){
+  if(!praiaAtual) return;
+  const box=document.getElementById('relBox');
+  document.getElementById('modalRel').style.display='block';
+  box.innerHTML=`<h2>📊 Relatório - ${praiaAtual.n}</h2><p>Buscando últimos 10 dias + próximos 10 dias...</p><p><small>${praiaAtual.municipio} - ${praiaAtual.lat.toFixed(3)}, ${praiaAtual.lng.toFixed(3)}</small></p>`;
+  try{
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${praiaAtual.lat}&longitude=${praiaAtual.lng}&past_days=10&forecast_days=10&daily=temperature_2m_max,temperature_2m_min,wind_speed_10m_max,precipitation_sum,weather_code&timezone=America/Bahia`;
+    const r=await fetch(url); const j=await r.json(); const d=j.daily;
+    let html=`<h2>📊 Relatório Completo - ${praiaAtual.n}</h2>
+    <p><b>${praiaAtual.municipio}</b> | ${praiaAtual.lat.toFixed(3)}, ${praiaAtual.lng.toFixed(3)} | ${praiaAtual.tipo}</p>
+    <button class="btn-rel btn-pdf" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+    <button class="btn-rel btn-csv" onclick="baixarCSV()">📥 Baixar CSV (Excel)</button>
+    <button class="btn-rel btn-reset" onclick="document.getElementById('modalRel').style.display='none'">Fechar</button>
+    <h3>Últimos 10 dias (Passado)</h3><table><tr><th>Data</th><th>Máx</th><th>Mín</th><th>Vento</th><th>Chuva</th><th>Pesca</th></tr>`;
+    for(let i=0;i<10;i++){
+      const data=d.time[i]; const max=d.temperature_2m_max[i]; const min=d.temperature_2m_min[i]; const vento=d.wind_speed_10m_max[i]; const chuva=d.precipitation_sum[i];
+      const pes=vento<15?"BOA":vento<25?"MÉDIA":"RUIM";
+      html+=`<tr><td>${data.split('-').reverse().join('/')}</td><td>${max}°C</td><td>${min}°C</td><td>${vento}km/h</td><td>${chuva}mm</td><td>${pes}</td></tr>`;
+    }
+    html+=`</table><h3>Próximos 10 dias (Previsão)</h3><table><tr><th>Data</th><th>Máx</th><th>Mín</th><th>Vento</th><th>Chuva</th><th>Navegação</th></tr>`;
+    for(let i=10;i<d.time.length;i++){
+      const data=d.time[i]; const max=d.temperature_2m_max[i]; const min=d.temperature_2m_min[i]; const vento=d.wind_speed_10m_max[i]; const chuva=d.precipitation_sum[i];
+      const nav=vento<15?"FAVORÁVEL":vento<25?"ATENÇÃO":"DESFAVORÁVEL";
+      html+=`<tr style="${i==10?'background:#e8f6ff;font-weight:bold':''}"><td>${data.split('-').reverse().join('/')}${i==10?' (HOJE)':''}</td><td>${max}°C</td><td>${min}°C</td><td>${vento}km/h</td><td>${chuva}mm</td><td>${nav}</td></tr>`;
+    }
+    html+=`</table><p><small>Fonte: Open-Meteo / INMET - Gerado em ${new Date().toLocaleString('pt-BR')}</small></p>`;
+    box.innerHTML=html;
+    window._ultimoRelatorio=d;
+  }catch(e){ box.innerHTML+=`<p style="color:red">Erro ao buscar dados. Tente novamente com internet.</p>`; }
 }
+function baixarCSV(){
+  if(!window._ultimoRelatorio) return;
+  const d=window._ultimoRelatorio;
+  let csv="Data,Temp Max,Temp Min,Vento Max,Chuva,Praia\n";
+  for(let i=0;i<d.time.length;i++){ csv+=`${d.time[i]},${d.temperature_2m_max[i]},${d.temperature_2m_min[i]},${d.wind_speed_10m_max[i]},${d.precipitation_sum[i]},${praiaAtual.n}\n`; }
+  const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`relatorio-${praiaAtual.n.replace(/ /g,'_')}-${new Date().toISOString().split('T')[0]}.csv`; a.click();
+}
+
 async function mostrarInfo(p){
+  praiaAtual=p;
   const panel=document.getElementById('infoPanel');
-  panel.innerHTML=`<b>⏳ Buscando tempo real de ${p.n}...</b><br><small>${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}</small>`;
-  const tempo=await buscarTempoReal(p.lat,p.lng);
-  const mare=calculaMare();
-  let html=`<b>${p.n}</b> <span class="tag" style="background:${p.cor}">${p.costa}</span><br>
-  <b>Município:</b> ${p.municipio}<br>
-  <b>Coord:</b> ${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}<br>
-  <b>Tipo:</b> ${p.tipo} | <b>Ext:</b> ${p.ext}<br>
-  <small>${p.desc}</small>
+  panel.innerHTML=`<b>⏳ Buscando tempo real de ${p.n}...</b>`;
+  const tempo=await buscarTempoReal(p.lat,p.lng); const mare=calculaMare();
+  let html=`<b>${p.n}</b> <span style="background:${p.cor};color:#fff;padding:2px 6px;border-radius:10px;font-size:10px">${p.costa}</span><br>
+  <b>${p.municipio}</b> | ${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}<br><small>${p.desc}</small>
   <div class="tempo-real">`;
   if(tempo.ok){
-    const aval=avaliaPescaNaveg(tempo.vento,tempo.temp);
-    html+=`<b>🌡️ AGORA AO VIVO:</b><br>
-    ${tempo.cond} - <b>${tempo.temp}°C</b><br>
-    💨 Vento: ${tempo.vento} km/h - Dir ${tempo.dir}°<br>
-    💧 Umidade: ${tempo.umid}%<br>
-    🌊 Maré: ${mare.altura}m - ${mare.estado}<br>
-    ⏰ ${mare.proxima}<br><br>
-    🐟 Pesca: <span class="badge ${aval.pescaClass}">${aval.pesca}</span><br>
-    ⛵ Navegação: <span class="badge ${aval.navClass}">${aval.nav}</span><br>
-    <small style="color:#555">Fonte: Open-Meteo + Marinha - Atualizado: ${new Date().toLocaleTimeString('pt-BR')}</small>`;
-  } else {
-    html+=`Tempo real offline, mas:<br>
-    🌊 Maré: ${mare.altura}m - ${mare.estado}<br>
-    <small>Sem internet no momento</small>`;
-  }
-  html+=`</div>${p.real ? '<div style="margin-top:6px;color:red;font-weight:bold">★ PONTO REAL DE REFERÊNCIA OFICIAL</div>' : ''}`;
+    const av=avalia(tempo.vento);
+    html+=`<b>🌡️ AO VIVO: ${tempo.temp}°C - ${tempo.cond}</b><br>💨 Vento: ${tempo.vento} km/h<br>🌊 Maré: ${mare.altura}m - ${mare.estado}<br>🐟 Pesca: <span class="badge ${av.c}">BOA - ${av.p}</span> | ⛵ <span class="badge ${av.nc}">${av.n}</span><br><small>${new Date().toLocaleTimeString('pt-BR')}</small>`;
+  } else html+=`🌊 Maré: ${mare.altura}m - ${mare.estado}`;
+  html+=`</div><button class="btn-rel" onclick="gerarRelatorio()">📊 GERAR RELATÓRIO 10 DIAS PASSADOS + 10 DIAS FUTURO</button>${p.real?'<div style="color:red;font-weight:bold;margin-top:5px">★ PONTO REAL OFICIAL</div>':''}`;
   panel.innerHTML=html;
 }
 function criarMarcadores(lista){
-  grupo.clearLayers(); marcadores=[];
+  grupo.clearLayers();
   lista.forEach(p=>{
-    let raio=p.real?15:7; let peso=p.real?4:1;
-    let m=L.circleMarker([p.lat,p.lng],{radius:raio,fillColor:p.cor,color:"#fff",weight:peso,fillOpacity:0.9}).addTo(grupo);
+    let m=L.circleMarker([p.lat,p.lng],{radius:p.real?14:7,fillColor:p.cor,color:"#fff",weight:p.real?3:1,fillOpacity:0.9}).addTo(grupo);
     m.on('click',()=>mostrarInfo(p));
-    if(p.real){ m.bindPopup(`<b>${p.n}</b><br>PONTO REAL`).openPopup(); }
-    marcadores.push({marker:m,dados:p});
   });
   document.getElementById('contador').innerText=lista.length;
 }
-function filtrarCosta(costa){ let f=praias.filter(p=>p.costa===costa); criarMarcadores(f); if(f.length){ let ml=f.reduce((a,b)=>a+b.lat,0)/f.length; let mL=f.reduce((a,b)=>a+b.lng,0)/f.length; map.setView([ml,mL],9);} }
-function filtrarBusca(){ let t=document.getElementById('busca').value.toLowerCase(); let f=praias.filter(p=>p.n.toLowerCase().includes(t)||p.municipio.toLowerCase().includes(t)); criarMarcadores(f); }
-function irItapua(){ let it=praias.find(p=>p.real); map.setView([it.lat,it.lng],14); mostrarInfo(it); }
-function resetar(){ document.getElementById('busca').value=""; criarMarcadores(praias); map.setView([-14.5,-39.0],7); }
+function filtrarCosta(c){let f=praias.filter(p=>p.costa===c);criarMarcadores(f);if(f.length){map.setView([f.reduce((a,b)=>a+b.lat,0)/f.length,f.reduce((a,b)=>a+b.lng,0)/f.length],9);}}
+function filtrarBusca(){let t=document.getElementById('busca').value.toLowerCase();criarMarcadores(praias.filter(p=>p.n.toLowerCase().includes(t)||p.municipio.toLowerCase().includes(t)));}
+function irItapua(){let it=praias.find(p=>p.real);map.setView([it.lat,it.lng],14);mostrarInfo(it);}
+function resetar(){document.getElementById('busca').value="";criarMarcadores(praias);map.setView([-14.5,-39.0],7);}
 criarMarcadores(praias);
 </script>
 </body>
