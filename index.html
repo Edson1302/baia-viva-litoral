@@ -39,9 +39,7 @@
 </div>
 <div id="map"></div>
 <div class="info-panel" id="infoPanel"><b>Clique em uma praia</b><br>Vai aparecer tempo real + botão de relatório.</div>
-
 <div class="relatorio-modal" id="modalRel"><div class="relatorio-box" id="relBox"></div></div>
-
 <script>
 const praias=[
 {n:"Mangue Seco",lat:-11.44,lng:-37.34,costa:"Coqueiros",cor:"#e67e22",municipio:"Jandaíra",tipo:"Oceânica dunas",ext:"5km",desc:"Dunas Tieta"},
@@ -88,7 +86,6 @@ let map=L.map('map').setView([-14.5,-39.0],7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OSM | Baía Viva 10.0'}).addTo(map);
 let grupo=L.layerGroup().addTo(map);
 let praiaAtual=null;
-
 async function buscarTempoReal(lat,lng){
   try{
     const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,wind_speed_10m,wind_direction_10m,weather_code,relative_humidity_2m&timezone=America/Bahia`;
@@ -104,70 +101,35 @@ function calculaMare(){
   return {altura,estado,proxima:fase<6?"Cheia em "+(6-fase).toFixed(1)+"h":"Baixa em "+(12.4-fase).toFixed(1)+"h"};
 }
 function avalia(vento){return vento<15?{p:"BOA",c:"badge-ok",n:"FAVORÁVEL",nc:"badge-ok"}:vento<25?{p:"MÉDIA",c:"badge-atencao",n:"ATENÇÃO",nc:"badge-atencao"}:{p:"RUIM",c:"badge-ruim",n:"DESFAVORÁVEL",nc:"badge-ruim"};}
-
-// NOVA FUNÇÃO - RELATÓRIO 10+10 DIAS
 async function gerarRelatorio(){
   if(!praiaAtual) return;
   const box=document.getElementById('relBox');
   document.getElementById('modalRel').style.display='block';
-  box.innerHTML=`<h2>📊 Relatório - ${praiaAtual.n}</h2><p>Buscando últimos 10 dias + próximos 10 dias...</p><p><small>${praiaAtual.municipio} - ${praiaAtual.lat.toFixed(3)}, ${praiaAtual.lng.toFixed(3)}</small></p>`;
+  box.innerHTML=`<h2>📊 Relatório - ${praiaAtual.n}</h2><p>Buscando últimos 10 dias + próximos 10 dias...</p>`;
   try{
     const url=`https://api.open-meteo.com/v1/forecast?latitude=${praiaAtual.lat}&longitude=${praiaAtual.lng}&past_days=10&forecast_days=10&daily=temperature_2m_max,temperature_2m_min,wind_speed_10m_max,precipitation_sum,weather_code&timezone=America/Bahia`;
     const r=await fetch(url); const j=await r.json(); const d=j.daily;
-    let html=`<h2>📊 Relatório Completo - ${praiaAtual.n}</h2>
-    <p><b>${praiaAtual.municipio}</b> | ${praiaAtual.lat.toFixed(3)}, ${praiaAtual.lng.toFixed(3)} | ${praiaAtual.tipo}</p>
-    <button class="btn-rel btn-pdf" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
-    <button class="btn-rel btn-csv" onclick="baixarCSV()">📥 Baixar CSV (Excel)</button>
-    <button class="btn-rel btn-reset" onclick="document.getElementById('modalRel').style.display='none'">Fechar</button>
-    <h3>Últimos 10 dias (Passado)</h3><table><tr><th>Data</th><th>Máx</th><th>Mín</th><th>Vento</th><th>Chuva</th><th>Pesca</th></tr>`;
-    for(let i=0;i<10;i++){
-      const data=d.time[i]; const max=d.temperature_2m_max[i]; const min=d.temperature_2m_min[i]; const vento=d.wind_speed_10m_max[i]; const chuva=d.precipitation_sum[i];
-      const pes=vento<15?"BOA":vento<25?"MÉDIA":"RUIM";
-      html+=`<tr><td>${data.split('-').reverse().join('/')}</td><td>${max}°C</td><td>${min}°C</td><td>${vento}km/h</td><td>${chuva}mm</td><td>${pes}</td></tr>`;
-    }
+    let html=`<h2>📊 Relatório Completo - ${praiaAtual.n}</h2><p><b>${praiaAtual.municipio}</b> | ${praiaAtual.lat.toFixed(3)}, ${praiaAtual.lng.toFixed(3)}</p><button class="btn-rel btn-pdf" onclick="window.print()">🖨️ Imprimir / PDF</button><button class="btn-rel btn-csv" onclick="baixarCSV()">📥 Baixar CSV</button><button class="btn-rel btn-reset" onclick="document.getElementById('modalRel').style.display='none'">Fechar</button><h3>Últimos 10 dias (Passado)</h3><table><tr><th>Data</th><th>Máx</th><th>Mín</th><th>Vento</th><th>Chuva</th><th>Pesca</th></tr>`;
+    for(let i=0;i<10;i++){ const pes=d.wind_speed_10m_max[i]<15?"BOA":d.wind_speed_10m_max[i]<25?"MÉDIA":"RUIM"; html+=`<tr><td>${d.time[i].split('-').reverse().join('/')}</td><td>${d.temperature_2m_max[i]}°C</td><td>${d.temperature_2m_min[i]}°C</td><td>${d.wind_speed_10m_max[i]}km/h</td><td>${d.precipitation_sum[i]}mm</td><td>${pes}</td></tr>`; }
     html+=`</table><h3>Próximos 10 dias (Previsão)</h3><table><tr><th>Data</th><th>Máx</th><th>Mín</th><th>Vento</th><th>Chuva</th><th>Navegação</th></tr>`;
-    for(let i=10;i<d.time.length;i++){
-      const data=d.time[i]; const max=d.temperature_2m_max[i]; const min=d.temperature_2m_min[i]; const vento=d.wind_speed_10m_max[i]; const chuva=d.precipitation_sum[i];
-      const nav=vento<15?"FAVORÁVEL":vento<25?"ATENÇÃO":"DESFAVORÁVEL";
-      html+=`<tr style="${i==10?'background:#e8f6ff;font-weight:bold':''}"><td>${data.split('-').reverse().join('/')}${i==10?' (HOJE)':''}</td><td>${max}°C</td><td>${min}°C</td><td>${vento}km/h</td><td>${chuva}mm</td><td>${nav}</td></tr>`;
-    }
-    html+=`</table><p><small>Fonte: Open-Meteo / INMET - Gerado em ${new Date().toLocaleString('pt-BR')}</small></p>`;
-    box.innerHTML=html;
-    window._ultimoRelatorio=d;
-  }catch(e){ box.innerHTML+=`<p style="color:red">Erro ao buscar dados. Tente novamente com internet.</p>`; }
+    for(let i=10;i<d.time.length;i++){ const nav=d.wind_speed_10m_max[i]<15?"FAVORÁVEL":d.wind_speed_10m_max[i]<25?"ATENÇÃO":"DESFAVORÁVEL"; html+=`<tr style="${i==10?'background:#e8f6ff;font-weight:bold':''}"><td>${d.time[i].split('-').reverse().join('/')}${i==10?' (HOJE)':''}</td><td>${d.temperature_2m_max[i]}°C</td><td>${d.temperature_2m_min[i]}°C</td><td>${d.wind_speed_10m_max[i]}km/h</td><td>${d.precipitation_sum[i]}mm</td><td>${nav}</td></tr>`; }
+    html+=`</table><p><small>Fonte: Open-Meteo / INMET - ${new Date().toLocaleString('pt-BR')}</small></p>`; box.innerHTML=html; window._ultimoRelatorio=d;
+  }catch(e){ box.innerHTML+=`<p style="color:red">Erro ao buscar dados.</p>`; }
 }
 function baixarCSV(){
   if(!window._ultimoRelatorio) return;
-  const d=window._ultimoRelatorio;
-  let csv="Data,Temp Max,Temp Min,Vento Max,Chuva,Praia\n";
+  const d=window._ultimoRelatorio; let csv="Data,Temp Max,Temp Min,Vento,Chuva,Praia\n";
   for(let i=0;i<d.time.length;i++){ csv+=`${d.time[i]},${d.temperature_2m_max[i]},${d.temperature_2m_min[i]},${d.wind_speed_10m_max[i]},${d.precipitation_sum[i]},${praiaAtual.n}\n`; }
-  const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download=`relatorio-${praiaAtual.n.replace(/ /g,'_')}-${new Date().toISOString().split('T')[0]}.csv`; a.click();
+  const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`relatorio-${praiaAtual.n}.csv`; a.click();
 }
-
 async function mostrarInfo(p){
-  praiaAtual=p;
-  const panel=document.getElementById('infoPanel');
-  panel.innerHTML=`<b>⏳ Buscando tempo real de ${p.n}...</b>`;
+  praiaAtual=p; const panel=document.getElementById('infoPanel'); panel.innerHTML=`<b>⏳ Buscando tempo real de ${p.n}...</b>`;
   const tempo=await buscarTempoReal(p.lat,p.lng); const mare=calculaMare();
-  let html=`<b>${p.n}</b> <span style="background:${p.cor};color:#fff;padding:2px 6px;border-radius:10px;font-size:10px">${p.costa}</span><br>
-  <b>${p.municipio}</b> | ${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}<br><small>${p.desc}</small>
-  <div class="tempo-real">`;
-  if(tempo.ok){
-    const av=avalia(tempo.vento);
-    html+=`<b>🌡️ AO VIVO: ${tempo.temp}°C - ${tempo.cond}</b><br>💨 Vento: ${tempo.vento} km/h<br>🌊 Maré: ${mare.altura}m - ${mare.estado}<br>🐟 Pesca: <span class="badge ${av.c}">BOA - ${av.p}</span> | ⛵ <span class="badge ${av.nc}">${av.n}</span><br><small>${new Date().toLocaleTimeString('pt-BR')}</small>`;
-  } else html+=`🌊 Maré: ${mare.altura}m - ${mare.estado}`;
-  html+=`</div><button class="btn-rel" onclick="gerarRelatorio()">📊 GERAR RELATÓRIO 10 DIAS PASSADOS + 10 DIAS FUTURO</button>${p.real?'<div style="color:red;font-weight:bold;margin-top:5px">★ PONTO REAL OFICIAL</div>':''}`;
-  panel.innerHTML=html;
+  let html=`<b>${p.n}</b> <span style="background:${p.cor};color:#fff;padding:2px 6px;border-radius:10px;font-size:10px">${p.costa}</span><br><b>${p.municipio}</b> | ${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}<br><small>${p.desc}</small><div class="tempo-real">`;
+  if(tempo.ok){ const av=avalia(tempo.vento); html+=`<b>🌡️ AO VIVO: ${tempo.temp}°C - ${tempo.cond}</b><br>💨 Vento: ${tempo.vento} km/h<br>🌊 Maré: ${mare.altura}m - ${mare.estado}<br>🐟 Pesca: <span class="badge ${av.c}">${av.p}</span> | ⛵ <span class="badge ${av.nc}">${av.n}</span><br><small>${new Date().toLocaleTimeString('pt-BR')}</small>`; } else html+=`🌊 Maré: ${mare.altura}m - ${mare.estado}`;
+  html+=`</div><button class="btn-rel" onclick="gerarRelatorio()">📊 GERAR RELATÓRIO 10 DIAS PASSADOS + 10 DIAS FUTURO</button>${p.real?'<div style="color:red;font-weight:bold;margin-top:5px">★ PONTO REAL OFICIAL</div>':''}`; panel.innerHTML=html;
 }
-function criarMarcadores(lista){
-  grupo.clearLayers();
-  lista.forEach(p=>{
-    let m=L.circleMarker([p.lat,p.lng],{radius:p.real?14:7,fillColor:p.cor,color:"#fff",weight:p.real?3:1,fillOpacity:0.9}).addTo(grupo);
-    m.on('click',()=>mostrarInfo(p));
-  });
-  document.getElementById('contador').innerText=lista.length;
-}
+function criarMarcadores(lista){ grupo.clearLayers(); lista.forEach(p=>{ let m=L.circleMarker([p.lat,p.lng],{radius:p.real?14:7,fillColor:p.cor,color:"#fff",weight:p.real?3:1,fillOpacity:0.9}).addTo(grupo); m.on('click',()=>mostrarInfo(p)); }); document.getElementById('contador').innerText=lista.length; }
 function filtrarCosta(c){let f=praias.filter(p=>p.costa===c);criarMarcadores(f);if(f.length){map.setView([f.reduce((a,b)=>a+b.lat,0)/f.length,f.reduce((a,b)=>a+b.lng,0)/f.length],9);}}
 function filtrarBusca(){let t=document.getElementById('busca').value.toLowerCase();criarMarcadores(praias.filter(p=>p.n.toLowerCase().includes(t)||p.municipio.toLowerCase().includes(t)));}
 function irItapua(){let it=praias.find(p=>p.real);map.setView([it.lat,it.lng],14);mostrarInfo(it);}
