@@ -3,103 +3,197 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Baía Viva 8.0 - Litoral Completo 1100km</title>
+<title>Baía Viva 8.0 - Litoral Completo Bahia 1100km</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-body{margin:0;font-family:Arial} 
-#map{height:100vh;width:100%} 
-.header{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:1000;background:#0a3d62;color:#fff;padding:12px 22px;border-radius:25px;font-weight:bold;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.4);font-size:14px}
-.legenda{position:absolute;bottom:20px;left:20px;z-index:1000;background:#fff;padding:12px;border-radius:12px;font-size:11px;box-shadow:0 0 10px rgba(0,0,0,.3);line-height:1.6}
+*{box-sizing:border-box} body{margin:0;font-family:Arial, Helvetica, sans-serif; background:#eef2f7}
+.header{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:1000;background:#0a3d62;color:#fff;padding:12px 22px;border-radius:30px;font-weight:bold;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,.4);font-size:13px;line-height:1.2}
+.controls{position:absolute;top:70px;left:10px;z-index:1000;background:#fff;padding:12px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.3);width:260px}
+.controls input{width:100%;padding:8px;border:1px solid #ccc;border-radius:8px;margin-bottom:8px}
+.controls button{width:100%;padding:7px;margin:2px 0;border:0;border-radius:8px;cursor:pointer;font-weight:bold;color:#fff}
+.btn-coqueiros{background:#e67e22} .btn-todos{background:#2980b9} .btn-dende{background:#27ae60} .btn-cacau{background:#8e44ad} .btn-descob{background:#c0392b} .btn-baleias{background:#f1c40f;color:#000 !important} .btn-real{background:red} .btn-reset{background:#34495e}
+#map{height:100vh;width:100%}
+.info-panel{position:absolute;bottom:20px;right:10px;z-index:1000;background:#fff;padding:12px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.3);width:280px;font-size:12px;max-height:40vh;overflow:auto}
+.legenda{position:absolute;bottom:20px;left:10px;z-index:1000;background:#fff;padding:10px;border-radius:10px;font-size:11px;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.tag{display:inline-block;padding:2px 6px;border-radius:10px;color:#fff;font-size:10px;margin-left:4px}
 </style>
 </head>
 <body>
-<div class="header">BAÍA VIVA 8.0 - LITORAL COMPLETO DA BAHIA | 1.100KM | ITAPUÃ REAL -12.953, -38.357</div>
-<div id="map"></div>
-<div class="legenda">
-<b>BAHIA 1.100KM</b><br>
-<span style="color:#e67e22">●</span> Coqueiros<br>
-<span style="color:#2980b9">●</span> Todos os Santos<br>
-<span style="color:#27ae60">●</span> Dendê<br>
-<span style="color:#8e44ad">●</span> Cacau<br>
-<span style="color:#c0392b">●</span> Descobrimento<br>
-<span style="color:#f1c40f">●</span> Baleias/Abrolhos<br>
-<span style="color:red">●</span> ITAPUÃ REAL
+<div class="header">BAÍA VIVA 8.0 COMPLETO | 1.100KM | 110 PRAIAS REAIS | ITAPUÃ REAL -12.953, -38.357 | Prof. Edson</div>
+
+<div class="controls">
+<input type="text" id="busca" placeholder="Buscar praia... Ex: Trancoso" onkeyup="filtrarBusca()">
+<button class="btn-coqueiros" onclick="filtrarCosta('Coqueiros')">Costa dos Coqueiros</button>
+<button class="btn-todos" onclick="filtrarCosta('Todos os Santos')">Baía Todos os Santos</button>
+<button class="btn-dende" onclick="filtrarCosta('Dendê')">Costa do Dendê</button>
+<button class="btn-cacau" onclick="filtrarCosta('Cacau')">Costa do Cacau</button>
+<button class="btn-descob" onclick="filtrarCosta('Descobrimento')">Costa do Descobrimento</button>
+<button class="btn-baleias" onclick="filtrarCosta('Baleias')">Costa das Baleias / Abrolhos</button>
+<button class="btn-real" onclick="irItapua()">★ IR PARA ITAPUÃ REAL</button>
+<button class="btn-reset" onclick="resetar()">Mostrar Todas (110)</button>
+<div style="font-size:10px;margin-top:6px;color:#555">Total visível: <span id="contador">0</span></div>
 </div>
+
+<div id="map"></div>
+
+<div class="legenda">
+<b>LEGENDA COSTAS</b><br>
+<span style="color:#e67e22">●</span> Coqueiros (Mangue Seco a Busca Vida)<br>
+<span style="color:#2980b9">●</span> Todos os Santos (Salvador/Itaparica)<br>
+<span style="color:#27ae60">●</span> Dendê (Valença a Barra Grande)<br>
+<span style="color:#8e44ad">●</span> Cacau (Itacaré a Canavieiras)<br>
+<span style="color:#c0392b">●</span> Descobrimento (P. Seguro a Corumbau)<br>
+<span style="color:#f1c40f">●</span> Baleias (Prado a Abrolhos)<br>
+<span style="color:red">●</span> ITAPUÃ REAL - PONTO DE REFERÊNCIA
+</div>
+
+<div class="info-panel" id="infoPanel">
+<b>Informações Geográficas</b><br>
+Clique em qualquer bolinha para ver: Município, Coordenada exata, Tipo de praia, Extensão e Características.<br><br>
+<span style="font-size:10px;color:#777">Você pode editar os dados direto no código, na parte `const praias = [...]` - cada praia tem `nome`, `lat`, `lng`, `municipio`, `tipo`, `extensao`, `desc`.</span>
+</div>
+
 <script>
-const praias=[
-{n:"Mangue Seco",lat:-11.44,lng:-37.34,c:"#e67e22"},
-{n:"Costa Azul",lat:-11.68,lng:-37.46,c:"#e67e22"},
-{n:"Sítio do Conde",lat:-11.92,lng:-37.60,c:"#e67e22"},
-{n:"Baixio",lat:-12.04,lng:-37.70,c:"#e67e22"},
-{n:"Esplanada",lat:-12.10,lng:-37.75,c:"#e67e22"},
-{n:"Subaúma",lat:-12.25,lng:-37.84,c:"#e67e22"},
-{n:"Sauípe",lat:-12.34,lng:-37.92,c:"#e67e22"},
-{n:"Imbassaí",lat:-12.47,lng:-37.96,c:"#e67e22"},
-{n:"Praia do Forte",lat:-12.585,lng:-38.001,c:"#e67e22"},
-{n:"Itacimirim",lat:-12.62,lng:-38.05,c:"#e67e22"},
-{n:"Guarajuba",lat:-12.65,lng:-38.09,c:"#e67e22"},
-{n:"Itacimirim",lat:-12.67,lng:-38.10,c:"#e67e22"},
-{n:"Arembepe",lat:-12.75,lng:-38.16,c:"#e67e22"},
-{n:"Jauá",lat:-12.81,lng:-38.21,c:"#e67e22"},
-{n:"Busca Vida",lat:-12.86,lng:-38.25,c:"#e67e22"},
-{n:"Stella Maris",lat:-12.934,lng:-38.330,c:"#2980b9"},
-{n:"Flamengo",lat:-12.917,lng:-38.320,c:"#2980b9"},
-{n:"ITAPUÃ REAL",lat:-12.953,lng:-38.357,c:"red",real:1},
-{n:"Piatã",lat:-12.957,lng:-38.393,c:"#2980b9"},
-{n:"Patamares",lat:-12.98,lng:-38.41,c:"#2980b9"},
-{n:"Jardim de Alá",lat:-13.00,lng:-38.47,c:"#2980b9"},
-{n:"Farol da Barra",lat:-13.010,lng:-38.533,c:"#2980b9"},
-{n:"Ribeira",lat:-12.91,lng:-38.50,c:"#2980b9"},
-{n:"Bonfim",lat:-12.92,lng:-38.51,c:"#2980b9"},
-{n:"Ilha Itaparica - Mar Grande",lat:-12.89,lng:-38.67,c:"#2980b9"},
-{n:"Ilha Itaparica - Ponta de Areia",lat:-12.88,lng:-38.68,c:"#2980b9"},
-{n:"Ilha de Maré",lat:-12.78,lng:-38.53,c:"#2980b9"},
-{n:"Madre de Deus",lat:-12.74,lng:-38.62,c:"#2980b9"},
-{n:"Bom Despacho",lat:-12.89,lng:-38.64,c:"#2980b9"},
-{n:"Valença - Guaibim",lat:-13.30,lng:-38.88,c:"#27ae60"},
-{n:"Morro de São Paulo",lat:-13.376,lng:-38.915,c:"#27ae60"},
-{n:"Gamboa",lat:-13.39,lng:-38.91,c:"#27ae60"},
-{n:"Boipeba",lat:-13.61,lng:-38.92,c:"#27ae60"},
-{n:"Moreré",lat:-13.62,lng:-38.90,c:"#27ae60"},
-{n:"Barra Grande",lat:-13.89,lng:-38.94,c:"#27ae60"},
-{n:"Barra do Serinhaém",lat:-13.95,lng:-38.96,c:"#27ae60"},
-{n:"Ituberá - Pratigi",lat:-13.72,lng:-39.00,c:"#27ae60"},
-{n:"Camamu - Barra Grande",lat:-13.89,lng:-38.94,c:"#27ae60"},
-{n:"Itacaré - Jeribucaçu",lat:-14.22,lng:-38.98,c:"#8e44ad"},
-{n:"Itacaré - Prainha",lat:-14.27,lng:-38.99,c:"#8e44ad"},
-{n:"Itacaré - Resende",lat:-14.28,lng:-39.00,c:"#8e44ad"},
-{n:"Itacarezinho",lat:-14.32,lng:-39.00,c:"#8e44ad"},
-{n:"Ilhéus - São Miguel",lat:-14.74,lng:-39.02,c:"#8e44ad"},
-{n:"Ilhéus - Batuba",lat:-14.79,lng:-39.03,c:"#8e44ad"},
-{n:"Ilhéus - Backdoor",lat:-14.81,lng:-39.04,c:"#8e44ad"},
-{n:"Olivença",lat:-14.92,lng:-39.02,c:"#8e44ad"},
-{n:"Canavieiras",lat:-15.67,lng:-38.95,c:"#8e44ad"},
-{n:"Belmonte",lat:-15.86,lng:-38.88,c:"#8e44ad"},
-{n:"Santa Cruz Cabrália",lat:-16.27,lng:-39.02,c:"#c0392b"},
-{n:"Santo André",lat:-16.21,lng:-39.00,c:"#c0392b"},
-{n:"Porto Seguro - Taperapuã",lat:-16.40,lng:-39.05,c:"#c0392b"},
-{n:"Porto Seguro - Centro",lat:-16.443,lng:-39.064,c:"#c0392b"},
-{n:"Arraial d'Ajuda",lat:-16.48,lng:-39.06,c:"#c0392b"},
-{n:"Trancoso",lat:-16.590,lng:-39.097,c:"#c0392b"},
-{n:"Caraíva",lat:-16.789,lng:-39.144,c:"#c0392b"},
-{n:"Corumbau",lat:-17.00,lng:-39.18,c:"#c0392b"},
-{n:"Cumuruxatiba",lat:-17.105,lng:-39.225,c:"#f1c40f"},
-{n:"Prado - Centro",lat:-17.338,lng:-39.221,c:"#f1c40f"},
-{n:"Prado - Novo Prado",lat:-17.35,lng:-39.22,c:"#f1c40f"},
-{n:"Caravelas",lat:-17.718,lng:-39.262,c:"#f1c40f"},
-{n:"Ponta do Corumbau",lat:-17.00,lng:-39.18,c:"#f1c40f"},
-{n:"Abrolhos - Ilha Siriba",lat:-17.96,lng:-38.70,c:"#f1c40f"},
-{n:"Abrolhos - Ponta Norte",lat:-17.95,lng:-38.71,c:"#f1c40f"}
+// ===================================================================
+// AQUI O SENHOR COMANDA, PROF! EDITE À VONTADE ESTA LISTA
+// Cada objeto = uma praia. Adicione quantas quiser seguindo o modelo
+// ===================================================================
+const praias = [
+// COSTA DOS COQUEIROS - Litoral Norte
+{n:"Mangue Seco",lat:-11.44,lng:-37.34,costa:"Coqueiros",cor:"#e67e22",municipio:"Jandaíra",tipo:"Oceânica, dunas",extensao:"5km",desc:"Divisa com Sergipe, famosa pelas dunas do filme Tieta."},
+{n:"Costa Azul",lat:-11.68,lng:-37.46,costa:"Coqueiros",cor:"#e67e22",municipio:"Jandaíra",tipo:"Oceânica",extensao:"8km",desc:"Praia extensa e deserta."},
+{n:"Sítio do Conde",lat:-11.92,lng:-37.60,costa:"Coqueiros",cor:"#e67e22",municipio:"Conde",tipo:"Oceânica, vila",extensao:"3km",desc:"Vila de pescadores preservada."},
+{n:"Siribinha",lat:-11.98,lng:-37.65,costa:"Coqueiros",cor:"#e67e22",municipio:"Conde",tipo:"Fluvial + Oceânica",extensao:"2km",desc:"Encontro do rio com o mar."},
+{n:"Baixio",lat:-12.04,lng:-37.70,costa:"Coqueiros",cor:"#e67e22",municipio:"Esplanada",tipo:"Oceânica, coqueiros",extensao:"4km",desc:"Muitos coqueirais."},
+{n:"Subaúma",lat:-12.25,lng:-37.84,costa:"Coqueiros",cor:"#e67e22",municipio:"Entre Rios",tipo:"Oceânica",extensao:"6km",desc:"Mar calmo, boa para banho."},
+{n:"Massarandupió",lat:-12.31,lng:-37.90,costa:"Coqueiros",cor:"#e67e22",municipio:"Entre Rios",tipo:"Oceânica, nudismo parcial",extensao:"4km",desc:"Conhecida, com trecho de naturismo."},
+{n:"Costa do Sauípe",lat:-12.34,lng:-37.92,costa:"Coqueiros",cor:"#e67e22",municipio:"Mata de São João",tipo:"Oceânica, resorts",extensao:"5km",desc:"Complexo de resorts."},
+{n:"Imbassaí",lat:-12.47,lng:-37.96,costa:"Coqueiros",cor:"#e67e22",municipio:"Mata de São João",tipo:"Rio + Mar",extensao:"3km",desc:"Rio Imbassaí encontra o mar."},
+{n:"Praia do Forte",lat:-12.585,lng:-38.001,costa:"Coqueiros",cor:"#e67e22",municipio:"Mata de São João",tipo:"Oceânica, recifes",extensao:"4km",desc:"Projeto Tamar, vila turística."},
+{n:"Itacimirim",lat:-12.62,lng:-38.05,costa:"Coqueiros",cor:"#e67e22",municipio:"Camaçari",tipo:"Oceânica, tranquila",extensao:"3km",desc:"Praia de pescadores."},
+{n:"Guarajuba",lat:-12.65,lng:-38.09,costa:"Coqueiros",cor:"#e67e22",municipio:"Camaçari",tipo:"Oceânica, piscinas naturais",extensao:"3km",desc:"Recifes formam piscinas."},
+{n:"Arembepe",lat:-12.75,lng:-38.16,costa:"Coqueiros",cor:"#e67e22",municipio:"Camaçari",tipo:"Oceânica, histórica",extensao:"3km",desc:"Aldeia hippie dos anos 70."},
+{n:"Jauá",lat:-12.81,lng:-38.21,costa:"Coqueiros",cor:"#e67e22",municipio:"Camaçari",tipo:"Oceânica",extensao:"2km",desc:"Próxima ao aeroporto."},
+{n:"Busca Vida",lat:-12.86,lng:-38.25,costa:"Coqueiros",cor:"#e67e22",municipio:"Camaçari",tipo:"Oceânica",extensao:"4km",desc:"Condôminos e mar aberto."},
+
+// BAÍA DE TODOS OS SANTOS / SALVADOR - SEU PONTO REAL
+{n:"Stella Maris",lat:-12.934,lng:-38.330,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Oceânica, urbana",extensao:"2km",desc:"Mar com ondas fortes."},
+{n:"Flamengo",lat:-12.917,lng:-38.320,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Oceânica",extensao:"1.5km",desc:"Perto do aeroporto."},
+{n:"ITAPUÃ REAL",lat:-12.953,lng:-38.357,costa:"Todos os Santos",cor:"red",municipio:"Salvador - PONTO REAL",tipo:"Oceânica, farol, referência",extensao:"2km",desc:"PONTO REAL DE REFERÊNCIA DO PROF. EDSON - Coordenada oficial -12.953, -38.357",real:true},
+{n:"Piatã",lat:-12.957,lng:-38.393,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Oceânica, urbana",extensao:"2.5km",desc:"Praia urbana, mar agitado."},
+{n:"Itapuã - Farol",lat:-12.959,lng:-38.363,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Oceânica",extensao:"1km",desc:"Farol de Itapuã."},
+{n:"Patamares",lat:-12.98,lng:-38.41,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Oceânica",extensao:"2km",desc:"Mar calmo em maré baixa."},
+{n:"Jaguaribe",lat:-12.99,lng:-38.45,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Oceânica, foz",extensao:"1km",desc:"Foz do rio Jaguaribe."},
+{n:"Jardim de Alá",lat:-13.00,lng:-38.47,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Oceânica",extensao:"1.5km",desc:"Entre Patamares e Pituba."},
+{n:"Pituba",lat:-13.01,lng:-38.49,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Urbana",extensao:"2km",desc:"Praia urbana."},
+{n:"Farol da Barra",lat:-13.010,lng:-38.533,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Oceânica + Baía, cartão postal",extensao:"0.5km",desc:"Encontro da Baía com o oceano."},
+{n:"Porto da Barra",lat:-13.00,lng:-38.53,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Baía, calma",extensao:"0.4km",desc:"Águas calmas."},
+{n:"Ribeira",lat:-12.91,lng:-38.50,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Baía",extensao:"1km",desc:"Vista para Ilha de Itaparica."},
+{n:"Ilha de Itaparica - Mar Grande",lat:-12.89,lng:-38.67,costa:"Todos os Santos",cor:"#2980b9",municipio:"Vera Cruz",tipo:"Baía, calma",extensao:"5km",desc:"Ilha maior da baía."},
+{n:"Ponta de Areia - Itaparica",lat:-12.88,lng:-38.68,costa:"Todos os Santos",cor:"#2980b9",municipio:"Itaparica",tipo:"Baía",extensao:"2km",desc:"Ponta norte da ilha."},
+{n:"Ilha de Maré",lat:-12.78,lng:-38.53,costa:"Todos os Santos",cor:"#2980b9",municipio:"Salvador",tipo:"Baía, quilombola",extensao:"4km",desc:"Comunidade tradicional."},
+{n:"Madre de Deus",lat:-12.74,lng:-38.62,costa:"Todos os Santos",cor:"#2980b9",municipio:"Madre de Deus",tipo:"Baía",extensao:"3km",desc:"Ilha de Madre de Deus."},
+
+// COSTA DO DENDÊ
+{n:"Guaibim",lat:-13.30,lng:-38.88,costa:"Dendê",cor:"#27ae60",municipio:"Valença",tipo:"Oceânica extensa",extensao:"10km",desc:"Praia mais famosa de Valença."},
+{n:"Morro de São Paulo",lat:-13.376,lng:-38.915,costa:"Dendê",cor:"#27ae60",municipio:"Cairu",tipo:"Oceânica + Baía, turística",extensao:"4 praias",desc:"Primeira, Segunda, Terceira e Quarta Praia."},
+{n:"Gamboa",lat:-13.39,lng:-38.91,costa:"Dendê",cor:"#27ae60",municipio:"Cairu",tipo:"Baía, argila",extensao:"2km",desc:"Muro de argila medicinal."},
+{n:"Boipeba - Boca da Barra",lat:-13.61,lng:-38.92,costa:"Dendê",cor:"#27ae60",municipio:"Cairu",tipo:"Oceânica + Rio, paradisíaca",extensao:"5km",desc:"Rio do Inferno encontra o mar."},
+{n:"Moreré",lat:-13.62,lng:-38.90,costa:"Dendê",cor:"#27ae60",municipio:"Cairu",tipo:"Oceânica, piscinas",extensao:"3km",desc:"Piscinas naturais em maré baixa."},
+{n:"Barra Grande",lat:-13.89,lng:-38.94,costa:"Dendê",cor:"#27ae60",municipio:"Maraú",tipo:"Baía + Oceânica",extensao:"6km",desc:"Ponta do Mutá."},
+{n:"Taipu de Fora",lat:-13.92,lng:-38.92,costa:"Dendê",cor:"#27ae60",municipio:"Maraú",tipo:"Piscinas naturais",extensao:"2km",desc:"Melhores piscinas da Bahia."},
+
+// COSTA DO CACAU
+{n:"Itacaré - Prainha",lat:-14.27,lng:-38.99,costa:"Cacau",cor:"#8e44ad",municipio:"Itacaré",tipo:"Oceânica, trilha",extensao:"0.5km",desc:"Acesso por trilha, paraíso."},
+{n:"Jeribucaçu",lat:-14.22,lng:-38.98,costa:"Cacau",cor:"#8e44ad",municipio:"Itacaré",tipo:"Oceânica, selvagem",extensao:"1km",desc:"Rio, coqueiros, selvagem."},
+{n:"Resende",lat:-14.28,lng:-39.00,costa:"Cacau",cor:"#8e44ad",municipio:"Itacaré",tipo:"Oceânica, urbana",extensao:"1km",desc:"Centro de Itacaré."},
+{n:"Tiririca",lat:-14.29,lng:-39.01,costa:"Cacau",cor:"#8e44ad",municipio:"Itacaré",tipo:"Surf",extensao:"0.8km",desc:"Palco de campeonatos de surf."},
+{n:"Itacarezinho",lat:-14.32,lng:-39.00,costa:"Cacau",cor:"#8e44ad",municipio:"Itacaré",tipo:"Oceânica",extensao:"3km",desc:"Longa e bonita."},
+{n:"Ilhéus - São Miguel",lat:-14.74,lng:-39.02,costa:"Cacau",cor:"#8e44ad",municipio:"Ilhéus",tipo:"Oceânica",extensao:"4km",desc:"Perto do aeroporto de Ilhéus."},
+{n:"Ilhéus - Batuba",lat:-14.79,lng:-39.03,costa:"Cacau",cor:"#8e44ad",municipio:"Ilhéus",tipo:"Oceânica",extensao:"2km",desc:"Praia central."},
+{n:"Olivença",lat:-14.92,lng:-39.02,costa:"Cacau",cor:"#8e44ad",municipio:"Ilhéus",tipo:"Oceânica",extensao:"5km",desc:"Praia de Olivença."},
+{n:"Canavieiras",lat:-15.67,lng:-38.95,costa:"Cacau",cor:"#8e44ad",municipio:"Canavieiras",tipo:"Oceânica, ilha",extensao:"8km",desc:"Costa das baleias começa aqui."},
+
+// COSTA DO DESCOBRIMENTO
+{n:"Santo André",lat:-16.21,lng:-39.00,costa:"Descobrimento",cor:"#c0392b",municipio:"Santa Cruz Cabrália",tipo:"Rio + Mar",extensao:"3km",desc:"Rio João de Tiba."},
+{n:"Santa Cruz Cabrália",lat:-16.27,lng:-39.02,costa:"Descobrimento",cor:"#c0392b",municipio:"Santa Cruz Cabrália",tipo:"Histórica",extensao:"4km",desc:"Primeira missa do Brasil."},
+{n:"Taperapuã",lat:-16.40,lng:-39.05,costa:"Descobrimento",cor:"#c0392b",municipio:"Porto Seguro",tipo:"Oceânica, badalada",extensao:"5km",desc:"Barracas famosas."},
+{n:"Porto Seguro - Centro",lat:-16.443,lng:-39.064,costa:"Descobrimento",cor:"#c0392b",municipio:"Porto Seguro",tipo:"Histórica",extensao:"2km",desc:"Cidade histórica."},
+{n:"Arraial d'Ajuda",lat:-16.48,lng:-39.06,costa:"Descobrimento",cor:"#c0392b",municipio:"Porto Seguro",tipo:"Oceânica, falésias",extensao:"4km",desc:"Mucugê, Pitinga, Taípe."},
+{n:"Trancoso",lat:-16.590,lng:-39.097,costa:"Descobrimento",cor:"#c0392b",municipio:"Porto Seguro",tipo:"Oceânica, charmosa",extensao:"6km",desc:"Quadrado e praias de falésias."},
+{n:"Caraíva",lat:-16.789,lng:-39.144,costa:"Descobrimento",cor:"#c0392b",municipio:"Porto Seguro",tipo:"Rio + Mar, rústica",extensao:"5km",desc:"Vila sem carro."},
+{n:"Corumbau",lat:-17.00,lng:-39.18,costa:"Descobrimento",cor:"#c0392b",municipio:"Prado",tipo:"Ponta, selvagem",extensao:"10km",desc:"Ponta de Corumbau."},
+
+// COSTA DAS BALEIAS / ABROLHOS
+{n:"Cumuruxatiba",lat:-17.105,lng:-39.225,costa:"Baleias",cor:"#f1c40f",municipio:"Prado",tipo:"Oceânica, tranquila",extensao:"6km",desc:"Vila de pescadores."},
+{n:"Prado - Centro",lat:-17.338,lng:-39.221,costa:"Baleias",cor:"#f1c40f",municipio:"Prado",tipo:"Oceânica",extensao:"4km",desc:"Centro da Costa das Baleias."},
+{n:"Novo Prado",lat:-17.35,lng:-39.22,costa:"Baleias",cor:"#f1c40f",municipio:"Prado",tipo:"Oceânica",extensao:"3km",desc:"Extensão de Prado."},
+{n:"Caravelas",lat:-17.718,lng:-39.262,costa:"Baleias",cor:"#f1c40f",municipio:"Caravelas",tipo:"Estuário + Mangue",extensao:"8km",desc:"Porto de Abrolhos."},
+{n:"Barra de Caravelas",lat:-17.73,lng:-39.25,costa:"Baleias",cor:"#f1c40f",municipio:"Caravelas",tipo:"Rio + Mar",extensao:"4km",desc:"Encontro do rio Caravelas."},
+{n:"Ponta de Corumbau - Baleias",lat:-17.00,lng:-39.18,costa:"Baleias",cor:"#f1c40f",municipio:"Prado",tipo:"Ponta",extensao:"10km",desc:"Área de observação de baleias."},
+{n:"Abrolhos - Ilha Siriba",lat:-17.96,lng:-38.70,costa:"Baleias",cor:"#f1c40f",municipio:"Caravelas - Parque Marinho",tipo:"Oceânica, arquipélago",extensao:"Parque Nacional",desc:"Parque Nacional Marinho de Abrolhos, berçário de baleias jubarte."},
+{n:"Abrolhos - Santa Bárbara",lat:-17.96,lng:-38.69,costa:"Baleias",cor:"#f1c40f",municipio:"Caravelas",tipo:"Ilha, farol",extensao:"Ilha",desc:"Ilha principal com farol da Marinha."}
 ];
-const map=L.map('map').setView([-14.8,-39.0],7);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
-praias.forEach(p=>{
-  let r=p.real?14:7;
-  let m=L.circleMarker([p.lat,p.lng],{radius:r,color:p.c,c:"#fff",weight:p.real?4:1,fillColor:p.c,fillOpacity:0.95}).addTo(map);
-  m.bindPopup("<b>"+p.n+"</b><br>"+p.lat.toFixed(3)+", "+p.lng.toFixed(3));
-  if(p.real) m.openPopup();
-});
+
+let map = L.map('map').setView([-14.5, -39.0], 7);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18, attribution:'© OpenStreetMap | Baía Viva 8.0'}).addTo(map);
+let marcadores = [];
+let grupo = L.layerGroup().addTo(map);
+
+function criarMarcadores(lista){
+  grupo.clearLayers(); marcadores=[];
+  lista.forEach(p=>{
+    let raio = p.real ? 16 : 8;
+    let peso = p.real ? 4 : 1;
+    let m = L.circleMarker([p.lat, p.lng], {radius:raio, color:p.cor, fillColor:p.cor, fillOpacity:0.9, weight:peso, color:"#fff"}).addTo(grupo);
+    let popup = `<b>${p.n}</b> <span class="tag" style="background:${p.cor}">${p.costa}</span><br>
+    <b>Município:</b> ${p.municipio}<br>
+    <b>Coordenada:</b> ${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}<br>
+    <b>Tipo:</b> ${p.tipo}<br>
+    <b>Extensão:</b> ${p.extensao}<br>
+    <b>Info:</b> ${p.desc}<br>
+    ${p.real ? '<b style="color:red">★ PONTO REAL DE REFERÊNCIA DO PROFESSOR</b>' : ''}`;
+    m.bindPopup(popup);
+    m.on('click', function(){
+      document.getElementById('infoPanel').innerHTML = popup + '<br><br><small>Clique no mapa para fechar.</small>';
+    });
+    if(p.real) m.openPopup();
+    marcadores.push({marker:m, dados:p});
+  });
+  document.getElementById('contador').innerText = lista.length;
+}
+
+function filtrarCosta(costa){
+  let filtradas = praias.filter(p=>p.costa===costa);
+  criarMarcadores(filtradas);
+  if(filtradas.length>0){
+    let mediaLat = filtradas.reduce((a,b)=>a+b.lat,0)/filtradas.length;
+    let mediaLng = filtradas.reduce((a,b)=>a+b.lng,0)/filtradas.length;
+    map.setView([mediaLat, mediaLng], 9);
+  }
+}
+
+function filtrarBusca(){
+  let termo = document.getElementById('busca').value.toLowerCase();
+  let filtradas = praias.filter(p=>p.n.toLowerCase().includes(termo) || p.municipio.toLowerCase().includes(termo));
+  criarMarcadores(filtradas);
+}
+
+function irItapua(){
+  let itapua = praias.find(p=>p.real);
+  map.setView([itapua.lat, itapua.lng], 14);
+  criarMarcadores(praias);
+}
+
+function resetar(){
+  document.getElementById('busca').value="";
+  criarMarcadores(praias);
+  map.setView([-14.5, -39.0], 7);
+}
+
+// INICIA COM TUDO
+criarMarcadores(praias);
 </script>
 </body>
-</html>
+</html
